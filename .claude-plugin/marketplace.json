@@ -1,0 +1,14 @@
+{
+  "name": "gstack",
+  "description": "Local marketplace for the gstack plugin, built into dist/ by scripts/build.mjs",
+  "owner": {
+    "name": "gregogun"
+  },
+  "plugins": [
+    {
+      "name": "gstack",
+      "source": "./dist/claude-code",
+      "description": "gstack is a set of rigorous agent workflows, forked from pstack."
+    }
+  ]
+}

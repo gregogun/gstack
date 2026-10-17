@@ -132,23 +132,23 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 - Fix `go-agent`. It searches `~/.cursor/plugins/` for the mode skill and uses `is_background`, which is Cursor frontmatter.
 - Rewrite the transcript-reading skills (`recall`, `reflect`, `automate-me`, the `show-me-your-work` audit and `worktree-audit.sh`) against a transcripts token.
 
-**4d. Build and install.**
-- Create `harnesses/claude-code/` with the token values, the plugin manifest and agent frontmatter.
-- Write the build script and the checks described in Approach.
-- The plugin is named `gstack`. Don't commit `dist/` for now (add it to `.gitignore`). Install from the local path.
-- Add a local `marketplace.json`, install with `/plugin marketplace add`, and uninstall `pstack@cursor-plugins`.
-- Check whether `/go-mode` works without the `gstack:` prefix.
+**4d. Build and install.** Build done, install not yet.
+- Done: `harnesses/claude-code/` holds `tokens.md`, `plugin.json`, `harness.json` (manifest target, extra root files, Cursor deny list) and agent frontmatter overlays (`go-agent`: `background: true`, `color`; `comment-sicko`: `color`). Model and effort stay unset for step 5.
+- Done: `scripts/build.mjs [harness...]` renders `dist/<harness>/` and fails with `file:line` on unknown or unrendered tokens, tokens in non-Markdown files, deny-listed Cursor names under `skills/` and `agents/`, and overlays without an agent. It warns on unused tokens. `dist/` is in `.gitignore`.
+- Done: `.claude-plugin/marketplace.json` at the repo root, marketplace `gstack`, plugin `gstack` from `./dist/claude-code`. `claude plugin validate` passes on both.
+- Remaining: build, then `claude plugin marketplace add <repo path>` and `claude plugin install gstack@gstack` (see `harnesses/claude-code/README.md`). Uninstall `pstack@cursor-plugins`.
+- Remaining: check whether `/go-mode` works without the `gstack:` prefix. The docs say a plugin skill with a frontmatter `name` also answers to the bare name while no other command uses it.
 
 Token values (claude-code). The build renders these in every Markdown file under `skills/` and `agents/`, references and playbooks included. It does not render scripts, so `worktree-audit.sh` takes its transcripts directory from `-t` or `GSTACK_TRANSCRIPTS_DIR`. Confidence is in brackets.
 
-- `{{install}}` (go-help install step): add the local marketplace with `/plugin marketplace add <path>`, then `/plugin install gstack@<marketplace>`. Fill in the real path and marketplace name once 4d sets them. [medium]
+- `{{install}}` (go-help install step): build with `node scripts/build.mjs claude-code`, then `/plugin marketplace add <path-to-gstack>` and `/plugin install gstack@gstack`. [high]
 - `{{loop_command}}`: the `/loop` skill. Used inline, as in "{{loop_command}} until done", so render it as `` `/loop` ``. [high]
 - `{{skill_authoring}}`: `skill-creator`. Used as "the {{skill_authoring}} skill" and "{{skill_authoring}}'s writing guidelines". Claude Code doesn't ship it built in. Here it is installed as a user skill (`~/.claude/skills/skill-creator`) and through the `anthropic-skills` plugin. `writing-for-agents` covers the prose rules if `skill-creator`'s are too thin. [medium]
 - `{{remote_isolation}}` (swarm, opt-in remote workers): the Agent tool's `isolation: "remote"`, where the account has it. [medium]
 - `{{models_config}}`: `~/.claude/gstack-models.md`, the user override file from step 5. Used as a noun, as in "its entry in {{models_config}}", so render it as `` `~/.claude/gstack-models.md` ``. Step 5 may change the path. [medium]
 - `{{project_skills_dir}}`: `.claude/skills`, no trailing slash. Used as `{{project_skills_dir}}/verify-<app>/`. [high]
 - `{{user_skills_dir}}`: `~/.claude/skills`, no trailing slash. [high]
-- `{{plugin_root}}` (go-agent, path to `skills/go-mode/SKILL.md` when the parent gave none): `${CLAUDE_PLUGIN_ROOT}`. Anthropic's `claude-security` plugin uses it in an agent body, so Claude Code likely expands it there. Check in step 6. If it isn't expanded, use "the gstack plugin under `~/.claude/plugins/cache/`". [medium]
+- `{{plugin_root}}` (go-agent, path to `skills/go-mode/SKILL.md` when the parent gave none): `${CLAUDE_PLUGIN_ROOT}`. The plugins manifest reference says Claude Code substitutes `${...}` variables anywhere in skill, command and agent Markdown bodies. Confirm in step 6. [high]
 - `{{transcripts_dir}}`: `~/.claude/projects/<slug>`, no trailing slash. Used in prose and in `ls` globs such as `{{transcripts_dir}}/*.jsonl`. [high, checked against this repo's transcripts]
 - `{{transcript_format}}` (a sentence or two that follows the dir): "`<slug>` is the workspace's absolute path with each `/` and `.` changed to `-`, so `/Users/you/proj` becomes `-Users-you-proj`. Each session is one `<session-id>.jsonl` file directly in that directory, and the newest is the current session. Subagent transcripts are in `<session-id>/subagents/agent-<id>.jsonl`. Each line is a JSON object with `type`, `timestamp`, `cwd`, `gitBranch` and `sessionId`. User and assistant turns have `type` `user` or `assistant` and their text in `message.content`, a string or a list of text, tool-use and tool-result blocks. Skip the other types." [high, checked against this repo's transcripts]
 
