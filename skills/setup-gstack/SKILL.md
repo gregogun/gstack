@@ -1,70 +1,21 @@
 ---
 name: setup-gstack
-description: Configure which models gstack uses per role and at what reasoning budget. Detects your available models and writes the gstack model config that the skills read. Use for /setup-gstack, "configure gstack models", "gstack budget", or changing gstack's model choices.
+description: Configure which model and effort gstack uses for each model role. Shows the current table, asks which roles to change, and writes only the overrides to the gstack model config. Use for /setup-gstack, "configure gstack models", "gstack effort", resetting a role, or changing gstack's model choices.
 ---
 
 # Setup gstack
 
-Write {{models_config}}, the file that sets gstack's model per role.
+Manage {{models_config}}, the user's override file for gstack's model roles. The roles, the lookup rule and the file format are in [`model-roles.md`](../go-mode/references/model-roles.md). The shipped defaults are in `model-defaults.md` in the same folder. Its intro lists the model and effort values this harness accepts. Editing the override file by hand works too. This skill saves looking up role names.
 
 ## Steps
 
-### 1. Detect available models
+1. **Load.** Read `model-roles.md`, `model-defaults.md` and, if it exists, {{models_config}}. Build the effective table: the defaults, with every role that has override rows taking those rows instead. Note any override row whose role is not in `model-roles.md`, or whose model or effort is not an accepted value.
+2. **Show.** Print the effective table with columns Role, Model, Effort and Source (`default` or `override`). A list role shows one row per entry. Below it, list any rows noted in step 1 and say they will be dropped.
+3. **Ask.** Ask which roles to change or reset, preferring the harness's structured question tool, if it has one, over free text. Offer "keep as is" too. For each chosen role, ask for:
+   - a model and an effort from the accepted values, or `inherit-parent` (runs on the parent's model and effort, so no effort is asked);
+   - for a list role, the full list of entries, one per subagent, so the count is the list length;
+   - or reset, which drops the role's override rows.
+4. **Write.** Write {{models_config}} with a one-line header saying what the file is, then a Role, Model, Effort table holding only the roles whose rows differ from the defaults, in `model-roles.md` order. Drop reset roles, roles set back to their defaults, and the rows step 2 flagged. If no override remains, delete the file. Overwrite the whole file, so a rerun stays idempotent.
+5. **Confirm.** Show the new effective table. Say that skills read the file at each spawn, so the change applies to the next subagent with no rebuild or restart.
 
-Enumerate the model slugs you can pass to a subagent in this session. That is the dependable source. If the harness also exposes a models API or CLI that lists the user's entitled models, prefer it for completeness. If you cannot detect any, ask the user to paste the slugs they have access to. Never write a real slug you have not confirmed is available. The aliases `inherit-parent` and `auto` are always valid even though they are not detected slugs.
-
-### 2. Load current state
-
-The default role-to-model mapping is the config shape shown in step 5 below. If {{models_config}} already exists, read it and treat its `# budget` line and its role values as the current choices. Otherwise start from those defaults. A line whose role is not in step 5, such as `how critics`, is from a retired role. Drop it.
-
-### 3. Budget, map, and confirm
-
-**(a) Ask for a budget.** Prefer the harness's structured question tool, if it has one, over free text. Offer these four options with these exact labels, and name the current budget when the config records one. With no config, say that `large` matches the skill defaults.
-
-- `unlimited — max reasoning`
-- `large — xhigh reasoning`
-- `medium — high reasoning`
-- `small — medium reasoning`
-
-**(b) Apply it.** Build the working table from the skill defaults, and on a re-run keep any role you changed by family, list, or alias (`inherit-parent`, `auto`). `unlimited`, `large`, `medium`, and `small` set the effort token of every real slug, panel entries included, to `max`, `xhigh`, `high`, or `medium`. The effort token is the last token, or the one before a trailing `fast`, on the ladder `max` > `xhigh` > `high` > `medium` > `low`. If the result is not a detected slug, use the same family's detected slug with the highest effort at or below the target, else mark the role as needing a choice. `inherit-parent` and `auto` do not change. So `unlimited` turns `claude-opus-5-5-xhigh` into `claude-opus-5-5-max`. Grok slugs top out at `xhigh`, so under `unlimited` the fallback puts Grok at `xhigh` and keeps `grok-4.7-xhigh-fast` as it is. `large` keeps both defaults. `small` turns them into `claude-opus-5-5-medium` and `grok-4.7-medium-fast`.
-
-**(c) Show the roles and confirm.** Show every role with its model, marking any real slug not in the detected set as needing a choice. Also list each line step 2 dropped. Ask whether to accept as-is or change specific roles, offering the detected models plus `inherit-parent` and `auto` (both mean: this role runs on the parent chat model, which is how Auto users stay on Auto) as the options. Prefer the harness's structured question tool, if it has one, over free text. For panel roles (arena runners, architect runners, interrogate reviewers) the value is a list, and one subagent runs per entry, alias entries included, so the list length sets the count. `arena cross-judge pool` is also a list, but Arena selects one value from it whose model family differs from the parent's when possible. `swarm workers` is the default model for every worker unless a race or comparison assigns another model per arm.
-
-### 4. Validate
-
-Every real slug written must be in the detected set. `inherit-parent` and `auto` always pass. If a chosen real slug is not available, stop and ask again.
-
-### 5. Write the config
-
-Write {{models_config}} with a `# budget` line with the chosen label and its target effort, and one line per role, using the same labels go-mode uses. Overwrite the whole file so re-runs stay idempotent. Shape:
-
-```
-# gstack model configuration. One line per role. Delete a line to fall back to the skill default.
-# `inherit-parent` or `auto` as a value: the role runs on the parent chat model (leave the subagent's model unset). Alias entries in a panel list still count toward its fan-out.
-# budget: large (xhigh)
-feature, refactoring: grok-4.7-xhigh-fast
-bug-fix: grok-4.7-xhigh-fast
-perf-issue: grok-4.7-xhigh-fast
-hillclimb: grok-4.7-xhigh-fast
-judgment and prose: claude-opus-5-5-xhigh
-hardest tasks: claude-opus-5-5-xhigh
-how explorer: grok-4.7-xhigh-fast
-how explainer: claude-opus-5-5-xhigh
-why investigators: grok-4.7-xhigh-fast
-why synthesizer: claude-opus-5-5-xhigh
-reflect tooling: grok-4.7-xhigh-fast
-reflect judgment, divergent, synthesizer: claude-opus-5-5-xhigh
-arena runners: claude-opus-5-5-xhigh, grok-4.7-xhigh-fast
-arena cross-judge pool: claude-opus-5-5-xhigh, grok-4.7-xhigh-fast
-swarm workers: grok-4.7-xhigh-fast
-architect runners: claude-opus-5-5-xhigh, grok-4.7-xhigh-fast
-interrogate reviewers: claude-opus-5-5-xhigh, grok-4.7-xhigh-fast
-```
-
-### 6. Confirm
-
-Tell the user the config was written and that it applies to new sessions. Re-running this skill updates it.
-
-### 7. Offer a verification skill (optional)
-
-Check whether the project has a way to drive the real app for proof (a `verify-*` skill, or an existing harness). If not, offer once: "want a project-local verification skill, so agents can drive the app the way a user does and prove changes work? I can generate one with /create-verification-skill." On yes, invoke `/create-verification-skill` (resolves wherever gstack is installed: workspace, user, or plugin). On no, move on without pushing.
+If the project has no way to drive the real app for proof (a `verify-*` skill or another harness), offer `/create-verification-skill` once. On no, move on.
