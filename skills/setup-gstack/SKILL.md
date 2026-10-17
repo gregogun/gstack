@@ -15,11 +15,11 @@ Enumerate the model slugs you can pass to a subagent in this session. That is th
 
 ### 2. Load current state
 
-The default role-to-model mapping is the rule shape shown in step 5 below. If {{models_config}} already exists, read it and treat its `# budget` line and its role values as the current choices. Otherwise start from those defaults. A line whose role is not in step 5, such as `how critics`, is from a retired role. Drop it.
+The default role-to-model mapping is the config shape shown in step 5 below. If {{models_config}} already exists, read it and treat its `# budget` line and its role values as the current choices. Otherwise start from those defaults. A line whose role is not in step 5, such as `how critics`, is from a retired role. Drop it.
 
 ### 3. Budget, map, and confirm
 
-**(a) Ask for a budget.** Prefer the harness's structured question tool, if it has one, over free text. Offer these four options with these exact labels, and name the current budget when the rule records one. With no rule, say that `large` matches the skill defaults.
+**(a) Ask for a budget.** Prefer the harness's structured question tool, if it has one, over free text. Offer these four options with these exact labels, and name the current budget when the config records one. With no config, say that `large` matches the skill defaults.
 
 - `unlimited — max reasoning`
 - `large — xhigh reasoning`
@@ -34,7 +34,7 @@ The default role-to-model mapping is the rule shape shown in step 5 below. If {{
 
 Every real slug written must be in the detected set. `inherit-parent` and `auto` always pass. If a chosen real slug is not available, stop and ask again.
 
-### 5. Write the rule
+### 5. Write the config
 
 Write {{models_config}} with a `# budget` line with the chosen label and its target effort, and one line per role, using the same labels go-mode uses. Overwrite the whole file so re-runs stay idempotent. Shape:
 

@@ -27,7 +27,7 @@ Check the state that changes the answer, and mention it only when it does:
 - No {{models_config}} means `/setup-gstack` hasn't run for this user, so every role uses the model that best fits its description.
 - No `verify-*` skill or other app harness in the project means agents have no scripted way to drive the app. Mention `/create-verification-skill` when the question is about proving a change works.
 
-When the model rule is missing and it matters, ask whether the user wants to pick a model for each role and a reasoning budget now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per chat. If the need is also unclear, ask both questions together. Offer two choices:
+When the model config is missing and it matters, ask whether the user wants to pick a model for each role and a reasoning budget now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per chat. If the need is also unclear, ask both questions together. Offer two choices:
 
 - Now: give them `/setup-gstack` to type, and answer their question too.
 - Later: answer their question, and add one line saying every role keeps its default model until they run `/setup-gstack`.
@@ -35,7 +35,7 @@ When the model rule is missing and it matters, ask whether the user wants to pic
 ## Get set up
 
 1. Install gstack: {{install}}
-2. Run [`/setup-gstack`](../setup-gstack/SKILL.md). It asks for a reasoning budget, maps a model to each role, and writes a rule. The rule applies to new chats.
+2. Run [`/setup-gstack`](../setup-gstack/SKILL.md). It asks for a reasoning budget, maps a model to each role, and writes the model config. The config applies to new chats.
 3. Start a real task with `/go-mode`, a goal, and a check that can pass or fail.
 
 Installing changes nothing until the user invokes a skill. Only `/setup-gstack` loads from the user's words. The [README](../../README.md) has the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
@@ -123,7 +123,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 |---|---|
 | The mode stopped applying after a few turns | `/go-mode` applies to the message it was typed with. Start each task with `/go-mode`. |
 | A question got treated as the next step of the last task | Say "new task", or say the turn doesn't need the mode. |
-| A new model choice had no effect | The rule from `/setup-gstack` applies to new chats. Start one. |
+| A new model choice had no effect | The model config from `/setup-gstack` applies to new chats. Start one. |
 | Runs cost more than expected | See the cost paragraph under Get set up. |
 | A skill didn't load on its own | Only `/setup-gstack` loads from the user's words. The others load when the user types them or when `/go-mode` runs them, and it doesn't run every skill. |
 | Parallel agents overwrote each other | Give each agent its own worktree. |
