@@ -133,7 +133,7 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 - Rewrite the transcript-reading skills (`recall`, `reflect`, `automate-me`, the `show-me-your-work` audit and `worktree-audit.sh`) against a transcripts token.
 
 **4d. Build and install.** Build done, install not yet.
-- Done: `harnesses/claude-code/` holds `tokens.md`, `plugin.json`, `harness.json` (manifest target, extra root files, Cursor deny list) and agent frontmatter overlays (`go-agent`: `background: true`, `color`; `comment-sicko`: `color`). Model and effort stay unset for step 5.
+- Done: `harnesses/claude-code/` holds `tokens.md`, `plugin.json`, `harness.json` (manifest target, extra root files, Cursor deny list) and agent frontmatter overlays (`go-agent`: `background: true`, `color`; `comment-sicko`: `color`). Overlays never set model or effort; the spawning skill sets both per role (step 5).
 - Done: `scripts/build.mjs [harness...]` renders `dist/<harness>/` and fails with `file:line` on unknown or unrendered tokens, tokens in non-Markdown files, deny-listed Cursor names under `skills/` and `agents/`, and overlays without an agent. It warns on unused tokens. `dist/` is in `.gitignore`.
 - Done: `.claude-plugin/marketplace.json` at the repo root, marketplace `gstack`, plugin `gstack` from `./dist/claude-code`. `claude plugin validate` passes on both.
 - Remaining: build, then `claude plugin marketplace add <repo path>` and `claude plugin install gstack@gstack` (see `harnesses/claude-code/README.md`). Uninstall `pstack@cursor-plugins`.
@@ -145,7 +145,7 @@ Token values (claude-code). The build renders these in every Markdown file under
 - `{{loop_command}}`: the `/loop` skill. Used inline, as in "{{loop_command}} until done", so render it as `` `/loop` ``. [high]
 - `{{skill_authoring}}`: `skill-creator`. Used as "the {{skill_authoring}} skill" and "{{skill_authoring}}'s writing guidelines". Claude Code doesn't ship it built in. Here it is installed as a user skill (`~/.claude/skills/skill-creator`) and through the `anthropic-skills` plugin. `writing-for-agents` covers the prose rules if `skill-creator`'s are too thin. [medium]
 - `{{remote_isolation}}` (swarm, opt-in remote workers): the Agent tool's `isolation: "remote"`, where the account has it. [medium]
-- `{{models_config}}`: `~/.claude/gstack-models.md`, the user override file from step 5. Used as a noun, as in "its entry in {{models_config}}", so render it as `` `~/.claude/gstack-models.md` ``. Step 5 may change the path. [medium]
+- `{{models_config}}`: `~/.claude/gstack-models.md`, the user override file from step 5. Used as a noun, as in "look up the role in {{models_config}}", so render it as `` `~/.claude/gstack-models.md` ``. [high]
 - `{{project_skills_dir}}`: `.claude/skills`, no trailing slash. Used as `{{project_skills_dir}}/verify-<app>/`. [high]
 - `{{user_skills_dir}}`: `~/.claude/skills`, no trailing slash. [high]
 - `{{plugin_root}}` (go-agent, path to `skills/go-mode/SKILL.md` when the parent gave none): `${CLAUDE_PLUGIN_ROOT}`. The plugins manifest reference says Claude Code substitutes `${...}` variables anywhere in skill, command and agent Markdown bodies. Confirm in step 6. [high]
@@ -156,48 +156,26 @@ Agent names: skills say "spawn a `go-agent` subagent" or "a `comment-sicko` suba
 
 ### 5. Model and effort config
 
-- Start by agreeing on the default model and effort for each role in Claude Code. This is a short discussion before any edits.
-- Define roles in neutral terms (code, hardest tasks, judgment and prose, explorer, reviewer panels and so on), keeping upstream's role list as the starting point.
-- Each harness defines its default model and effort per role. For Claude Code, that's `model` (opus, sonnet, haiku, fable) and `effort`.
-- Keep a user override file outside the plugin, such as `~/.claude/gstack-models.md`, so changing a model doesn't need a reinstall. Its path is a harness token.
-- Rewrite `setup-pstack` to edit that file, or drop it if editing by hand is enough.
+Done.
 
-Model roles used by the source after 4c. Skills read each one from `{{models_config}}`. When a role has no entry, the skill uses the available model that best fits the description below. `inherit-parent` means the parent model. Step 5 sets the real defaults.
+- `skills/go-mode/references/model-roles.md` (neutral, shipped) lists the 17 roles, marks list roles, and holds the one rule every skill links to: look the role up in `{{models_config}}`, else the shipped defaults; pass both model and effort; `inherit-parent` leaves both unset; a rejected spawn falls back to the parent, said aloud. A spawn that names no role takes `swarm workers` or `judgment and prose` by job. The per-skill copies of the rule, the reasoning budget and the fast or standard speed choice are gone, and effort is no longer adjusted per spawn.
+- `harnesses/<name>/models.md` holds each harness's defaults as a Role, Model, Effort table, one row per entry for list roles. The build ships it as `skills/go-mode/references/model-defaults.md` and fails if it is missing, misses or adds a role, gives a single-entry role several rows, or uses a model or effort outside `harness.json`'s `models` and `efforts`.
+- The override file has the same shape with only the changed roles. Any row for a role replaces all its default rows. It lives outside the plugin, and skills read it at each spawn, so no rebuild or reinstall. Documented in `harnesses/claude-code/README.md`.
+- `setup-gstack` shows the effective table, asks which roles to change or reset, and writes only the overrides. Cursor slugs, effort-in-slug, `auto` and the budget are gone.
 
-| Role | Used by | Description in the skills |
-| --- | --- | --- |
-| `feature, refactoring` | feature and refactoring playbooks | a fast code model |
-| `bug-fix` | bug-fix playbook | a fast code model |
-| `perf-issue` | perf-issue playbook | a fast code model |
-| `hillclimb` | hillclimb playbook | a fast code model |
-| `hardest tasks` | go-mode code delegates for the hardest changes | the strongest reasoning model |
-| `judgment and prose` | go-mode prose and judgment delegates | the strongest reasoning model |
-| `how explorer` | how | a fast code model |
-| `how explainer` | how | the strongest reasoning model |
-| `why investigators` | why | a fast code model |
-| `why synthesizer` | why | the strongest reasoning model |
-| `reflect tooling` | reflect | a fast code model, from a different family than the judgment role where possible |
-| `reflect judgment, divergent, synthesizer` | reflect | the strongest reasoning model |
-| `arena runners` (list) | arena | the strongest reasoning model plus a second, different model for diversity |
-| `arena cross-judge pool` (list) | arena | the same two, preferring a family other than the parent's |
-| `architect runners` (list) | architect, via arena | the strongest reasoning model plus a second, different model for diversity |
-| `interrogate reviewers` (list) | interrogate | Reviewer A: the strongest reasoning model. Reviewer B: a second, different model for diversity |
-| `swarm workers` | swarm, and go-mode verification | a fast code model |
+Claude Code defaults, agreed with the user by role description:
 
-Agreed Claude Code defaults, by description:
-
-| Description | Model | Effort |
-| --- | --- | --- |
-| a fast code model | opus | medium (to start; revisit) |
-| the strongest reasoning model | opus | high |
-| a second, different model for diversity | sonnet | high |
-
-`setup-gstack` still has Cursor-shaped slugs (Grok and Opus defaults, effort tokens inside slugs, the `auto` alias). Its paths and tool names are neutral. Rewrite the rest here.
+| Description | Roles | Model | Effort |
+| --- | --- | --- | --- |
+| a fast code model | `feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`, `how explorer`, `why investigators`, `reflect tooling`, `swarm workers` | opus | medium (to start; revisit) |
+| the strongest reasoning model | `hardest tasks`, `judgment and prose`, `how explainer`, `why synthesizer`, `reflect judgment, divergent, synthesizer`, and entry 1 of each list role | opus | high |
+| a second, different model for diversity | entry 2 of `arena runners`, `arena cross-judge pool`, `architect runners` and `interrogate reviewers` | sonnet | high |
 
 ### 6. Verify
 
 - Build and install the plugin, then start a fresh Claude Code session.
-- Run `go-mode` on a small real task. Check that it picks a playbook, that subagents get the configured model and effort, and that no skill hits a missing Cursor name.
+- Run `go-mode` on a small real task. Check that it picks a playbook, that subagents get the model and effort from `model-defaults.md` (and from `~/.claude/gstack-models.md` once `/setup-gstack` has written an override), and that no skill hits a missing Cursor name.
+- Run `/setup-gstack`, override one role, and check that the next spawn of that role uses it without a restart.
 - Run `interrogate` on a diff, and `how` on a question, to cover the panel and read-only subagent paths.
 
 ### 7. Merge overlapping skills (separate task)
@@ -206,4 +184,4 @@ Not part of the port. Some pstack skills overlap with skills we already have: `t
 
 ## Open decisions
 
-- Default model and effort per role. Settled at the start of step 5.
+- None. Default model and effort per role were settled in step 5.
