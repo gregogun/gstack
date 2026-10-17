@@ -6,7 +6,7 @@ Every subagent gstack spawns runs under a model role. This file lists the roles 
 
 1. **Find the role.** The skill or playbook names it. A spawn that names no role takes the role whose description fits its job: `swarm workers` for searching, reading, parsing and mechanical edits, `judgment and prose` for judgment, review and writing. When a skill asks for a model other than the one that did the work, pick an entry of `arena cross-judge pool` that differs from it.
 2. **Look up the role in {{models_config}}.** If that file is missing or has no rows for the role, use the role's rows in `model-defaults.md`, next to this file. Those are the defaults shipped for this harness. If `model-defaults.md` is missing too, use the available model that best fits the role's description, leave the effort unset, and say which.
-3. **Pass both the model and the effort on the spawn.** Don't change them to suit the job. Difficulty is handled by the role you pick (the hardest changes go to `hardest tasks`), and keeping the configured model keeps a diverse panel diverse.
+3. **Pass both the model and the effort on the spawn.** Keep the configured model, so a diverse panel stays diverse. Inside a go-mode run, the effort can move a step or more to suit the job (see go-mode's "Match the effort to the job"). Elsewhere, pass it as configured.
 4. **`inherit-parent` means leave both unset,** so the subagent runs on the parent's model and effort. It is a valid choice, never a rejected model.
 5. **If a spawn rejects a model or effort,** spawn it again with both unset, so it runs on the parent, and say so. Don't block the work on it.
 
