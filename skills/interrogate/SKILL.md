@@ -24,18 +24,16 @@ Before spawning reviewers, state the intent in one clear paragraph from the user
 
 ## Step 3, Spawn Reviewers
 
-Spawn all reviewers in a single message, one per entry in the `interrogate reviewers` model role in {{models_config}}, labeled Reviewer A, B, and so on to match the entry count. With no entry for the role, use the available models that best fit the table and say which.
+Spawn all reviewers in a single message, one per entry in the `interrogate reviewers` model role, labeled Reviewer A, B, and so on to match the entry count. Set each reviewer's model and effort from its entry, per [`model-roles.md`](../go-mode/references/model-roles.md).
 
 | Subagent | Role description |
 |----------|------------------|
 | Reviewer A | the strongest reasoning model |
 | Reviewer B | a second, different model for diversity, from another family where possible |
 
-Each reviewer is a read-only general-purpose subagent, with its model set to its configured entry. Leave the model unset for an `inherit-parent` entry, so that reviewer runs on the parent model.
+Each reviewer is a read-only general-purpose subagent. If the spawn rejects an entry, run that reviewer on the parent model and say so. Do not block the review on the model issue.
 
-If the spawn rejects a configured entry, run that reviewer on the parent model and say so. Do not block the review on the model issue. Never treat an `inherit-parent` entry as a rejected model.
-
-Read `references/reviewer-prompt.md` and fill in the same template for every reviewer with the stated intent, the diff or file contents, the rubric from `references/rubric.md`, and the code-quality lens from `references/code-quality-review.md`. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+Read `references/reviewer-prompt.md` and fill in the same template for every reviewer with the stated intent, the diff or file contents, the rubric from `references/rubric.md`, and the code-quality lens from `references/code-quality-review.md`.
 
 ## Step 4, Synthesize
 

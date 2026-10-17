@@ -19,12 +19,12 @@ Open a todolist with one entry per phase before launching anything.
 
 1. State the done predicate and the artifact or report the swarm must return.
 2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
-4. Pick the worker model from the `swarm workers` model role in {{models_config}} (a fast code model). With no entry for the role, use the available model that best fits the role's description and say which. Leave the model unset for an `inherit-parent` entry, so the workers run on the parent model. If the spawn rejects a model, use the parent model and say so. For a model race, name each arm's model up front. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+4. Workers use the `swarm workers` model role (a fast code model). Set their model and effort from it, per [`model-roles.md`](../go-mode/references/model-roles.md). For a model race, name each arm's model and effort up front.
 5. Give each worker its own writable output when it writes. When workers verify or measure commits, each brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
 
 ## Phase B: Fan out
 
-Spawn all N workers in one message as local background general-purpose subagents with the step 4 model, left unset for `inherit-parent`. Give each worker that writes its own git worktree. Read-only workers can share the checkout. Local workers share one machine, so a timing race contends for CPU. Run its arms on a quiet machine, or fewer at once. When the user opts in to remote workers, spawn them with {{remote_isolation}} instead.
+Spawn all N workers in one message as local background general-purpose subagents with the step 4 model and effort. Give each worker that writes its own git worktree. Read-only workers can share the checkout. Local workers share one machine, so a timing race contends for CPU. Run its arms on a quiet machine, or fewer at once. When the user opts in to remote workers, spawn them with {{remote_isolation}} instead.
 
 When a worker must start from a non-default branch, give it a worktree off that branch.
 

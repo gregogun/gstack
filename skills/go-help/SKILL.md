@@ -24,10 +24,10 @@ Infer the need from the message and the conversation. A named situation, such as
 
 Check the state that changes the answer, and mention it only when it does:
 
-- No {{models_config}} means `/setup-gstack` hasn't run for this user, so every role uses the model that best fits its description.
+- No {{models_config}} means the user hasn't overridden any role, so every role runs on the model and effort gstack ships as its default ([`model-roles.md`](../go-mode/references/model-roles.md)).
 - No `verify-*` skill or other app harness in the project means agents have no scripted way to drive the app. Mention `/create-verification-skill` when the question is about proving a change works.
 
-When the model config is missing and it matters, ask whether the user wants to pick a model for each role and a reasoning budget now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per chat. If the need is also unclear, ask both questions together. Offer two choices:
+When the model config is missing and it matters, ask whether the user wants to review the model and effort for each role now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per chat. If the need is also unclear, ask both questions together. Offer two choices:
 
 - Now: give them `/setup-gstack` to type, and answer their question too.
 - Later: answer their question, and add one line saying every role keeps its default model until they run `/setup-gstack`.
@@ -35,12 +35,12 @@ When the model config is missing and it matters, ask whether the user wants to p
 ## Get set up
 
 1. Install gstack: {{install}}
-2. Run [`/setup-gstack`](../setup-gstack/SKILL.md). It asks for a reasoning budget, maps a model to each role, and writes the model config. The config applies to new chats.
+2. Run [`/setup-gstack`](../setup-gstack/SKILL.md). It shows the model and effort each role runs on, and writes the roles the user changes to the override file. A change applies at the next spawn.
 3. Start a real task with `/go-mode`, a goal, and a check that can pass or fail.
 
 Installing changes nothing until the user invokes a skill. Only `/setup-gstack` loads from the user's words. The [README](../../README.md) has the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
 
-If cost is the worry, say where the tokens go and how to spend fewer. gstack spends extra tokens on subagents and review panels. Rerun `/setup-gstack` and pick a smaller budget or cheaper models. A role set to `auto` or `inherit-parent` runs on the chat's model, which saves tokens when the chat runs on Auto or a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/go-mode` for work that needs rigor.
+If cost is the worry, say where the tokens go and how to spend fewer. gstack spends extra tokens on subagents and review panels. Rerun `/setup-gstack` and pick lower efforts or cheaper models. A role set to `inherit-parent` runs on the chat's model and effort, which saves tokens when the chat runs on a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/go-mode` for work that needs rigor.
 
 ## Start a task with `/go-mode`
 
@@ -81,7 +81,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Vet a performance number before reporting or acting on it | [`/benchmark-checklist`](../benchmark-checklist/SKILL.md) |
 | Run a large or cross-cutting change, or one to review after stepping away | [`/figure-it-out`](../figure-it-out/SKILL.md) |
 | Keep a decision log during a run, and review it afterward | [`/show-me-your-work`](../show-me-your-work/SKILL.md) |
-| Pick a model for each role and a reasoning budget | [`/setup-gstack`](../setup-gstack/SKILL.md) |
+| Pick a model and effort for each role | [`/setup-gstack`](../setup-gstack/SKILL.md) |
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
@@ -123,7 +123,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 |---|---|
 | The mode stopped applying after a few turns | `/go-mode` applies to the message it was typed with. Start each task with `/go-mode`. |
 | A question got treated as the next step of the last task | Say "new task", or say the turn doesn't need the mode. |
-| A new model choice had no effect | The model config from `/setup-gstack` applies to new chats. Start one. |
+| A new model choice had no effect | Skills read {{models_config}} at each spawn, so a change applies to the next one. Check that the role name matches a role in [`model-roles.md`](../go-mode/references/model-roles.md) exactly, and that the row has Role, Model and Effort cells. |
 | Runs cost more than expected | See the cost paragraph under Get set up. |
 | A skill didn't load on its own | Only `/setup-gstack` loads from the user's words. The others load when the user types them or when `/go-mode` runs them, and it doesn't run every skill. |
 | Parallel agents overwrote each other | Give each agent its own worktree. |

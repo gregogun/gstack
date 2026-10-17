@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Investigate the motivation and intent behind code. The companion `how` skill answers what the code does and how it works. `why` answers what forces led to its shape.
 
-Each spawn below names a model role. Set the model from that role's entry in {{models_config}}. With no entry for the role, use the available model that best fits the role's description and say which. Leave the model unset for an `inherit-parent` entry, so the subagent runs on the parent model. If the spawn rejects a model, use the parent model and say so. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+Each spawn below names a model role. Set each spawn's model and effort from its role, per [`model-roles.md`](../go-mode/references/model-roles.md).
 
 Every spawn is a general-purpose subagent that is not read-only. **Do not use a read-only subagent.** It may lose MCP access, which disables the MCP-backed investigators and the synthesizer's citation spot-checks. Investigators still shouldn't write anything.
 

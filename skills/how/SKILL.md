@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-Every spawn is a read-only general-purpose subagent. Explorers use the `how explorer` model role (a fast code model), and every explainer uses the `how explainer` role (the strongest reasoning model). Set the model from that role's entry in {{models_config}}. With no entry for the role, use the available model that best fits the role's description and say which. Leave the model unset for an `inherit-parent` entry, so the subagent runs on the parent model. If the spawn rejects a model, use the parent model and say so. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+Every spawn is a read-only general-purpose subagent. Explorers use the `how explorer` model role (a fast code model), and every explainer uses the `how explainer` role (the strongest reasoning model). Set each spawn's model and effort from its role, per [`model-roles.md`](../go-mode/references/model-roles.md).
 
 ## 1. Assess complexity
 

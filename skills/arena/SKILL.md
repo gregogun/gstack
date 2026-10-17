@@ -14,7 +14,7 @@ Every candidate gets the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate is producing.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
-3. Pick the runners. Use the entries in the `arena runners` model role in {{models_config}}. With no entry for the role, run one on the strongest reasoning model and one on a second, different model for diversity, from another family where possible, and say which. An `inherit-parent` entry in this role or the cross-judge role means the parent model, so leave the model unset for it. If the spawn rejects a configured entry, run that seat on the parent model and say so. Spawn more runners when the arena covers multiple design directions. Use the same model N times when the work is generation-bound rather than judgment-sensitive. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+3. Pick the runners: one per entry of the `arena runners` model role (the strongest reasoning model, and a second, different model for diversity), each with its entry's model and effort, per [`model-roles.md`](../go-mode/references/model-roles.md). If a spawn rejects an entry, run that seat on the parent model and say so. Spawn more runners when the arena covers multiple design directions. Use the same entry N times when the work is generation-bound rather than judgment-sensitive.
 4. Give each candidate its own output location (a git worktree where possible, otherwise `/tmp/arena-<slug>/candidate-<n>/`), per the **separate-before-serializing-shared-state** principle skill.
 
 ## Phase B: Fan out
@@ -25,7 +25,7 @@ If a candidate produces no output, proceed with N-1 and note the dropout.
 
 ## Phase C: Cross-judge
 
-After all Phase B candidates complete, choose one model from the `arena cross-judge pool` model role in {{models_config}}. With no entry for the role, choose between the strongest reasoning model and a second, different model for diversity. Prefer a different model family from the parent's. Spawn one read-only judge subagent on that model. It sees the rubric and the candidates by path label, scores each criterion, and recommends a base with rationale. It runs in parallel with your reading in Phase D. Don't spawn it while candidates are still writing.
+After all Phase B candidates complete, choose one entry from the `arena cross-judge pool` model role, per [`model-roles.md`](../go-mode/references/model-roles.md). Prefer a different model family from the parent's. Spawn one read-only judge subagent with that entry's model and effort. It sees the rubric and the candidates by path label, scores each criterion, and recommends a base with rationale. It runs in parallel with your reading in Phase D. Don't spawn it while candidates are still writing.
 
 ## Phase D: Pick a base
 

@@ -24,7 +24,7 @@ That covers the flat (`<id>.jsonl`), nested (`<id>/<id>.jsonl`), and subagent (`
 
 One message, three general-purpose subagents, not read-only. Reviewers need MCP access to look up the tickets, chat threads, and observability traces the transcript references, and a read-only subagent may lose MCP tools.
 
-Each reviewer and the synthesizer name a model role. Set the model from that role's entry in {{models_config}}. With no entry for the role, use the available model that best fits the role's description and say which. Leave the model unset for an `inherit-parent` entry, so the subagent runs on the parent model. If the spawn rejects a model, use the parent model and say so. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **go-mode** skill.
+Each reviewer and the synthesizer name a model role. Set each spawn's model and effort from its role, per [`model-roles.md`](../go-mode/references/model-roles.md).
 
 | Lens | Model role | Role description | Prompt template |
 |---|---|---|---|
