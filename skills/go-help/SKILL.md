@@ -46,7 +46,7 @@ If cost is the worry, say where the tokens go and how to spend fewer. gstack spe
 
 `/go-mode` matches the task to a playbook, copies the playbook's steps into the todo list, and runs the other skills as the steps need them. A step it skips stays in the list as `skip: <reason>`. A good prompt states the goal and how to tell it's done. It doesn't list skills, because a hand-written sequence tends to drop or reorder steps the playbook would keep. Read [`references/prompting.md`](references/prompting.md) before you help word one.
 
-`/go-mode` attaches the skill to one message, and it fades as the chat moves on, so start each task with `/go-mode`. Mid-chat, "new task" makes the mode match a fresh playbook. `/go-mode` already uses `go-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it with `subagent_type: "go-agent"`.
+`/go-mode` attaches the skill to one message, and it fades as the chat moves on, so start each task with `/go-mode`. Mid-chat, "new task" makes the mode match a fresh playbook. `/go-mode` already uses `go-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn a `go-agent` subagent.
 
 ## Pick a skill
 
