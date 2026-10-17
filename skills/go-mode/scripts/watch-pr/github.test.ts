@@ -226,69 +226,89 @@ describe("closed enum parsing", () => {
   });
 });
 
-it("annotates Bugbot threads with distinct review-pass counts", () => {
-  const response = {
+describe("review bot threads", () => {
+  const node = (
+    id: string,
+    author: { login: string; __typename?: string },
+    oid: string | null,
+    isResolved = false
+  ) => ({
+    id,
+    isResolved,
+    comments: {
+      nodes: [
+        {
+          body: "possible bug",
+          createdAt: "now",
+          path: "a.ts",
+          line: 1,
+          author,
+          originalCommit: oid === null ? null : { oid },
+        },
+      ],
+    },
+  });
+  const page = (nodes: readonly unknown[]) => ({
     data: {
       repository: {
         pullRequest: {
           reviewThreads: {
             pageInfo: { hasNextPage: false, endCursor: null },
-            nodes: [
-              {
-                id: "one",
-                isResolved: false,
-                comments: {
-                  nodes: [
-                    {
-                      body: "RUN_ID: run-1",
-                      createdAt: "now",
-                      path: "a.ts",
-                      line: 1,
-                      author: { login: "bugbot" },
-                    },
-                  ],
-                },
-              },
-              {
-                id: "two",
-                isResolved: false,
-                comments: {
-                  nodes: [
-                    {
-                      body: "CURSOR_AUTOMATION_ID: run-2 severity high",
-                      createdAt: "now",
-                      path: null,
-                      line: null,
-                      author: { login: "cursor" },
-                    },
-                  ],
-                },
-              },
-              {
-                id: "resolved",
-                isResolved: true,
-                comments: {
-                  nodes: [
-                    {
-                      body: "RUN_ID: run-3",
-                      createdAt: "now",
-                      path: null,
-                      line: null,
-                      author: { login: "bugbot" },
-                    },
-                  ],
-                },
-              },
-            ],
+            nodes,
           },
         },
       },
     },
-  };
-  const threads = buildReviewThreads(parseReviewThreadPage(response).threads);
-  expect(threads).toHaveLength(2);
-  expect(threads.map((thread) => thread.isBugbot)).toEqual([true, true]);
-  expect(threads.map((thread) => thread.bugbotReviewPasses)).toEqual([3, 3]);
+  });
+  const bot = { login: "some-bot", __typename: "Bot" };
+
+  it("annotates bot threads with distinct review-pass counts", () => {
+    const threads = buildReviewThreads(
+      parseReviewThreadPage(
+        page([
+          node("one", bot, "c1"),
+          node("two", bot, "c2"),
+          node("resolved", bot, "c3", true),
+        ])
+      ).threads
+    );
+    expect(threads).toHaveLength(2);
+    expect(threads.map((thread) => thread.isReviewBot)).toEqual([true, true]);
+    expect(threads.map((thread) => thread.reviewBotPasses)).toEqual([3, 3]);
+  });
+
+  it("counts a non-cursor bot such as coderabbitai[bot]", () => {
+    const threads = buildReviewThreads(
+      parseReviewThreadPage(
+        page([
+          node("rest", { login: "coderabbitai[bot]" }, "c1"),
+          node("graphql", { login: "coderabbitai", __typename: "Bot" }, "c1"),
+        ])
+      ).threads
+    );
+    expect(threads.map((thread) => thread.isReviewBot)).toEqual([true, true]);
+    expect(threads.map((thread) => thread.reviewBotPasses)).toEqual([1, 1]);
+  });
+
+  it("does not count a human comment", () => {
+    const threads = buildReviewThreads(
+      parseReviewThreadPage(
+        page([
+          node("human", { login: "cursor", __typename: "User" }, "c1"),
+          node("bot-like", { login: "review-bot-fan", __typename: "User" }, "c2"),
+        ])
+      ).threads
+    );
+    expect(threads.map((thread) => thread.isReviewBot)).toEqual([false, false]);
+    expect(threads.map((thread) => thread.reviewBotPasses)).toEqual([0, 0]);
+  });
+
+  it("counts one pass for bot threads without a commit", () => {
+    const threads = buildReviewThreads(
+      parseReviewThreadPage(page([node("one", bot, null)])).threads
+    );
+    expect(threads.map((thread) => thread.reviewBotPasses)).toEqual([1]);
+  });
 });
 
 describe("review thread pagination", () => {
@@ -296,6 +316,8 @@ describe("review thread pagination", () => {
     id,
     firstComment: {
       authorLogin: "someone",
+      authorIsBot: false,
+      commitOid: "c1",
       body: "please fix",
       path: "a.ts",
       line: 1,
@@ -340,12 +362,14 @@ describe("review thread pagination", () => {
     expect(reader.calls).toEqual(["reviewThreadPage:null"]);
   });
 
-  it("counts Bugbot review passes across every page", async () => {
-    const bugbot = (id: string, runId: string) => ({
+  it("counts review bot passes across every page", async () => {
+    const bot = (id: string, oid: string) => ({
       id,
       firstComment: {
-        authorLogin: "bugbot",
-        body: `RUN_ID: ${runId}`,
+        authorLogin: "reviewer[bot]",
+        authorIsBot: true,
+        commitOid: oid,
+        body: "possible bug",
         path: "a.ts",
         line: 1,
         createdAt: "now",
@@ -354,12 +378,12 @@ describe("review thread pagination", () => {
     });
     const reader = fakeReader({
       threadPages: [
-        { threads: [bugbot("one", "run-1")], endCursor: "next" },
-        { threads: [bugbot("two", "run-2")], endCursor: null },
+        { threads: [bot("one", "c1")], endCursor: "next" },
+        { threads: [bot("two", "c2")], endCursor: null },
       ],
     });
     const threads = await resolveReviewThreads(reader, context);
-    expect(threads.map((item) => item.bugbotReviewPasses)).toEqual([2, 2]);
+    expect(threads.map((item) => item.reviewBotPasses)).toEqual([2, 2]);
   });
 
   it("drops resolved threads from later pages too", async () => {

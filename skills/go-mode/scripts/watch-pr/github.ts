@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import type * as T from "./types.ts";
 import { nonEmpty, parsePrNumber } from "./types.ts";
 export const REVIEW_THREADS_QUERY =
-  "\nquery ReviewThreads($owner: String!, $repo: String!, $pr: Int!, $after: String) {\n  repository(owner: $owner, name: $repo) {\n    pullRequest(number: $pr) {\n      reviewThreads(first: 100, after: $after) {\n        pageInfo {\n          hasNextPage\n          endCursor\n        }\n        nodes {\n          id\n          isResolved\n          comments(first: 10) {\n            nodes {\n              body\n              createdAt\n              path\n              line\n              author { login }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n";
+  "\nquery ReviewThreads($owner: String!, $repo: String!, $pr: Int!, $after: String) {\n  repository(owner: $owner, name: $repo) {\n    pullRequest(number: $pr) {\n      reviewThreads(first: 100, after: $after) {\n        pageInfo {\n          hasNextPage\n          endCursor\n        }\n        nodes {\n          id\n          isResolved\n          comments(first: 10) {\n            nodes {\n              body\n              createdAt\n              path\n              line\n              author { login __typename }\n              originalCommit { oid }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n";
 export const PR_COMMIT_STATUS_QUERY =
   "\nquery PrCommitStatuses($owner: String!, $repo: String!, $pr: Int!) {\n  repository(owner: $owner, name: $repo) {\n    pullRequest(number: $pr) {\n      commits(last: 50) {\n        nodes {\n          commit {\n            oid\n            statusCheckRollup {\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n";
 export const PR_CHECK_ROLLUP_QUERY =
@@ -310,11 +310,23 @@ function parseComment(value: unknown): T.ReviewComment {
     object.author === null
       ? null
       : record(object.author, "review comment.author");
+  const authorLogin =
+    author === null
+      ? null
+      : optionalString(author.login, "review comment.author.login");
+  const commit =
+    object.originalCommit === null || object.originalCommit === undefined
+      ? null
+      : record(object.originalCommit, "review comment.originalCommit");
   return {
-    authorLogin:
-      author === null
+    authorLogin,
+    authorIsBot:
+      author?.__typename === "Bot" ||
+      (authorLogin ?? "").toLowerCase().endsWith("[bot]"),
+    commitOid:
+      commit === null
         ? null
-        : optionalString(author.login, "review comment.author.login"),
+        : optionalString(commit.oid, "review comment.originalCommit.oid"),
     body: string(object.body, "review comment.body"),
     path: optionalString(object.path, "review comment.path"),
     line:
@@ -326,32 +338,13 @@ function parseComment(value: unknown): T.ReviewComment {
     createdAt: string(object.createdAt, "review comment.createdAt"),
   };
 }
-function isBugbot(comment: T.ReviewComment | null): boolean {
-  if (comment === null) return false;
-  const author = (comment.authorLogin ?? "").toLowerCase();
-  const body = comment.body.toLowerCase();
-  return (
-    author.includes("bugbot") ||
-    (author === "cursor" &&
-      [
-        "bugbot",
-        "cursor_automation_id",
-        "agentic security review",
-        "description start",
-        "severity",
-      ].some((token) => body.includes(token)))
-  );
+function isReviewBot(comment: T.ReviewComment | null): boolean {
+  return comment?.authorIsBot ?? false;
 }
+// A review bot reviews each pushed commit once, so a pass is a distinct
+// commit that a bot thread was opened against.
 function passKey(comment: T.ReviewComment | null): string | null {
-  if (comment === null) return null;
-  for (const pattern of [
-    /RUN_ID:\s*([a-zA-Z0-9_.:-]+)/,
-    /CURSOR_AUTOMATION_ID:\s*([a-zA-Z0-9_.:-]+)/,
-  ]) {
-    const match = pattern.exec(comment.body);
-    if (match?.[1]) return match[1];
-  }
-  return null;
+  return comment?.commitOid ?? null;
 }
 export function parseReviewThreadPage(value: unknown): T.ReviewThreadPage {
   const reviewThreads = record(
@@ -389,7 +382,7 @@ export function buildReviewThreads(
   const keys = new Set<string>();
   let keyless = false;
   for (const thread of threads) {
-    if (!isBugbot(thread.firstComment)) continue;
+    if (!isReviewBot(thread.firstComment)) continue;
     const key = passKey(thread.firstComment);
     if (key === null) keyless = true;
     else keys.add(key);
@@ -400,8 +393,8 @@ export function buildReviewThreads(
     .map(({ id, firstComment }) => ({
       id,
       firstComment,
-      isBugbot: isBugbot(firstComment),
-      bugbotReviewPasses: passes,
+      isReviewBot: isReviewBot(firstComment),
+      reviewBotPasses: passes,
     }));
 }
 export function parsePullRequest(
