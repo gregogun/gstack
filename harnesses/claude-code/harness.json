@@ -1,0 +1,9 @@
+{
+  "manifest": {
+    "source": "plugin.json",
+    "target": ".claude-plugin/plugin.json"
+  },
+  "copy": ["LICENSE", "README.md"],
+  "denyList": ["\\.cursor", "Cursor", "AskQuestion", "subagent_type", "generalPurpose", "\\bTask tool"],
+  "allowList": ["endCursor", "precursor", "cursor location"]
+}

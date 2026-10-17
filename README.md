@@ -42,7 +42,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 
 ## Install
 
-See `harnesses/`.
+Each harness renders its own copy of the skills with `node scripts/build.mjs <harness>`. For Claude Code, see [`harnesses/claude-code/README.md`](harnesses/claude-code/README.md).
 
 ## Upstream
 
