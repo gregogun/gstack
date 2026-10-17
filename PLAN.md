@@ -128,7 +128,7 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 
 **4b. Act on the triage.** Done. Apply the decisions in the Triage table and the resolved list below. This includes dropping `make-bot-ui`, copying in `deslop`, `control-ui` and `control-cli`, and writing a short gstack README.
 
-**4c. Neutral source.** Rewrite the remaining Cursor names across skills, playbooks and agents into neutral language or tokens. Use upstream's translation doc as the checklist of names, then delete it.
+**4c. Neutral source.** Done. Rewrite the remaining Cursor names across skills, playbooks and agents into neutral language or tokens. Use upstream's translation doc as the checklist of names, then delete it.
 - Fix `go-agent`. It searches `~/.cursor/plugins/` for the mode skill and uses `is_background`, which is Cursor frontmatter.
 - Rewrite the transcript-reading skills (`recall`, `reflect`, `automate-me`, the `show-me-your-work` audit and `worktree-audit.sh`) against a transcripts token.
 
@@ -139,6 +139,21 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 - Add a local `marketplace.json`, install with `/plugin marketplace add`, and uninstall `pstack@cursor-plugins`.
 - Check whether `/go-mode` works without the `gstack:` prefix.
 
+Token values (claude-code). The build renders these in every Markdown file under `skills/` and `agents/`, references and playbooks included. It does not render scripts, so `worktree-audit.sh` takes its transcripts directory from `-t` or `GSTACK_TRANSCRIPTS_DIR`. Confidence is in brackets.
+
+- `{{install}}` (go-help install step): add the local marketplace with `/plugin marketplace add <path>`, then `/plugin install gstack@<marketplace>`. Fill in the real path and marketplace name once 4d sets them. [medium]
+- `{{loop_command}}`: the `/loop` skill. Used inline, as in "{{loop_command}} until done", so render it as `` `/loop` ``. [high]
+- `{{skill_authoring}}`: `skill-creator`. Used as "the {{skill_authoring}} skill" and "{{skill_authoring}}'s writing guidelines". Claude Code doesn't ship it built in. Here it is installed as a user skill (`~/.claude/skills/skill-creator`) and through the `anthropic-skills` plugin. `writing-for-agents` covers the prose rules if `skill-creator`'s are too thin. [medium]
+- `{{remote_isolation}}` (swarm, opt-in remote workers): the Agent tool's `isolation: "remote"`, where the account has it. [medium]
+- `{{models_config}}`: `~/.claude/gstack-models.md`, the user override file from step 5. Used as a noun, as in "its entry in {{models_config}}", so render it as `` `~/.claude/gstack-models.md` ``. Step 5 may change the path. [medium]
+- `{{project_skills_dir}}`: `.claude/skills`, no trailing slash. Used as `{{project_skills_dir}}/verify-<app>/`. [high]
+- `{{user_skills_dir}}`: `~/.claude/skills`, no trailing slash. [high]
+- `{{plugin_root}}` (go-agent, path to `skills/go-mode/SKILL.md` when the parent gave none): `${CLAUDE_PLUGIN_ROOT}`. Anthropic's `claude-security` plugin uses it in an agent body, so Claude Code likely expands it there. Check in step 6. If it isn't expanded, use "the gstack plugin under `~/.claude/plugins/cache/`". [medium]
+- `{{transcripts_dir}}`: `~/.claude/projects/<slug>`, no trailing slash. Used in prose and in `ls` globs such as `{{transcripts_dir}}/*.jsonl`. [high, checked against this repo's transcripts]
+- `{{transcript_format}}` (a sentence or two that follows the dir): "`<slug>` is the workspace's absolute path with each `/` and `.` changed to `-`, so `/Users/you/proj` becomes `-Users-you-proj`. Each session is one `<session-id>.jsonl` file directly in that directory, and the newest is the current session. Subagent transcripts are in `<session-id>/subagents/agent-<id>.jsonl`. Each line is a JSON object with `type`, `timestamp`, `cwd`, `gitBranch` and `sessionId`. User and assistant turns have `type` `user` or `assistant` and their text in `message.content`, a string or a list of text, tool-use and tool-result blocks. Skip the other types." [high, checked against this repo's transcripts]
+
+Agent names: skills say "spawn a `go-agent` subagent" or "a `comment-sicko` subagent" in prose, with no token. Claude Code lists them as `gstack:go-agent` and `gstack:comment-sicko`. Check in step 6 that the model maps the bare name. If it doesn't, add an agent-name token.
+
 ### 5. Model and effort config
 
 - Start by agreeing on the default model and effort for each role in Claude Code. This is a short discussion before any edits.
@@ -146,6 +161,30 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 - Each harness defines its default model and effort per role. For Claude Code, that's `model` (opus, sonnet, haiku, fable) and `effort`.
 - Keep a user override file outside the plugin, such as `~/.claude/gstack-models.md`, so changing a model doesn't need a reinstall. Its path is a harness token.
 - Rewrite `setup-pstack` to edit that file, or drop it if editing by hand is enough.
+
+Model roles used by the source after 4c. Skills read each one from `{{models_config}}`. When a role has no entry, the skill uses the available model that best fits the description below. `inherit-parent` means the parent model. Step 5 sets the real defaults.
+
+| Role | Used by | Description in the skills |
+| --- | --- | --- |
+| `feature, refactoring` | feature and refactoring playbooks | a fast code model |
+| `bug-fix` | bug-fix playbook | a fast code model |
+| `perf-issue` | perf-issue playbook | a fast code model |
+| `hillclimb` | hillclimb playbook | a fast code model |
+| `hardest tasks` | go-mode code delegates for the hardest changes | the strongest reasoning model |
+| `judgment and prose` | go-mode prose and judgment delegates | the strongest reasoning model |
+| `how explorer` | how | a fast code model |
+| `how explainer` | how | the strongest reasoning model |
+| `why investigators` | why | a fast code model |
+| `why synthesizer` | why | the strongest reasoning model |
+| `reflect tooling` | reflect | a fast code model, from a different family than the judgment role where possible |
+| `reflect judgment, divergent, synthesizer` | reflect | the strongest reasoning model |
+| `arena runners` (list) | arena | the strongest reasoning model plus a second, different model for diversity |
+| `arena cross-judge pool` (list) | arena | the same two, preferring a family other than the parent's |
+| `architect runners` (list) | architect, via arena | the strongest reasoning model plus a second, different model for diversity |
+| `interrogate reviewers` (list) | interrogate | Reviewer A: the strongest reasoning model. Reviewer B: a second, different model for diversity |
+| `swarm workers` | swarm, and go-mode verification | a fast code model |
+
+`setup-gstack` still has Cursor-shaped slugs (Grok and Opus defaults, effort tokens inside slugs, the `auto` alias). Its paths and tool names are neutral. Rewrite the rest here.
 
 ### 6. Verify
 
