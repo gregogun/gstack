@@ -5,5 +5,7 @@
   },
   "copy": ["LICENSE", "README.md"],
   "denyList": ["\\.cursor", "Cursor", "AskQuestion", "subagent_type", "generalPurpose", "\\bTask tool"],
-  "allowList": ["endCursor", "precursor", "cursor location"]
+  "allowList": ["endCursor", "precursor", "cursor location"],
+  "models": ["opus", "sonnet", "haiku", "fable"],
+  "efforts": ["low", "medium", "high", "xhigh", "max"]
 }

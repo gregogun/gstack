@@ -28,7 +28,7 @@ the Agent tool's `isolation: "remote"`, where the account has it
 
 ## models_config
 
-<!-- Used as a noun, as in "its entry in {{models_config}}". Step 5 may change the path. -->
+<!-- The user's model override file. Used as a noun, as in "look up the role in {{models_config}}". Outside the plugin, so edits need no rebuild. -->
 
 `~/.claude/gstack-models.md`
 

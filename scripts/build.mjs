@@ -6,6 +6,8 @@
 //   harness.json   manifest {source, target}, extra root files to copy, deny/allow lists
 //   tokens.md      one "## name" section per {{name}} token; HTML comments are ignored
 //   agents/*.yml   frontmatter lines merged into agents/<name>.md
+//   models.md      default model and effort per role (required), checked against ROLES_FILE
+//                  and shipped as MODEL_DEFAULTS_TARGET
 //   the manifest template named by harness.json
 
 import fs from "node:fs";
@@ -16,6 +18,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE_DIRS = ["skills", "agents"];
 const EXCLUDE = new Set(["node_modules", ".DS_Store"]);
 const TOKEN = /\{\{([a-z_]+)\}\}/g;
+const ROLES_FILE = "skills/go-mode/references/model-roles.md";
+const MODEL_DEFAULTS_TARGET = "skills/go-mode/references/model-defaults.md";
 
 const rel = (p) => path.relative(ROOT, p);
 const lineOf = (text, index) => text.slice(0, index).split("\n").length;
@@ -46,6 +50,70 @@ function parseTokens(file) {
     tokens.set(name, value.replace(/\s*\n\s*/g, " "));
   }
   return tokens;
+}
+
+// Rows of the Markdown tables in `text` (after the first line matching `after`, if given),
+// as arrays of trimmed cells, skipping header and separator rows.
+function tableRows(text, after) {
+  let lines = text.split("\n");
+  if (after) lines = lines.slice(Math.max(0, lines.findIndex((l) => after.test(l))));
+  const rows = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].startsWith("|")) continue;
+    if (/^\|[\s:|-]+\|$/.test(lines[i]) || lines[i + 1]?.match(/^\|[\s:|-]+\|$/)) continue;
+    rows.push({ line: i + 1, cells: lines[i].split("|").slice(1, -1).map((c) => c.trim()) });
+  }
+  return rows;
+}
+
+const roleName = (cell) => cell.match(/^`([^`]+)`$/)?.[1];
+
+function parseRoles(errors) {
+  const file = path.join(ROOT, ROLES_FILE);
+  const roles = new Map();
+  for (const { line, cells } of tableRows(fs.readFileSync(file, "utf8"), /^## Roles\s*$/)) {
+    const name = roleName(cells[0]);
+    if (!name || !["one", "list"].includes(cells[1])) {
+      errors.push(`${ROLES_FILE}:${line}: role row needs a \`role\` and an Entries of "one" or "list"`);
+      continue;
+    }
+    roles.set(name, cells[1]);
+  }
+  if (!roles.size) errors.push(`${ROLES_FILE}: no roles found under "## Roles"`);
+  return roles;
+}
+
+function checkModelDefaults(file, roles, config, errors) {
+  const label = rel(file);
+  if (!fs.existsSync(file)) {
+    errors.push(`${label}: missing. Every harness needs a default model and effort per role (see ${ROLES_FILE})`);
+    return;
+  }
+  const models = config.models ?? [];
+  const efforts = config.efforts ?? [];
+  const counts = new Map();
+  for (const { line, cells } of tableRows(fs.readFileSync(file, "utf8"))) {
+    const [cell, model, effort] = cells;
+    const name = roleName(cell ?? "");
+    const at = `${label}:${line}`;
+    if (!name) {
+      errors.push(`${at}: first cell must be a \`role\``);
+      continue;
+    }
+    if (!roles.has(name)) errors.push(`${at}: unknown role "${name}" (not in ${ROLES_FILE})`);
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+    if (model === "inherit-parent") {
+      if (effort !== "-") errors.push(`${at}: inherit-parent takes effort "-", got "${effort}"`);
+    } else {
+      if (models.length && !models.includes(model)) errors.push(`${at}: model "${model}" is not one of ${models.join(", ")}, inherit-parent`);
+      if (efforts.length && !efforts.includes(effort)) errors.push(`${at}: effort "${effort}" is not one of ${efforts.join(", ")}`);
+    }
+  }
+  for (const [name, entries] of roles) {
+    const n = counts.get(name) ?? 0;
+    if (n === 0) errors.push(`${label}: no default for role "${name}"`);
+    if (entries === "one" && n > 1) errors.push(`${label}: role "${name}" takes one entry, has ${n}`);
+  }
 }
 
 function mergeFrontmatter(text, overlay, label, errors) {
@@ -84,6 +152,10 @@ function build(harness) {
   const used = new Set();
 
   fs.rmSync(out, { recursive: true, force: true });
+
+  const modelDefaults = path.join(hdir, "models.md");
+  checkModelDefaults(modelDefaults, parseRoles(errors), config, errors);
+  if (fs.existsSync(path.join(ROOT, MODEL_DEFAULTS_TARGET))) errors.push(`${MODEL_DEFAULTS_TARGET}: the build writes this file from harnesses/<harness>/models.md, so the source must not have it`);
 
   for (const dir of SOURCE_DIRS) {
     for (const src of walk(path.join(ROOT, dir))) {
@@ -135,6 +207,8 @@ function build(harness) {
 
   for (const name of overlays.keys()) errors.push(`harnesses/${harness}/agents/${name}.yml: no agents/${name}.md to merge into`);
   for (const name of tokens.keys()) if (!used.has(name)) warnings.push(`harnesses/${harness}/tokens.md: token "${name}" is defined but never used`);
+
+  if (fs.existsSync(modelDefaults)) fs.copyFileSync(modelDefaults, path.join(out, MODEL_DEFAULTS_TARGET));
 
   for (const file of config.copy ?? []) {
     fs.copyFileSync(path.join(ROOT, file), path.join(out, file));
