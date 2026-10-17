@@ -14,7 +14,7 @@ This skill orchestrates three others: an inline mining pass (see step 1), the {{
 
 ### 0. Check for an existing skill
 
-Look recursively for `.cursor/skills/**/*-mode/SKILL.md` and `~/.cursor/skills/*-mode/SKILL.md` matching the user's handle. Mode skills can live in a personal category directory (`.cursor/skills/<handle>/`), not only at the top level. If one exists, confirm intent with `AskQuestion` (unless they already said "update my skill" or similar):
+Look recursively for `{{project_skills_dir}}/**/*-mode/SKILL.md` and `{{user_skills_dir}}/*-mode/SKILL.md` matching the user's handle. Mode skills can live in a personal category directory (`{{project_skills_dir}}/<handle>/`), not only at the top level. If one exists, confirm intent by asking the user, with the structured question tool if the harness has one (unless they already said "update my skill" or similar):
 
 - Update the existing skill (default for repeat runs)
 - Start fresh (rare, ask why before doing it)
@@ -41,9 +41,9 @@ Cross-check across slices before elevating a signal. Patterns seen in 2+ slices 
 
 ### 2. Ask the user directly
 
-Mining misses intent that hasn't come up yet. Use the `AskQuestion` tool (structured multi-choice) rather than asking the user to type from scratch.
+Mining misses intent that hasn't come up yet. Ask with structured multiple-choice questions, using the harness's structured question tool if it has one, rather than asking the user to type from scratch.
 
-Shape: one or two questions with 4-6 options each, `allow_multiple: true` for category questions. Start broad ("Which areas matter most?"), then follow up on selected areas with specific options. After the structured rounds, one free-form chat question catches anything the options missed.
+Shape: one or two questions with 4-6 options each, allowing multiple answers for category questions. Start broad ("Which areas matter most?"), then follow up on selected areas with specific options. After the structured rounds, one free-form chat question catches anything the options missed.
 
 Don't dump 20 questions.
 
@@ -66,7 +66,7 @@ The **go-mode** skill shows the shape. Read it for granularity. Don't copy its c
 
 Use the {{skill_authoring}} skill to author the skill. Placement:
 
-- Path: preserve an existing mode skill's category. For a new mode, use `.cursor/skills/<handle>/<handle>-mode/SKILL.md` when the repo has an established personal category for that handle. Otherwise default to `.cursor/skills/<handle>-mode/SKILL.md` in the project (or `~/.cursor/skills/<handle>-mode/` if the user prefers a personal skill).
+- Path: preserve an existing mode skill's category. For a new mode, use `{{project_skills_dir}}/<handle>/<handle>-mode/SKILL.md` when the repo has an established personal category for that handle. Otherwise default to `{{project_skills_dir}}/<handle>-mode/SKILL.md` in the project (or `{{user_skills_dir}}/<handle>-mode/` if the user prefers a personal skill).
 - Handle: the user's first name or chosen identifier.
 - Frontmatter `description`: trigger on their name + `/<handle>-mode` + "work in their style", not on generic keywords like "write code" or "review PR".
 - Frontmatter formatting: follow {{skill_authoring}}'s YAML rules. Keep `description` as one YAML scalar. Quote it or use `description: >-` with indented continuation lines when punctuation or wrapping requires it.
