@@ -91,7 +91,16 @@ Decisions only. Nothing below has been acted on. Line numbers are at commit `04d
 | Cursor install and distribution text | `skills/poteto-help/SKILL.md:13,37,45` | Low. Help text. Links point to `cursor/plugins`, install uses `/add-plugin` and the sidebar, and line 45 says "built for Cursor". | Replace links with our repo or local paths. Install steps become an `{{install}}` token. Drop the line 45 paragraph. |
 | README in poteto's Cursor voice | `README.md:3-11,28-34,51,103-105,138,254-262,268` | Low per line, but most of the prose is Cursor pitch and install. | Replace with a lean gstack README. Needs decision. |
 
-**Needs decision**
+**Resolved decisions** (agreed with the user, these replace the recommendations below where they differ)
+
+1. `deslop`, `control-ui` and `control-cli` are copied into gstack from `cursor-team-kit` at the same upstream commit and recorded in the README's Upstream section. They are not Cursor-specific. This replaces the `deslop` and `control-cli` / `control-ui` rows above.
+2. The watcher treats a review comment from any bot account as a review bot. The pass count is kept.
+3. The built-in PR tool paragraph and its draft and Origin clauses are dropped. Only Cursor has such a tool, and `gh` already covers it.
+4. Swarm uses local background subagents, with a worktree each for writers. Remote isolation is an opt-in harness token.
+5. Custom-mode text is dropped. Users start each task with `/go-mode`.
+6. The README is rewritten as a short gstack README in 4b.
+
+**Needs decision** (original recommendations)
 
 1. **`deslop` replacement.** Recommend mapping to `simplify` now. Reason: `simplify` plus `no-comments` covers most of what deslop removes, and a gstack-owned `deslop` can come later if gaps show.
 2. **Watcher Bugbot detection.** Recommend generalizing `isBugbot` to "review comment from a bot account" (GraphQL `__typename: Bot` or a `[bot]` login), with the pass count kept. Reason: it keeps the third-pass dismissal rule working for any review bot, such as a Claude review action.
@@ -111,12 +120,24 @@ Decisions only. Nothing below has been acted on. Line numbers are at commit `04d
 
 ### 4. Neutral source and Claude Code build
 
-- Rewrite Cursor names across the skills, playbooks and agents into neutral language or tokens. Use upstream's translation doc as the checklist of names.
+Step 4 is large, so it runs as four sub-steps. Each one is done by its own subagent and committed before the next starts.
+
+**4a. Rename.** Replace poteto and pstack with gstack names.
+- `poteto-mode` becomes `go-mode`, `poteto-agent` becomes `go-agent`, `poteto-help` becomes `go-help` and `setup-pstack` becomes `setup-gstack`. Rename the folders, frontmatter `name` fields and every reference.
+- Prose like "poteto's agent style" or "pstack skills" becomes gstack wording. Leave the README for 4b and the Upstream section as it is.
+
+**4b. Act on the triage.** Apply the decisions in the Triage table and the resolved list below. This includes dropping `make-bot-ui`, copying in `deslop`, `control-ui` and `control-cli`, and writing a short gstack README.
+
+**4c. Neutral source.** Rewrite the remaining Cursor names across skills, playbooks and agents into neutral language or tokens. Use upstream's translation doc as the checklist of names, then delete it.
+- Fix `go-agent`. It searches `~/.cursor/plugins/` for the mode skill and uses `is_background`, which is Cursor frontmatter.
+- Rewrite the transcript-reading skills (`recall`, `reflect`, `automate-me`, the `show-me-your-work` audit and `worktree-audit.sh`) against a transcripts token.
+
+**4d. Build and install.**
 - Create `harnesses/claude-code/` with the token values, the plugin manifest and agent frontmatter.
 - Write the build script and the checks described in Approach.
-- Fix `poteto-agent`. It searches `~/.cursor/plugins/` for `poteto-mode` and uses `is_background`, which is Cursor frontmatter.
 - The plugin is named `gstack`. Don't commit `dist/` for now (add it to `.gitignore`). Install from the local path.
 - Add a local `marketplace.json`, install with `/plugin marketplace add`, and uninstall `pstack@cursor-plugins`.
+- Check whether `/go-mode` works without the `gstack:` prefix.
 
 ### 5. Model and effort config
 
