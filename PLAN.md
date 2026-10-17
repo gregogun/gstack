@@ -184,12 +184,20 @@ Model roles used by the source after 4c. Skills read each one from `{{models_con
 | `interrogate reviewers` (list) | interrogate | Reviewer A: the strongest reasoning model. Reviewer B: a second, different model for diversity |
 | `swarm workers` | swarm, and go-mode verification | a fast code model |
 
+Agreed Claude Code defaults, by description:
+
+| Description | Model | Effort |
+| --- | --- | --- |
+| a fast code model | opus | medium (to start; revisit) |
+| the strongest reasoning model | opus | high |
+| a second, different model for diversity | sonnet | high |
+
 `setup-gstack` still has Cursor-shaped slugs (Grok and Opus defaults, effort tokens inside slugs, the `auto` alias). Its paths and tool names are neutral. Rewrite the rest here.
 
 ### 6. Verify
 
 - Build and install the plugin, then start a fresh Claude Code session.
-- Run `poteto-mode` on a small real task. Check that it picks a playbook, that subagents get the configured model and effort, and that no skill hits a missing Cursor name.
+- Run `go-mode` on a small real task. Check that it picks a playbook, that subagents get the configured model and effort, and that no skill hits a missing Cursor name.
 - Run `interrogate` on a diff, and `how` on a question, to cover the panel and read-only subagent paths.
 
 ### 7. Merge overlapping skills (separate task)
