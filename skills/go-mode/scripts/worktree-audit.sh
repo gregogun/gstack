@@ -4,8 +4,10 @@
 # operated in it. Emits a table sorted by size with a suggested bucket. Never
 # deletes anything; deletion stays a human-gated step in the playbook.
 #
-# Usage: worktree-audit.sh [-b|--base <ref>] [repo-path]
+# Usage: worktree-audit.sh [-b|--base <ref>] [-t|--transcripts <dir>] [repo-path]
 #   repo-path defaults to the current repo.
+#   -t sets the directory of chat transcripts (JSONL) to scan for LAST_CHAT,
+#   overriding $GSTACK_TRANSCRIPTS_DIR. With neither, LAST_CHAT is "-".
 #   -b sets the ref the MERGED column checks against (e.g. origin/integration).
 #   Without it the base is origin/HEAD, then origin/main, then origin/master.
 #   origin/HEAD is the remote's default branch, not necessarily the branch PRs
@@ -13,9 +15,11 @@
 set -u
 
 base=""
+transcripts="${GSTACK_TRANSCRIPTS_DIR:-}"
 while [ $# -gt 0 ]; do
 	case "$1" in
 	-b|--base) [ $# -ge 2 ] || { echo "error: $1 needs a ref" >&2; exit 2; }; base="$2"; shift 2 ;;
+	-t|--transcripts) [ $# -ge 2 ] || { echo "error: $1 needs a dir" >&2; exit 2; }; transcripts="$2"; shift 2 ;;
 	-h|--help) sed -n '2,/^set -u/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
 	-*) echo "error: unknown option: $1" >&2; exit 2 ;;
 	*) break ;;
@@ -56,9 +60,10 @@ if raw=$(gh pr list --author "@me" --state all --limit 1000 \
 fi
 [ -s "$prs" ] || echo "[]" > "$prs"
 
-# Transcripts dir: ~/.cursor/projects/<slugified-repo-path>/agent-transcripts.
-slug=$(printf '%s' "$main_wt" | sed 's#^/##; s#/#-#g')
-transcripts="$HOME/.cursor/projects/$slug/agent-transcripts"
+# Transcripts dir comes from -t or GSTACK_TRANSCRIPTS_DIR. The harness decides
+# where it is, so the caller passes it.
+if [ -z "$transcripts" ]; then echo "warn: no transcripts dir (-t or GSTACK_TRANSCRIPTS_DIR); LAST_CHAT will be -" >&2
+elif [ ! -d "$transcripts" ]; then echo "warn: transcripts dir not found: $transcripts; LAST_CHAT will be -" >&2; fi
 now=$(date +%s)
 
 echo "# base: $base"
@@ -98,7 +103,7 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt;
 	# Most recent chat whose transcript operated in this worktree. Match path
 	# followed by "/" or a quote so glint-482 does not match glint-482-r37.
 	last="-"; last_ts=0
-	if [ -d "$transcripts" ]; then
+	if [ -n "$transcripts" ] && [ -d "$transcripts" ]; then
 		f=$(rg -l -e "${wt}/" -e "${wt}\"" "$transcripts" 2>/dev/null \
 			| xargs stat -f '%m %N' 2>/dev/null | sort -rn | head -1)
 		if [ -n "$f" ]; then last_ts=$(echo "$f" | awk '{print $1}')
