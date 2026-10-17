@@ -12,6 +12,10 @@ there's a growing sense that ai writes too much slop code. i agree. i don't want
 
 fork it. improve it. make it yours. PRs are welcome! 
 
+## Upstream
+
+This repo is a snapshot fork of pstack from [cursor/plugins at commit `182f2ce`](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/pstack) (2026-10-16), copied without upstream history. Staying in sync with upstream is not a goal.
+
 ## install
 
 ```bash
