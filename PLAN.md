@@ -50,7 +50,8 @@ Only the Claude Code harness gets built now. Adding a harness later means adding
 - Delete upstream's Cursor packaging and translation pieces: `.cursor-plugin/`, `docs/harness/claude-code.md` (after step 4 has used it as a checklist) and the generator.
 - Delete `automations/benny/`, which only runs on Cursor.
 - Delete the playbooks we won't use: orchestrate, autopilot-full, autopilot-stack and shipping. Keep worktree-cleanup (see step 3).
-- Decide whether to keep `docs/guide/`. It's useful reading but written for Cursor.
+- Delete the multi-phase plan playbook and `check-plan.mjs`. They only fed the deleted autopilot and orchestrate playbooks.
+- Delete `docs/guide/` and `assets/logo.png`. The guide stays readable upstream at `182f2ce`. If we need a guide later, write a lean one for gstack.
 
 ### 3. Triage Cursor dependencies
 
