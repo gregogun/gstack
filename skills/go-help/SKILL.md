@@ -8,9 +8,9 @@ disable-model-invocation: true
 
 Answer the user's question about gstack, hand them a prompt they can send, and link the file the answer came from. For a help question, don't start the work. The user asked how, and a gstack run spends real tokens, so let them send the prompt.
 
-A message that asks for work, such as "use gstack to fix this bug", is not a help question. Read [`go-mode`](../go-mode/SKILL.md), do the work under it, and mention once that a Custom Mode keeps it on.
+A message that asks for work, such as "use gstack to fix this bug", is not a help question. Read [`go-mode`](../go-mode/SKILL.md), and do the work under it.
 
-This file maps questions to the skills that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/cursor/plugins/blob/main/pstack/` followed by its path.
+This file maps questions to the skills that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The links here are relative to this file, so give the user the file's full local path in the installed plugin.
 
 ## Find out what they need
 
@@ -34,7 +34,7 @@ When the model rule is missing and it matters, ask whether the user wants to pic
 
 ## Get set up
 
-1. Install with `/add-plugin gstack` in chat, or from Customize in the sidebar.
+1. Install gstack: {{install}}
 2. Run [`/setup-gstack`](../setup-gstack/SKILL.md). It asks for a reasoning budget, maps a model to each role, and writes a rule. The rule applies to new chats.
 3. Start a real task with `/go-mode`, a goal, and a check that can pass or fail.
 
@@ -42,19 +42,11 @@ Installing changes nothing until the user invokes a skill. Only `/setup-gstack` 
 
 If cost is the worry, say where the tokens go and how to spend fewer. gstack spends extra tokens on subagents and review panels. Rerun `/setup-gstack` and pick a smaller budget or cheaper models. A role set to `auto` or `inherit-parent` runs on the chat's model, which saves tokens when the chat runs on Auto or a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/go-mode` for work that needs rigor.
 
-gstack is built for Cursor. Its skills use the Agent Skills format, so other tools can read them. But most workflow skills, including `/go-mode`, `/how`, `/why`, and `/teach`, spawn Cursor subagents with per-role models, and Custom Modes and `/loop` are Cursor features, so those parts may not work there.
-
 ## Start a task with `/go-mode`
 
 `/go-mode` matches the task to a playbook, copies the playbook's steps into the todo list, and runs the other skills as the steps need them. A step it skips stays in the list as `skip: <reason>`. A good prompt states the goal and how to tell it's done. It doesn't list skills, because a hand-written sequence tends to drop or reorder steps the playbook would keep. Read [`references/prompting.md`](references/prompting.md) before you help word one.
 
-Whether `/go-mode` stays on depends on how the user starts it:
-
-- Enter on `/go-mode` attaches the skill to one message. It fades as the chat moves on.
-- Option+Enter on Mac or Alt+Enter on Windows, or Use as Mode from the skill entry, makes it a Custom Mode. It stays in context every turn until the user exits the mode, and it stays out of casual turns.
-- Cursor's docs list Custom Modes in the Agents Window and the CLI. Elsewhere, start each new task with `/go-mode`.
-
-Link [Cursor's skills docs](https://cursor.com/docs/skills) when this comes up. Mid-chat, "new task" makes the mode match a fresh playbook. `/go-mode` already uses `go-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it with `subagent_type: "go-agent"`.
+`/go-mode` attaches the skill to one message, and it fades as the chat moves on, so start each task with `/go-mode`. Mid-chat, "new task" makes the mode match a fresh playbook. `/go-mode` already uses `go-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it with `subagent_type: "go-agent"`.
 
 ## Pick a skill
 
@@ -73,11 +65,14 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Know what a small diff could break outside itself | [`/blast-radius`](../blast-radius/SKILL.md) |
 | Settle types and module shape before code that crosses a function boundary | [`/architect`](../architect/SKILL.md) |
 | Get several attempts at one brief, merged into the best one | [`/arena`](../arena/SKILL.md) |
-| Run parallel checks over slices, or race workers, as cloud agents | [`/swarm`](../swarm/SKILL.md) |
+| Run parallel checks over slices, or race workers | [`/swarm`](../swarm/SKILL.md) |
 | Have different models review a diff and try to break it | [`/interrogate`](../interrogate/SKILL.md) |
 | Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
 | Apply TypeScript rules to `.ts` or `.tsx` work | [`/typescript-best-practices`](../typescript-best-practices/SKILL.md) |
 | Strip comments before review, using a reviewer that didn't write them | [`/no-comments`](../no-comments/SKILL.md) |
+| Clean AI slop out of a diff before commit | [`/deslop`](../deslop/SKILL.md) |
+| Drive a CLI or TUI to reproduce or verify a change | [`/control-cli`](../control-cli/SKILL.md) |
+| Drive a browser, Electron, or web UI to reproduce or verify a change | [`/control-ui`](../control-ui/SKILL.md) |
 | Clean AI tells out of prose | [`/unslop`](../unslop/SKILL.md) |
 | Write docs, an RFC, a README, a PR description, or a commit message to a standard | [`/technical-writing`](../technical-writing/SKILL.md) |
 | Hear the last reply again in plain words | [`/bro`](../bro/SKILL.md) |
@@ -90,7 +85,6 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
-| Build a page whose buttons wake a Grok Bot over a webhook | [`/make-bot-ui`](../make-bot-ui/SKILL.md) |
 | Find their way around gstack | `/go-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
@@ -106,8 +100,7 @@ Close calls:
 
 Not in gstack:
 
-- `/deslop`, `control-cli`, and `control-ui` ship in the `cursor-team-kit` plugin.
-- `/loop` and `/create-skill` are Cursor built-ins.
+- {{loop_command}} and the {{skill_authoring}} skill come from the harness.
 
 ## Playbooks and principles
 
@@ -118,9 +111,9 @@ Playbooks are step lists inside `/go-mode`, not skills, so they have no slash co
 - "pause safely" runs Pause safely.
 - "run the eval playbook" runs Eval.
 
-Without `/go-mode`, a phrase such as "babysit this pr" can start Cursor's own skill for the same job instead. The Playbooks section of [`go-mode`](../go-mode/SKILL.md) lists every playbook and when it applies.
+The Playbooks section of [`go-mode`](../go-mode/SKILL.md) lists every playbook and when it applies.
 
-gstack has no planning skill. Cursor's Plan Mode works alongside it. For a design question, the Prototype playbook or `/architect` settles it in code first.
+gstack has no planning skill. The harness's plan mode works alongside it. For a design question, the Prototype playbook or `/architect` settles it in code first.
 
 Principles are one-rule skills that `/go-mode` reads and cites in its replies. The user rarely invokes one. They steer with the names instead, as in "apply prove it works. show me the real output." Typing `/principle-<name>` still loads one on demand.
 
@@ -128,13 +121,13 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 
 | Symptom | Fix |
 |---|---|
-| The mode stopped applying after a few turns | It was started with Enter. Start it as a Custom Mode, or start each task with `/go-mode`. |
+| The mode stopped applying after a few turns | `/go-mode` applies to the message it was typed with. Start each task with `/go-mode`. |
 | A question got treated as the next step of the last task | Say "new task", or say the turn doesn't need the mode. |
 | A new model choice had no effect | The rule from `/setup-gstack` applies to new chats. Start one. |
 | Runs cost more than expected | See the cost paragraph under Get set up. |
 | A skill didn't load on its own | Only `/setup-gstack` loads from the user's words. The others load when the user types them or when `/go-mode` runs them, and it doesn't run every skill. |
-| Parallel agents overwrote each other | Give each agent its own worktree, or run them as cloud agents, which each get their own machine. |
-| An overnight run moved but finished nothing | `/loop` needs a check that can pass or fail, not a duration. |
+| Parallel agents overwrote each other | Give each agent its own worktree. |
+| An overnight run moved but finished nothing | {{loop_command}} needs a check that can pass or fail, not a duration. |
 | The reply claims success from a green build | Ask for the real command, flow, stored value, or profile. That's the prove-it-works principle. |
 
 For a run that drifts, [`references/prompting.md`](references/prompting.md) has one-line steers.

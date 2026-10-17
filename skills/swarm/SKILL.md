@@ -24,9 +24,9 @@ Open a todolist with one entry per phase before launching anything.
 
 ## Phase B: Fan out
 
-Spawn all N workers in one message with `subagent_type: generalPurpose`, `environment: "cloud"`, `run_in_background: true`, and the step 4 model, left unset for `auto` or `inherit-parent`. Use `environment: "local"` only when the worker needs access to something on the user's computer.
+Spawn all N workers in one message as local background subagents with `subagent_type: generalPurpose`, `run_in_background: true`, and the step 4 model, left unset for `auto` or `inherit-parent`. Give each worker that writes its own git worktree. Read-only workers can share the checkout. Local workers share one machine, so a timing race contends for CPU. Run its arms on a quiet machine, or fewer at once. When the user opts in to remote workers, spawn them with {{remote_isolation}} instead.
 
-When a worker must start from a non-default pushed branch, pass `cloud_base_branch`.
+When a worker must start from a non-default branch, give it a worktree off that branch.
 
 Every brief stands alone. Include the goal, scope, exact slice or race arm, how to verify, and what to report. Reports use `PASS`, `ISSUES`, or `BLOCKED` with evidence. A worker that can prove a defect reports `ISSUES` and lists every issue it can prove, not only the first.
 

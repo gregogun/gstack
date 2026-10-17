@@ -126,7 +126,7 @@ Step 4 is large, so it runs as four sub-steps. Each one is done by its own subag
 - `poteto-mode` becomes `go-mode`, `poteto-agent` becomes `go-agent`, `poteto-help` becomes `go-help` and `setup-pstack` becomes `setup-gstack`. Rename the folders, frontmatter `name` fields and every reference.
 - Prose like "poteto's agent style" or "pstack skills" becomes gstack wording. Leave the README for 4b and the Upstream section as it is.
 
-**4b. Act on the triage.** Apply the decisions in the Triage table and the resolved list below. This includes dropping `make-bot-ui`, copying in `deslop`, `control-ui` and `control-cli`, and writing a short gstack README.
+**4b. Act on the triage.** Done. Apply the decisions in the Triage table and the resolved list below. This includes dropping `make-bot-ui`, copying in `deslop`, `control-ui` and `control-cli`, and writing a short gstack README.
 
 **4c. Neutral source.** Rewrite the remaining Cursor names across skills, playbooks and agents into neutral language or tokens. Use upstream's translation doc as the checklist of names, then delete it.
 - Fix `go-agent`. It searches `~/.cursor/plugins/` for the mode skill and uses `is_background`, which is Cursor frontmatter.
