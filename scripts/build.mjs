@@ -6,7 +6,8 @@
 //   harness.json   manifest {source, target}, extra root files to copy, deny/allow lists
 //   tokens.md      one "## name" section per {{name}} token; HTML comments are ignored
 //   agents/*.yml   frontmatter lines merged into agents/<name>.md
-//   models.md      default model and effort per role (required), checked against ROLES_FILE
+//   models.md      default model and effort per role and a "Drop order:" line (required),
+//                  checked against ROLES_FILE
 //                  and shipped as MODEL_DEFAULTS_TARGET
 //   the manifest template named by harness.json
 
@@ -73,8 +74,8 @@ function parseRoles(errors) {
   const roles = new Map();
   for (const { line, cells } of tableRows(fs.readFileSync(file, "utf8"), /^## Roles\s*$/)) {
     const name = roleName(cells[0]);
-    if (!name || !["one", "list"].includes(cells[1])) {
-      errors.push(`${ROLES_FILE}:${line}: role row needs a \`role\` and an Entries of "one" or "list"`);
+    if (!name || !["one", "list"].includes(cells[1]) || !["yes", "no"].includes(cells[2])) {
+      errors.push(`${ROLES_FILE}:${line}: role row needs a \`role\`, an Entries of "one" or "list", and a Can drop of "yes" or "no"`);
       continue;
     }
     roles.set(name, cells[1]);
@@ -92,7 +93,14 @@ function checkModelDefaults(file, roles, config, errors) {
   const models = config.models ?? [];
   const efforts = config.efforts ?? [];
   const counts = new Map();
-  for (const { line, cells } of tableRows(fs.readFileSync(file, "utf8"))) {
+  const text = fs.readFileSync(file, "utf8");
+  const order = text.match(/^Drop order: *(.+)$/m)?.[1].split(",").map((m) => m.trim());
+  if (!order) errors.push(`${label}: missing a "Drop order: <model>, <model>, ..." line, strongest model first`);
+  for (const model of order ?? []) {
+    if (models.length && !models.includes(model)) errors.push(`${label}: drop order model "${model}" is not one of ${models.join(", ")}`);
+  }
+  if (order && new Set(order).size !== order.length) errors.push(`${label}: drop order lists a model twice`);
+  for (const { line, cells } of tableRows(text)) {
     const [cell, model, effort] = cells;
     const name = roleName(cell ?? "");
     const at = `${label}:${line}`;
