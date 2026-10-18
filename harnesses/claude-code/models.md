@@ -4,6 +4,10 @@ The model and effort each role runs on unless `~/.claude/gstack-models.md` overr
 
 Model is what the Agent tool's `model` takes: `opus`, `sonnet`, `haiku` or `fable`, or `inherit-parent` to leave model and effort unset. Effort is what its `effort` takes: `low`, `medium`, `high`, `xhigh` or `max`, or `-` with `inherit-parent`.
 
+Drop order: opus, sonnet, haiku
+
+A role marked "Can drop" in `model-roles.md` may move one step down this order for a smaller job, keeping its effort. A model not in the order never drops.
+
 | Role | Model | Effort |
 |---|---|---|
 | `feature, refactoring` | opus | medium |
