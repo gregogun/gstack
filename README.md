@@ -21,6 +21,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`arena`](skills/arena/SKILL.md): runs several attempts at one brief and merges the best parts.
 - [`swarm`](skills/swarm/SKILL.md): runs parallel workers over slices or races and returns one report.
 - [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff and try to break it.
+- [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
 - [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md): TypeScript rules for `.ts` and `.tsx` work.
 - [`deslop`](skills/deslop/SKILL.md): removes AI-generated code slop from a diff before commit.
