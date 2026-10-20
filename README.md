@@ -11,6 +11,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`setup-gstack`](skills/setup-gstack/SKILL.md): picks the model and effort for each role.
 - [`in-your-own-words`](skills/in-your-own-words/SKILL.md): plays back the goal and the problem before work starts.
 - [`sharpen`](skills/sharpen/SKILL.md): aims a task higher without overspecifying it.
+- [`grilling`](skills/grilling/SKILL.md): interviews you about an idea until the product decisions are settled.
 - [`how`](skills/how/SKILL.md): explains how a subsystem works.
 - [`why`](skills/why/SKILL.md): finds out why code is shaped the way it is.
 - [`teach`](skills/teach/SKILL.md): runs `how` and `why` and gives one plain explanation.
