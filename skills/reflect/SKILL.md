@@ -48,7 +48,7 @@ Present the synthesizer's full Accepted / Rejected / Backlog output and wait for
 
 File each Backlog item to your team's devex or backlog tracker without waiting. Only the Accepted list waits for approval.
 
-Follow each approved row's Routing exactly:
+Follow each approved row's Routing exactly. Write every skill edit with the **writing-for-agents** skill.
 
 - Trivial existing-skill edit (a one-line bullet, a tightened sentence, a stale fact corrected): the parent does it directly.
 - Substantive existing-skill edit (a new section, a new pattern table, more than ~10 lines): hand to the {{skill_authoring}} skill and run its draft / test / iterate loop.

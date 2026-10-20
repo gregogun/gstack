@@ -32,6 +32,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`no-comments`](skills/no-comments/SKILL.md): strips comments before review.
 - [`unslop`](skills/unslop/SKILL.md): removes AI tells from prose.
 - [`technical-writing`](skills/technical-writing/SKILL.md): a standard for docs, READMEs, PR descriptions and commit messages.
+- [`writing-for-agents`](skills/writing-for-agents/SKILL.md): writes skills, prompts and `AGENTS.md` files that agents follow the same way every run.
 - [`bro`](skills/bro/SKILL.md): restates the last reply in plain words.
 - [`control-cli`](skills/control-cli/SKILL.md): drives and inspects a CLI or TUI through a local harness.
 - [`control-ui`](skills/control-ui/SKILL.md): drives and inspects a web, IDE or Electron UI through a local browser or CDP harness.
