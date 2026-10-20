@@ -26,13 +26,15 @@ Each dimension is stated once. Apply the ones that are relevant.
 
 3. **Bias toward cleaning the design, not just accepting working code.** If behavior can stay the same while the structure becomes meaningfully cleaner, push for the cleaner version. Prefer simplifications that remove moving pieces over refactors that spread the same complexity around.
 
-4. **Prefer direct, boring, maintainable code over hacky or magical code.** Treat brittle, ad-hoc, or "magic" behavior as a problem. Be skeptical of generic mechanisms that hide simple data-shape assumptions. Flag thin abstractions, identity wrappers, or pass-through helpers that add indirection without buying clarity. Flag a name that doesn't say what the thing does or holds, which often means the design is murky. Flag a caller walking `a.b().c().d()`, and hide the walk behind one method. Prefer composition over a subclass that ignores or overrides most of what it inherits.
+4. **Prefer direct, boring, maintainable code over hacky or magical code.** Treat brittle, ad-hoc, or "magic" behavior as a problem. Be skeptical of generic mechanisms that hide simple data-shape assumptions. Flag thin abstractions, identity wrappers, or pass-through helpers that add indirection without buying clarity. Prefer composition over a subclass that ignores or overrides most of what it inherits.
 
 5. **Push on type and boundary cleanliness when it affects maintainability.** Question unnecessary optionality, `unknown`, `any`, or cast-heavy code when a clearer type boundary could exist. Prefer explicit typed models over loosely-shaped ad-hoc objects. Fields or parameters that keep travelling together (a data clump) want to be one type. If a branch leans on a silent fallback to paper over an unclear invariant, ask whether the boundary should be made explicit.
 
-6. **Keep logic in the canonical layer and reuse existing helpers.** Call out feature logic leaking into shared paths or implementation details leaking through APIs. Prefer existing canonical utilities over bespoke one-offs. Push code toward the right package, service, or module instead of normalizing drift. A function that reads another module's data more than its own (feature envy) belongs with that data. A module edited for several unrelated reasons (divergent change) should split.
+6. **Keep logic in the canonical layer and reuse existing helpers.** Call out feature logic leaking into shared paths or implementation details leaking through APIs. Prefer existing canonical utilities over bespoke one-offs. Push code toward the right package, service, or module instead of normalizing drift. A function that reads another module's data more than its own (feature envy) belongs with that data. A module edited for several unrelated reasons (divergent change) should split. A caller walking `a.b().c().d()` depends on structure it shouldn't see: hide the walk behind one method.
 
 7. **Treat unnecessary sequential orchestration and non-atomic updates as design smells when the cleaner structure is obvious.** If independent work is serialized for no reason, ask whether it should run in parallel. If related updates can leave state half-applied, push for a more atomic structure. Do not over-index on micro-optimizations, but do flag avoidable orchestration complexity that makes the code more brittle.
+
+8. **Names say what things do.** Flag a function, variable, or type whose name doesn't reveal what it does or holds. If no honest name comes, the design is murky.
 
 ## Output Expectations
 
