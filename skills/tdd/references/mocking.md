@@ -13,6 +13,8 @@ Don't mock:
 - Internal collaborators
 - Anything you control
 
+To decide which side of that line a dependency falls on, classify it per the **architect** skill's [`references/dependencies.md`](../../architect/references/dependencies.md).
+
 ## Designing for Mockability
 
 Apply this only when the code is already being reshaped. Never restructure code just to make a test possible.
