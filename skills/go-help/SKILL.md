@@ -67,6 +67,11 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Get several attempts at one brief, merged into the best one | [`/arena`](../arena/SKILL.md) |
 | Run parallel checks over slices, or race workers | [`/swarm`](../swarm/SKILL.md) |
 | Have different models review a diff and try to break it | [`/interrogate`](../interrogate/SKILL.md) |
+| Settle the product decisions behind an idea by being interviewed | [`/grilling`](../grilling/SKILL.md) |
+| Turn a settled conversation into a short feature spec | [`/to-spec`](../to-spec/SKILL.md) |
+| Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
+| Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
+| Find the root cause of a bug without fixing it yet | [`/diagnosing-bugs`](../diagnosing-bugs/SKILL.md) |
 | Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
 | Apply TypeScript rules to `.ts` or `.tsx` work | [`/typescript-best-practices`](../typescript-best-practices/SKILL.md) |
 | Strip comments before review, using a reviewer that didn't write them | [`/no-comments`](../no-comments/SKILL.md) |
@@ -75,6 +80,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Drive a browser, Electron, or web UI to reproduce or verify a change | [`/control-ui`](../control-ui/SKILL.md) |
 | Clean AI tells out of prose | [`/unslop`](../unslop/SKILL.md) |
 | Write docs, an RFC, a README, a PR description, or a commit message to a standard | [`/technical-writing`](../technical-writing/SKILL.md) |
+| Write a skill, playbook, subagent prompt, `AGENTS.md`, or `CLAUDE.md` that an agent reads | [`/writing-for-agents`](../writing-for-agents/SKILL.md) |
 | Hear the last reply again in plain words | [`/bro`](../bro/SKILL.md) |
 | Give agents a scripted way to drive the app and prove behavior | [`/create-verification-skill`](../create-verification-skill/SKILL.md) |
 | Bring a verification skill and its feature map back in line with the app | [`/maintain-verification-skill`](../maintain-verification-skill/SKILL.md) |
@@ -95,6 +101,8 @@ Close calls:
 - `/arena` gives every worker the same brief and merges the best parts. `/swarm` splits work into slices or a race and returns one report.
 - `/architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
 - `/interrogate` reviews the diff. `/blast-radius` looks for breakage outside the diff and proves the one fact that makes the change safe.
+- `/technical-writing` is for documents people read. `/writing-for-agents` is for documents agents read.
+- `/diagnosing-bugs` stops at a confirmed cause. `/go-mode fix …` runs it and then fixes the bug.
 - `/recall` rebuilds context across recent chats. `/ketchup` covers only this chat since the user's last message. Resuming one specific chat or branch is the Session pickup playbook.
 - `/figure-it-out` designs one rigorous run. The Autonomous run playbook drives one task to a finish condition.
 

@@ -11,6 +11,9 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`setup-gstack`](skills/setup-gstack/SKILL.md): picks the model and effort for each role.
 - [`in-your-own-words`](skills/in-your-own-words/SKILL.md): plays back the goal and the problem before work starts.
 - [`sharpen`](skills/sharpen/SKILL.md): aims a task higher without overspecifying it.
+- [`grilling`](skills/grilling/SKILL.md): interviews you about an idea until the product decisions are settled.
+- [`to-spec`](skills/to-spec/SKILL.md): turns a settled conversation into a short feature spec.
+- [`to-tickets`](skills/to-tickets/SKILL.md): splits a spec into labeled vertical-slice tickets.
 - [`how`](skills/how/SKILL.md): explains how a subsystem works.
 - [`why`](skills/why/SKILL.md): finds out why code is shaped the way it is.
 - [`teach`](skills/teach/SKILL.md): runs `how` and `why` and gives one plain explanation.
@@ -20,13 +23,16 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`architect`](skills/architect/SKILL.md): settles types and module shape before code that crosses a function boundary.
 - [`arena`](skills/arena/SKILL.md): runs several attempts at one brief and merges the best parts.
 - [`swarm`](skills/swarm/SKILL.md): runs parallel workers over slices or races and returns one report.
-- [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff and try to break it.
+- [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff, try to break it, and check it against the spec.
+- [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
+- [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
 - [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md): TypeScript rules for `.ts` and `.tsx` work.
 - [`deslop`](skills/deslop/SKILL.md): removes AI-generated code slop from a diff before commit.
 - [`no-comments`](skills/no-comments/SKILL.md): strips comments before review.
 - [`unslop`](skills/unslop/SKILL.md): removes AI tells from prose.
 - [`technical-writing`](skills/technical-writing/SKILL.md): a standard for docs, READMEs, PR descriptions and commit messages.
+- [`writing-for-agents`](skills/writing-for-agents/SKILL.md): writes skills, prompts and `AGENTS.md` files that agents follow the same way every run.
 - [`bro`](skills/bro/SKILL.md): restates the last reply in plain words.
 - [`control-cli`](skills/control-cli/SKILL.md): drives and inspects a CLI or TUI through a local harness.
 - [`control-ui`](skills/control-ui/SKILL.md): drives and inspects a web, IDE or Electron UI through a local browser or CDP harness.

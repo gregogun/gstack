@@ -14,6 +14,8 @@ Look for these signs:
 - Public options expose internal stages or implementation choices.
 - Learning the interface does not save the caller from learning the implementation.
 
+Apply the deletion test: imagine deleting the module. If its complexity vanishes, it was a pass-through. If the complexity reappears across its callers, it earns its place.
+
 ## Information leakage
 
 Information leakage makes multiple modules depend on the same internal decision. A representation, policy, or protocol detail appears in more than one place, so changing it requires coordinated edits.

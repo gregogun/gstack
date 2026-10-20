@@ -16,6 +16,7 @@ The Principles section below grounds every trigger. In your reply, name each pri
 
 Remaining triggers:
 
+- Task given as a ticket or issue → fetch it, including its comments and parent spec, and state its title. Its acceptance criteria are the definition of done. Then route by what it asks for, usually Feature. A `ready-for-human` ticket needs the user's go-ahead first.
 - Nontrivial change, architecture decision, or "are we sure?" → the **how** skill.
 - About to ask the user a question on a "which approach", "how should I", or "what should this do" fork → classify it before you ask. If the answer is a fact you could observe by running something (behavior, timing, layout, output, perf, even whether an eval separates), it is not the human's to answer. Sketch it via the Prototype playbook (`playbooks/prototype.md`) and let the result decide. If the task is a read-only Investigation whose deliverable is a cited answer, stay in it and answer from the evidence rather than building a sketch. Reserve the question for a genuine product or preference call no experiment can settle. Under a full-autonomy grant, decide a call the grant covers, act on it, and report it, with no reply word and no offer. Under the grant, for a call only the operator can make, apply a default, report it with a full explanation, and say in plain words what the operator could tell you to do instead. The operator answers in their own words. Never give a shorthand token to type back. Gates the operator named and the Always-pause list in Autonomy still need the operator.
 - Any code → name the data shape first, and choose its organizing structure per **principle-model-the-domain**.
@@ -27,7 +28,7 @@ Remaining triggers:
 - Docs, RFCs, readmes, PR descriptions, or commit messages → the **technical-writing** skill (`/technical-writing`).
 - Before commit → the **deslop** skill (`/deslop`).
 - Before review → the **no-comments** skill (`/no-comments`).
-- Shipping UI / IDE / CLI → the matching control skill: **control-cli** (CLIs and TUIs) or **control-ui** (browser / Electron / web UIs). For bug fixes, reproduce first on the same surface yourself. Hand to the user only under the narrow Bug fix step 1 exception.
+- Shipping UI / IDE / CLI → the matching control skill: **control-cli** (CLIs and TUIs) or **control-ui** (browser / Electron / web UIs). For bug fixes, reproduce first on the same surface yourself. Hand to the user only under the narrow exception in the **diagnosing-bugs** skill's step 1.
 - Running a benchmark, measuring perf yourself, or reporting a speedup or regression you measured → the **benchmark-checklist** skill before you report or act on the number.
 - Any PR-status request ("babysit this", "get it green", "address the review bot comments", and most often "check on PR X" or "anything outstanding on X") → the **Babysit** playbook (`playbooks/babysit.md`). Never triggered by merely opening a PR. Declare its mode before polling. The playbook's step 1 owns the request-to-mode mapping. Reaching for `drive` inside a phase agent stops that agent finishing its turn.
 - A review bot commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code. Triage fix / dismiss / ask per `references/review-bot-triage.md`.
