@@ -14,6 +14,18 @@ The author's stated intent for this change:
 
 Review whether the code achieves this intent well. Do NOT question the intent itself. Assume the goal is correct and challenge the execution.
 
+## Spec
+
+{SPEC_OR_NO_SPEC}
+
+Check the code against the spec. Report requirements that are missing or partial, behavior the spec did not ask for, and requirements that look implemented but are wrong. Quote the spec line for each. Skip this when there is no spec.
+
+## Repo Standards
+
+{STANDARDS_CONTENTS}
+
+These are the repo's own rules. Where they disagree with the code-quality lens, the repo's rules win. Cite the file and the rule for each violation.
+
 ## Code Under Review
 
 {DIFF_OR_FILES}

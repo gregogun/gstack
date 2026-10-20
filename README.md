@@ -23,7 +23,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`architect`](skills/architect/SKILL.md): settles types and module shape before code that crosses a function boundary.
 - [`arena`](skills/arena/SKILL.md): runs several attempts at one brief and merges the best parts.
 - [`swarm`](skills/swarm/SKILL.md): runs parallel workers over slices or races and returns one report.
-- [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff and try to break it.
+- [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff, try to break it, and check it against the spec.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
