@@ -13,6 +13,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`sharpen`](skills/sharpen/SKILL.md): aims a task higher without overspecifying it.
 - [`grilling`](skills/grilling/SKILL.md): interviews you about an idea until the product decisions are settled.
 - [`to-spec`](skills/to-spec/SKILL.md): turns a settled conversation into a short feature spec.
+- [`to-tickets`](skills/to-tickets/SKILL.md): splits a spec into labeled vertical-slice tickets.
 - [`how`](skills/how/SKILL.md): explains how a subsystem works.
 - [`why`](skills/why/SKILL.md): finds out why code is shaped the way it is.
 - [`teach`](skills/teach/SKILL.md): runs `how` and `why` and gives one plain explanation.
