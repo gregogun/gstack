@@ -28,7 +28,7 @@ Remaining triggers:
 - Docs, RFCs, readmes, PR descriptions, or commit messages → the **technical-writing** skill (`/technical-writing`).
 - Before commit → the **deslop** skill (`/deslop`).
 - Before review → the **no-comments** skill (`/no-comments`).
-- Shipping UI / IDE / CLI → the matching control skill: **control-cli** (CLIs and TUIs) or **control-ui** (browser / Electron / web UIs). For bug fixes, reproduce first on the same surface yourself. Hand to the user only under the narrow Bug fix step 1 exception.
+- Shipping UI / IDE / CLI → the matching control skill: **control-cli** (CLIs and TUIs) or **control-ui** (browser / Electron / web UIs). For bug fixes, reproduce first on the same surface yourself. Hand to the user only under the narrow exception in the **diagnosing-bugs** skill's step 1.
 - Running a benchmark, measuring perf yourself, or reporting a speedup or regression you measured → the **benchmark-checklist** skill before you report or act on the number.
 - Any PR-status request ("babysit this", "get it green", "address the review bot comments", and most often "check on PR X" or "anything outstanding on X") → the **Babysit** playbook (`playbooks/babysit.md`). Never triggered by merely opening a PR. Declare its mode before polling. The playbook's step 1 owns the request-to-mode mapping. Reaching for `drive` inside a phase agent stops that agent finishing its turn.
 - A review bot commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code. Triage fix / dismiss / ask per `references/review-bot-triage.md`.
