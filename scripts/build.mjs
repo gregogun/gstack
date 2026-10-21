@@ -3,7 +3,8 @@
 // Usage: node scripts/build.mjs [harness...]   (default: every folder in harnesses/)
 //
 // A harness folder holds:
-//   harness.json   manifest {source, target}, extra root files to copy, deny/allow lists
+//   harness.json   manifest {source, target}, extra root files to copy, deny/allow lists,
+//                  and an optional skillPrefix put on every `/<skill>` mention of a gstack skill
 //   tokens.md      one "## name" section per {{name}} token; HTML comments are ignored
 //   agents/*.yml   frontmatter lines merged into agents/<name>.md
 //   models.md      default model and effort per role and a "Drop order:" line (required),
@@ -107,6 +108,8 @@ function build(harness) {
   const tokens = fs.existsSync(tokensFile) ? parseTokens(tokensFile) : new Map();
   const deny = (config.denyList ?? []).map((p) => new RegExp(p));
   const allow = config.allowList ?? [];
+  const skillNames = fs.readdirSync(path.join(ROOT, "skills"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
+  const skillMention = config.skillPrefix ? new RegExp(`\`/(${skillNames.join("|")})(?=[\`\\s])`, "g") : null;
   const overlayDir = input(path.join(hdir, "agents"));
   const overlays = new Map(
     fs.existsSync(overlayDir)
@@ -149,6 +152,7 @@ function build(harness) {
         used.add(name);
         return tokens.get(name);
       });
+      if (skillMention) rendered = rendered.replace(skillMention, `\`/${config.skillPrefix}$1`);
 
       if (dir === "agents") {
         const name = path.basename(src, ".md");

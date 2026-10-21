@@ -4,6 +4,7 @@
     "target": ".claude-plugin/plugin.json"
   },
   "copy": ["LICENSE", "README.md"],
+  "skillPrefix": "gstack:",
   "denyList": ["\\.cursor", "Cursor", "AskQuestion", "subagent_type", "generalPurpose", "\\bTask tool"],
   "allowList": ["endCursor", "precursor", "cursor location"],
   "models": ["opus", "sonnet", "haiku", "fable"],
