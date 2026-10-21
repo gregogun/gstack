@@ -6,7 +6,7 @@ This folder holds what the Claude Code build of gstack needs beyond the shared s
 - `plugin.json`: the plugin manifest. The build writes it to `.claude-plugin/plugin.json`.
 - `models.md`: the default model and effort for each model role. The build ships it as `skills/go-mode/references/model-defaults.md`. See [Models](#models).
 - `agents/<name>.yml`: frontmatter lines the build adds to `agents/<name>.md`. They never set `model` or `effort`: the skill that spawns an agent sets both from the agent's role.
-- `harness.json`: where the manifest goes, the extra root files to copy, the deny list of Cursor names the build rejects, and the `model` and `effort` values `models.md` may use.
+- `harness.json`: where the manifest goes, the extra root files to copy, the deny list of Cursor names the build rejects, the `model` and `effort` values `models.md` may use, and the `skillPrefix` the build puts on skill mentions (see [Names](#names)).
 
 ## Build
 
@@ -52,4 +52,4 @@ The override file lives outside the plugin, so a change applies at the next spaw
 
 ## Names
 
-Skills are namespaced by the plugin, so `/go-mode` is also `/gstack:go-mode`. The bare name works while no other command uses it. Agents load as `gstack:go-agent` and `gstack:comment-sicko`.
+Skills are namespaced by the plugin, so `/go-mode` is also `/gstack:go-mode`. The bare name works while no other command uses it. A user skill of the same name takes the bare name, so the build sets `skillPrefix` in `harness.json` and writes every `` `/<skill>` `` mention in the rendered Markdown as `` `/gstack:<skill>` ``. A skill that tells the agent to run another gstack skill then always gets gstack's copy. Agents load as `gstack:go-agent` and `gstack:comment-sicko`.
