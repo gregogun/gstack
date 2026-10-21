@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-// Read-only install checks for gstack. Prints a Markdown findings table and exits 1 when any finding is an error.
-// Every harness path comes in as an argument; the doctor skill fills them in.
 
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { checkModelRows, parseRoles } from "./model-table.mjs";
+import { checkModelRows, MODEL_ROLES_PATH, MODEL_VALUES_PATH, parseRoles } from "../../go-mode/scripts/model-table.mjs";
 
 const { values: args } = parseArgs({
   options: {
@@ -145,13 +143,19 @@ function distance(a, b) {
   return prev[b.length];
 }
 
-// Close means one edit apart, or a shared stem of 5+ letters covering two thirds of the shorter name (grill-me, grilling).
+const MIN_STEM = 5;
+const MIN_STEM_SHARE = 2 / 3;
+
+function sharesLongStem(x, y) {
+  const shorter = Math.min(x.length, y.length);
+  let stem = 0;
+  while (stem < shorter && x[stem] === y[stem]) stem++;
+  return stem >= MIN_STEM && stem >= shorter * MIN_STEM_SHARE;
+}
+
 function lookalike(a, b) {
   const [x, y] = [a.replaceAll("-", ""), b.replaceAll("-", "")];
-  if (x === y) return false;
-  let stem = 0;
-  while (stem < Math.min(x.length, y.length) && x[stem] === y[stem]) stem++;
-  return distance(x, y) <= 1 || (stem >= 5 && stem * 3 >= Math.min(x.length, y.length) * 2);
+  return x !== y && (distance(x, y) <= 1 || sharesLongStem(x, y));
 }
 
 for (const skill of others) {
@@ -209,12 +213,11 @@ else {
 }
 
 const modelsConfig = expand(args["models-config"]);
-const references = path.join(pluginRoot, "skills/go-mode/references");
 if (!modelsConfig || !fs.existsSync(modelsConfig)) add("model config", "ok", "No override file, so every role uses its default.");
 else {
-  const { roles } = parseRoles(fs.readFileSync(path.join(references, "model-roles.md"), "utf8"));
-  const values = readJson(path.join(references, "model-values.json"));
-  if (!values) add("model config", "warn", `${show(references)}/model-values.json is missing, so models and efforts were not checked.`, "Rebuild gstack.");
+  const { roles } = parseRoles(fs.readFileSync(path.join(pluginRoot, MODEL_ROLES_PATH), "utf8"));
+  const values = readJson(path.join(pluginRoot, MODEL_VALUES_PATH));
+  if (!values) add("model config", "warn", `${show(path.join(pluginRoot, MODEL_VALUES_PATH))} is missing, so models and efforts were not checked.`, "Rebuild gstack.");
   const { problems } = checkModelRows(fs.readFileSync(modelsConfig, "utf8"), roles, values ?? {});
   for (const { line, message } of problems) {
     add("model config", "error", `${show(modelsConfig)}${line ? `:${line}` : ""}: ${message}.`, `Run \`/${gstack}:setup-gstack\` to rewrite the file, or fix the row by hand.`);

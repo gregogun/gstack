@@ -17,8 +17,7 @@ function write(root, files) {
   }
 }
 
-// A gstack repo whose dist/ is the plugin, added as a local directory marketplace and installed at user scope.
-function makeMachine(t) {
+function makeLocalMarketplaceInstall(t) {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "doctor-test-")));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   write(root, {
@@ -66,7 +65,7 @@ function doctor(root, extra = []) {
 }
 
 test("a healthy install reports every check ok", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   const r = doctor(root);
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(
@@ -76,7 +75,7 @@ test("a healthy install reports every check ok", (t) => {
 });
 
 test("a user skill with a gstack name is an error, and a bare command runs it", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, { "home/skills/teach/SKILL.md": skill("teach") });
   const r = doctor(root);
   assert.equal(r.status, 1);
@@ -87,7 +86,7 @@ test("a user skill with a gstack name is an error, and a bare command runs it", 
 });
 
 test("a symlinked clash names the target and offers to remove only the link", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, { "elsewhere/grilling/SKILL.md": skill("grilling") });
   fs.mkdirSync(path.join(root, "home/skills"), { recursive: true });
   fs.symlinkSync(path.join(root, "elsewhere/grilling"), path.join(root, "home/skills/grilling"));
@@ -98,13 +97,13 @@ test("a symlinked clash names the target and offers to remove only the link", (t
 });
 
 test("a user skill whose frontmatter name clashes is caught under another folder name", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, { "home/skills/my-teacher/SKILL.md": skill("teach") });
   assert.equal(doctor(root).of("clash")[0].severity, "error");
 });
 
 test("a project copy is a warning with no removal offered", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, { "project/.claude/skills/teach/SKILL.md": skill("teach") });
   const r = doctor(root);
   assert.equal(r.status, 0);
@@ -115,7 +114,7 @@ test("a project copy is a warning with no removal offered", (t) => {
 });
 
 test("another enabled plugin with a gstack name is an error whose winner is unknown", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   const records = JSON.parse(fs.readFileSync(path.join(root, "plugins/installed.json"), "utf8"));
   records.plugins["other@mkt"] = [{ scope: "user", installPath: path.join(root, "cache/other") }];
   records.plugins["off@mkt"] = [{ scope: "user", installPath: path.join(root, "cache/off") }];
@@ -134,7 +133,7 @@ test("another enabled plugin with a gstack name is an error whose winner is unkn
 });
 
 test("a model-invocable skill with a close name is a lookalike, and a disabled one is not", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, {
     "home/skills/grill-me/SKILL.md": skill("grill-me"),
     "home/skills/teachx/SKILL.md": skill("teachx", "disable-model-invocation: true\n"),
@@ -149,7 +148,7 @@ test("a model-invocable skill with a close name is a lookalike, and a disabled o
 });
 
 test("a bad model config row is an error with its line", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, {
     "home/gstack-models.md": "# overrides\n\n| Role | Model | Effort |\n|---|---|---|\n| `bug-fix` | gpt | high |\n| `nope` | opus | low |\n",
   });
@@ -162,7 +161,7 @@ test("a bad model config row is an error with its line", (t) => {
 });
 
 test("source newer than the build is a stale build warning with the rebuild command", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   const future = new Date(Date.now() + 60_000);
   fs.utimesSync(path.join(root, "repo/skills/teach/SKILL.md"), future, future);
   const [stale] = doctor(root).of("stale build");
@@ -172,7 +171,7 @@ test("source newer than the build is a stale build warning with the rebuild comm
 });
 
 test("a plugin not built from a local folder skips the stale build check, and a project install warns", (t) => {
-  const root = makeMachine(t);
+  const root = makeLocalMarketplaceInstall(t);
   write(root, {
     "plugins/marketplaces.json": { gstack: { source: { source: "github" }, installLocation: path.join(root, "mkt") } },
     "plugins/installed.json": { plugins: { "gstack@gstack": [{ scope: "project", projectPath: path.join(root, "project"), installPath: path.join(root, "repo/dist") }] } },

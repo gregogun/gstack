@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const BUILD = path.join(HERE, "build.mjs");
-const MODEL_TABLE = "skills/doctor/scripts/model-table.mjs";
+const MODEL_TABLE = "skills/go-mode/scripts/model-table.mjs";
 
 function makeFixture(skillBody, extra = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "build-test-"));
@@ -61,4 +61,14 @@ test("drop order with an unknown model fails the build", (t) => {
   const r = build(root);
   assert.equal(r.status, 1, "build should exit 1 on an unknown drop-order model");
   assert.match(r.stderr, /drop order model "gpt"/);
+});
+
+test("the build writes the harness's models and efforts for the doctor", (t) => {
+  const root = makeFixture("# Demo\n", {
+    "harnesses/fx/harness.json": '{"models": ["opus", "sonnet"], "efforts": ["low", "high"]}',
+  });
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  assert.equal(build(root).status, 0);
+  const values = JSON.parse(fs.readFileSync(path.join(root, "dist/fx/skills/go-mode/references/model-values.json"), "utf8"));
+  assert.deepEqual(values, { models: ["opus", "sonnet"], efforts: ["low", "high"] });
 });

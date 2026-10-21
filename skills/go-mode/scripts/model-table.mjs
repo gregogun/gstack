@@ -1,8 +1,8 @@
-// The model-table rules shared by scripts/build.mjs (for models.md) and doctor.mjs (for the user's override file).
-// Each check returns problems as { line, message }; line is null for a whole-file problem.
+export const MODEL_ROLES_PATH = "skills/go-mode/references/model-roles.md";
+export const MODEL_VALUES_PATH = "skills/go-mode/references/model-values.json";
 
-// Rows of the Markdown tables in `text` (after the first line matching `after`, if given),
-// as arrays of trimmed cells, skipping header and separator rows.
+const isSeparatorRow = (line) => /^\|[\s:|-]+\|$/.test(line);
+
 export function tableRows(text, after) {
   let lines = text.split("\n");
   let offset = 0;
@@ -13,7 +13,7 @@ export function tableRows(text, after) {
   const rows = [];
   for (let i = 0; i < lines.length; i++) {
     if (!lines[i].startsWith("|")) continue;
-    if (/^\|[\s:|-]+\|$/.test(lines[i]) || lines[i + 1]?.match(/^\|[\s:|-]+\|$/)) continue;
+    if (isSeparatorRow(lines[i]) || isSeparatorRow(lines[i + 1] ?? "")) continue;
     rows.push({ line: offset + i + 1, cells: lines[i].split("|").slice(1, -1).map((c) => c.trim()) });
   }
   return rows;
@@ -21,7 +21,6 @@ export function tableRows(text, after) {
 
 const roleName = (cell) => cell.match(/^`([^`]+)`$/)?.[1];
 
-// Roles from the "## Roles" table of model-roles.md, as a Map of name to "one" or "list".
 export function parseRoles(text) {
   const roles = new Map();
   const problems = [];
@@ -37,7 +36,6 @@ export function parseRoles(text) {
   return { roles, problems };
 }
 
-// Checks every Role, Model, Effort row in `text`. Returns the problems and the row count per role.
 export function checkModelRows(text, roles, { models = [], efforts = [] }) {
   const problems = [];
   const counts = new Map();
@@ -48,7 +46,7 @@ export function checkModelRows(text, roles, { models = [], efforts = [] }) {
       problems.push({ line, message: "first cell must be a `role`" });
       continue;
     }
-    if (!roles.has(name)) problems.push({ line, message: `unknown role "${name}" (not in model-roles.md)` });
+    if (!roles.has(name)) problems.push({ line, message: `unknown role "${name}" (not in ${MODEL_ROLES_PATH})` });
     counts.set(name, (counts.get(name) ?? 0) + 1);
     if (model === "inherit-parent") {
       if (effort !== "-") problems.push({ line, message: `inherit-parent takes effort "-", got "${effort}"` });

@@ -14,15 +14,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkModelRows, parseRoles as parseRoleTable } from "../skills/doctor/scripts/model-table.mjs";
+import { checkModelRows, MODEL_ROLES_PATH as ROLES_FILE, MODEL_VALUES_PATH, parseRoles as parseRoleTable } from "../skills/go-mode/scripts/model-table.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE_DIRS = ["skills", "agents"];
 const EXCLUDE = new Set(["node_modules", ".DS_Store"]);
 const TOKEN = /\{\{([a-z_]+)\}\}/g;
-const ROLES_FILE = "skills/go-mode/references/model-roles.md";
 const MODEL_DEFAULTS_TARGET = "skills/go-mode/references/model-defaults.md";
-const MODEL_VALUES_TARGET = "skills/go-mode/references/model-values.json";
 
 const rel = (p) => path.relative(ROOT, p);
 const lineOf = (text, index) => text.slice(0, index).split("\n").length;
@@ -122,6 +120,7 @@ function build(harness) {
   const modelDefaults = path.join(hdir, "models.md");
   checkModelDefaults(modelDefaults, parseRoles(errors), config, errors);
   if (fs.existsSync(path.join(ROOT, MODEL_DEFAULTS_TARGET))) errors.push(`${MODEL_DEFAULTS_TARGET}: the build writes this file from harnesses/<harness>/models.md, so the source must not have it`);
+  if (fs.existsSync(path.join(ROOT, MODEL_VALUES_PATH))) errors.push(`${MODEL_VALUES_PATH}: the build writes this file from harnesses/<harness>/harness.json, so the source must not have it`);
 
   for (const dir of SOURCE_DIRS) {
     for (const src of walk(path.join(ROOT, dir))) {
@@ -175,7 +174,7 @@ function build(harness) {
   for (const name of tokens.keys()) if (!used.has(name)) warnings.push(`harnesses/${harness}/tokens.md: token "${name}" is defined but never used`);
 
   if (fs.existsSync(modelDefaults)) fs.copyFileSync(modelDefaults, path.join(out, MODEL_DEFAULTS_TARGET));
-  fs.writeFileSync(path.join(out, MODEL_VALUES_TARGET), `${JSON.stringify({ models: config.models ?? [], efforts: config.efforts ?? [] }, null, 2)}\n`);
+  fs.writeFileSync(path.join(out, MODEL_VALUES_PATH), `${JSON.stringify({ models: config.models ?? [], efforts: config.efforts ?? [] }, null, 2)}\n`);
 
   for (const file of config.copy ?? []) {
     fs.copyFileSync(path.join(ROOT, file), path.join(out, file));
