@@ -91,3 +91,9 @@ run `/reload-plugins` or start a new session
 <!-- The full doctor command. The bare /doctor is Claude Code's built-in install check, so the doctor skill is always written with its plugin prefix. -->
 
 `/gstack:doctor`
+
+## disable_plugin
+
+<!-- Used as "disable that plugin with {{disable_plugin}}, using the plugin id from the row". Changes enabledPlugins in the settings file of the scope it finds. -->
+
+`claude plugin disable <plugin-id>`

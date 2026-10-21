@@ -33,7 +33,7 @@ Inside a session, `/plugin marketplace add /path/to/gstack` and `/plugin install
 
 Claude Code loads a plugin from a local-directory marketplace in place, so after a source change rerun the build and run `/reload-plugins` or start a new session. No reinstall or version bump is needed.
 
-If a gstack command runs a different skill, or a source change doesn't show up, run `/gstack:doctor`. Type the full name, because the bare `/doctor` is Claude Code's own command. It finds other skills with gstack's names, a build older than its source, and a non-user install scope.
+If a gstack command runs a different skill, or a source change doesn't show up, run `/gstack:doctor`. Type the full name, because the bare `/doctor` is Claude Code's own command. It finds other skills with gstack's names, a build older than the files it reads, and a non-user install scope. Each build writes `build-inputs.json` to `dist/claude-code/`, which lists those files. The doctor script reads Claude Code's plugin records, so another harness needs its own readers.
 
 To remove it, run `claude plugin marketplace remove gstack`, which also uninstalls the plugin.
 
