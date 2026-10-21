@@ -6,8 +6,8 @@
 # Usage: audit.sh [section...] [-b|--base <ref>] [-t|--transcripts <dir>] [repo-path]
 #   Sections: --worktrees --branches --stashes --prs --scratch --processes --disk.
 #   None means all. repo-path defaults to the current repo; --disk alone needs none.
-#   -t sets the directory of chat transcripts (JSONL) to scan for LAST_CHAT,
-#   overriding $GSTACK_TRANSCRIPTS_DIR. With neither, LAST_CHAT is "-".
+#   -t adds a directory of chat transcripts (JSONL) to scan for LAST_CHAT, and
+#   may repeat. It overrides $GSTACK_TRANSCRIPTS_DIR. With neither, LAST_CHAT is "-".
 #   -b sets the ref the MERGED column checks against (e.g. origin/integration).
 #   Without it the base is origin/HEAD, then origin/main, then origin/master.
 #   origin/HEAD is the remote's default branch, not necessarily the branch PRs
@@ -23,25 +23,29 @@
 #              keep. origin rows: merged-PR heads still on origin, bucket report.
 #   prs        open PRs flagged head-gone (branch not on origin) or stale-draft
 #              (draft not updated in 14 days).
-#   Other sections have no bucket; they are report only.
+#   Other sections have no bucket; they are report only. processes lists every
+#   process whose cwd is in a linked worktree, and main-worktree processes only
+#   when they hold a port or are orphans (ORPHAN is yes).
 set -u
 
 all="worktrees branches stashes prs scratch processes disk"
 sections=""
 base=""
-transcripts="${GSTACK_TRANSCRIPTS_DIR:-}"
+transcripts=""
 stale_days=14
 while [ $# -gt 0 ]; do
 	case "$1" in
 	--worktrees|--branches|--stashes|--prs|--scratch|--processes|--disk) sections="$sections ${1#--}"; shift ;;
 	-b|--base) [ $# -ge 2 ] || { echo "error: $1 needs a ref" >&2; exit 2; }; base="$2"; shift 2 ;;
-	-t|--transcripts) [ $# -ge 2 ] || { echo "error: $1 needs a dir" >&2; exit 2; }; transcripts="$2"; shift 2 ;;
+	-t|--transcripts) [ $# -ge 2 ] || { echo "error: $1 needs a dir" >&2; exit 2; }; transcripts="$transcripts$2"$'\n'; shift 2 ;;
 	-h|--help) sed -n '2,/^set -u/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
 	-*) echo "error: unknown option: $1" >&2; exit 2 ;;
 	*) break ;;
 	esac
 done
+[ $# -le 1 ] || { echo "error: unexpected argument: $2 (options go before repo-path)" >&2; exit 2; }
 [ -z "$sections" ] && sections="$all"
+[ -z "$transcripts" ] && [ -n "${GSTACK_TRANSCRIPTS_DIR:-}" ] && transcripts="$GSTACK_TRANSCRIPTS_DIR"$'\n'
 wants() { for s in "$@"; do case " $sections " in *" $s "*) return 0 ;; esac; done; return 1; }
 
 tmp=$(mktemp -d)
@@ -77,14 +81,16 @@ if wants worktrees branches; then
 	esac
 	git rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1 || { echo "error: base ref not found: $base" >&2; exit 1; }
 	base_branch="${base#*/}"
+	default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)
+	default_branch="${default_branch#origin/}"
 	echo "# base: $base"
 fi
 
 prs="$tmp/prs"
 if wants worktrees branches prs; then
 	gh pr list --author "@me" --state all --limit 1000 \
-		--json number,state,headRefName,headRefOid,isDraft,isCrossRepository,updatedAt,title \
-		--jq 'sort_by(.number) | reverse | .[] | [.number, (.state | ascii_downcase), .headRefName, .headRefOid, .isDraft, .isCrossRepository, (.updatedAt | fromdateiso8601), .title] | @tsv' \
+		--json number,state,headRefName,headRefOid,isDraft,isCrossRepository,updatedAt,title,baseRefName \
+		--jq 'sort_by(.number) | reverse | .[] | [.number, (.state | ascii_downcase), .headRefName, .headRefOid, .isDraft, .isCrossRepository, (.updatedAt | fromdateiso8601), .title, .baseRefName] | @tsv' \
 		> "$prs" 2>/dev/null || { echo "warn: gh could not list PRs; PR columns will be -" >&2; : > "$prs"; }
 fi
 pr_for() { awk -F'\t' -v b="$1" '$3==b {print "#" $1 "/" $2; exit}' "$prs"; }
@@ -92,11 +98,15 @@ pr_for() { awk -F'\t' -v b="$1" '$3==b {print "#" $1 "/" $2; exit}' "$prs"; }
 # Branch heads on origin, read with ls-remote so stale remote-tracking refs
 # never make a deleted branch look alive.
 heads="$tmp/heads"
-if wants branches prs; then
+heads_ok=""
+: > "$heads"
+if wants branches prs scratch; then
 	if listing=$(git ls-remote --heads origin 2>/dev/null); then
 		printf '%s\n' "$listing" | awk -F'\t' '$2 ~ /^refs\/heads\// {print $1 "\t" substr($2, 12)}' > "$heads"
-	else echo "warn: could not list origin heads; remote checks will be wrong" >&2; : > "$heads"; fi
+		heads_ok=yes
+	else echo "warn: could not list origin heads; UPSTREAM uses local tracking refs, and no head-gone or origin rows" >&2; fi
 fi
+on_origin() { awk -F'\t' -v b="$1" '$2==b {f=1} END {exit !f}' "$heads"; }
 
 if wants branches scratch; then
 	git for-each-ref refs/heads \
@@ -104,16 +114,23 @@ if wants branches scratch; then
 		> "$tmp/branches"
 fi
 worktree_of() { awk -F'\t' -v b="$1" '$1==b {print $2; exit}' "$tmp/wt_branches"; }
-upstream_state() { if [ -z "$1" ]; then echo none; elif [ "$2" = "[gone]" ]; then echo gone; else echo tracking; fi; }
-mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1"; }
+upstream_state() {
+	if [ -z "$1" ]; then echo none
+	elif [ "$2" = "[gone]" ]; then echo gone
+	elif [ -n "$heads_ok" ] && [ "${1#origin/}" != "$1" ] && ! on_origin "${1#origin/}"; then echo gone
+	else echo tracking; fi
+}
+mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1"; }
 
 section_worktrees() {
-	if [ -z "$transcripts" ]; then echo "warn: no transcripts dir (-t or GSTACK_TRANSCRIPTS_DIR); LAST_CHAT will be -" >&2
-	elif [ ! -d "$transcripts" ]; then echo "warn: transcripts dir not found: $transcripts; LAST_CHAT will be -" >&2; fi
+	[ -z "$transcripts" ] && echo "warn: no transcripts dir (-t or GSTACK_TRANSCRIPTS_DIR); LAST_CHAT will be -" >&2
+	printf '%s' "$transcripts" | while IFS= read -r d; do
+		[ -d "$d" ] || echo "warn: transcripts dir not found: $d; LAST_CHAT skips it" >&2
+	done
 
 	echo "# worktrees"
 	printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
-	while read -r wt; do
+	while IFS= read -r wt; do
 		[ "$wt" = "$main_wt" ] && continue
 
 		size=$(du -sh "$wt" 2>/dev/null | awk '{print $1}')
@@ -142,12 +159,11 @@ section_worktrees() {
 
 		# A path counts only when "/" or a quote follows it, so wt-1 never matches wt-12.
 		last="-"; last_ts=0
-		if [ -n "$transcripts" ] && [ -d "$transcripts" ]; then
-			f=$(grep -rlF -e "${wt}/" -e "${wt}\"" "$transcripts" 2>/dev/null \
-				| while read -r t; do echo "$(mtime "$t") $t"; done | sort -rn | head -1)
-			if [ -n "$f" ]; then last_ts=$(echo "$f" | awk '{print $1}')
-				last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null || date -d "@$last_ts" '+%Y-%m-%d'); fi
-		fi
+		f=$(printf '%s' "$transcripts" | while IFS= read -r d; do
+				[ -d "$d" ] && grep -rlF -e "${wt}/" -e "${wt}\"" "$d" 2>/dev/null
+			done | while IFS= read -r t; do echo "$(mtime "$t") $t"; done | sort -rn | head -1)
+		if [ -n "$f" ]; then last_ts=$(echo "$f" | awk '{print $1}')
+			last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null || date -d "@$last_ts" '+%Y-%m-%d'); fi
 		recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
 
 		case "$dirty" in wip:*) bucket=hold-wip ;; *)
@@ -175,10 +191,10 @@ tip_in_merged_pr() {
 }
 
 merged_pr_heads_on_origin() {
-	awk -F'\t' -v now="$now" -v base="$base_branch" '
+	awk -F'\t' -v now="$now" -v base="$base_branch" -v dflt="$default_branch" '
 		FILENAME==ARGV[1] { remote[$2]=$1; next }
-		$2=="open" { open[$3]=1; next }
-		$2=="merged" && $6=="false" && ($3 in remote) && $3!=base && !seen[$3]++ {
+		$2=="open" { open[$3]=1; open[$9]=1; next }
+		$2=="merged" && $6=="false" && ($3 in remote) && $3!=base && $3!=dflt && !seen[$3]++ {
 			row[$3]=sprintf("origin\t%dd\t%s\t-\t#%s/merged\t-\treport\t%s", (now-$7)/86400, (remote[$3]==$4 ? "pr" : "no"), $1, $3)
 		}
 		END { for (h in row) if (!(h in open)) print row[h] }' "$heads" "$prs"
@@ -189,7 +205,7 @@ section_branches() {
 	printf "WHERE\tAGE\tMERGED\tUPSTREAM\tPR\tWORKTREE\tBUCKET\tBRANCH\n"
 	{
 		while IFS="$field" read -r name sha ts up track _; do
-			[ "$name" = "$base_branch" ] && continue
+			[ "$name" = "$base_branch" ] || [ "$name" = "$default_branch" ] && continue
 			if git merge-base --is-ancestor "$sha" "$base" 2>/dev/null; then merged=YES
 			elif tip_in_merged_pr "$name" "$sha"; then merged=pr
 			else merged=no; fi
@@ -222,11 +238,11 @@ section_stashes() {
 section_prs() {
 	echo "# prs"
 	printf "PR\tSTATE\tAGE\tHEAD\tFLAG\tTITLE\n"
-	awk -F'\t' -v now="$now" -v stale="$stale_days" '
+	awk -F'\t' -v now="$now" -v stale="$stale_days" -v known="$heads_ok" '
 		FILENAME==ARGV[1] { remote[$2]=1; next }
 		$2=="open" {
 			age = int((now - $7) / 86400); flag = ""
-			if ($6=="false" && !($3 in remote)) flag = "head-gone"
+			if (known && $6=="false" && !($3 in remote)) flag = "head-gone"
 			if ($5=="true" && age > stale) flag = flag (flag ? "," : "") "stale-draft"
 			if (flag) printf "#%s\t%s\t%dd\t%s\t%s\t%s\n", $1, ($5=="true" ? "draft" : "open"), age, $3, flag, $8
 		}' "$heads" "$prs"
@@ -242,7 +258,9 @@ section_scratch() {
 	while IFS="$field" read -r name _ ts up track subject; do
 		case "$subject" in [Ww][Ii][Pp]|[Ww][Ii][Pp][:\ \(!]*) ;; *) continue ;; esac
 		[ -n "$(worktree_of "$name")" ] && continue
-		printf "wip-commit\t%sd\t%s\tupstream:%s %s\n" "$(( (now - ts) / 86400 ))" "$name" "$(upstream_state "$up" "$track")" "$subject"
+		upstream=$(upstream_state "$up" "$track")
+		[ "$upstream" = tracking ] && continue
+		printf "wip-commit\t%sd\t%s\tupstream:%s %s\n" "$(( (now - ts) / 86400 ))" "$name" "$upstream" "$subject"
 	done < "$tmp/branches"
 }
 
@@ -263,8 +281,8 @@ section_processes() {
 	pid_worktrees | while IFS=$'\t' read -r pid wt; do
 		ports=$(awk -F'\t' -v p="$pid" '$1==p {print $2}' "$tmp/ports" | sort -un | paste -sd, -)
 		read -r ppid etime cmd <<< "$(ps -o ppid=,etime=,command= -p "$pid" 2>/dev/null)"
-		[ -z "$ppid" ] && continue
-		[ -z "$ports" ] && [ "$ppid" != 1 ] && continue
+		[ -z "$ppid" ] || [ "$pid" = "$$" ] || [ "$ppid" = "$$" ] && continue
+		[ "$wt" = "$main_wt" ] && [ -z "$ports" ] && [ "$ppid" != 1 ] && continue
 		printf "%s\t%s\t%s\t%s\t%s\t%s\t%.120s\n" "$pid" "$ppid" "$([ "$ppid" = 1 ] && echo yes || echo no)" "${ports:--}" "$etime" "$wt" "$cmd"
 	done
 }
