@@ -182,3 +182,15 @@ test("a plugin not built from a local folder skips the stale build check, and a 
   assert.equal(scope.severity, "warn");
   assert.match(scope.detail, /project scope for .*project/);
 });
+
+test("no skill sends users to the bare /doctor, which is the harness's own command", () => {
+  const skills = path.join(path.dirname(DOCTOR), "../..");
+  const bare = [];
+  for (const file of fs.readdirSync(skills, { recursive: true })) {
+    if (!file.endsWith(".md")) continue;
+    fs.readFileSync(path.join(skills, file), "utf8").split("\n").forEach((line, i) => {
+      if (/(?<![\w:./-])\/doctor\b/.test(line)) bare.push(`skills/${file}:${i + 1}`);
+    });
+  }
+  assert.deepEqual(bare, []);
+});

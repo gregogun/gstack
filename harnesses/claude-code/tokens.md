@@ -85,3 +85,9 @@ ${CLAUDE_PLUGIN_ROOT}
 <!-- Used as "then {{reload_plugins}}" after a rebuild. -->
 
 run `/reload-plugins` or start a new session
+
+## doctor_command
+
+<!-- The full doctor command. The bare /doctor is Claude Code's built-in install check, so the doctor skill is always written with its plugin prefix. -->
+
+`/gstack:doctor`

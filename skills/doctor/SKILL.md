@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: "Check the gstack install for problems: other skills that take a gstack skill's name, lookalike skills that can run on their own, a stale build, the install scope, and the model config. Offers a fix for each problem and asks before every change. Use for /doctor, or when a gstack command runs the wrong skill."
+description: "Check the gstack install for problems: other skills that take a gstack skill's name, lookalike skills that can run on their own, a stale build, the install scope, and the model config. Offers a fix for each problem and asks before every change. Use for {{doctor_command}}, or when a gstack command runs the wrong skill."
 disable-model-invocation: true
 ---
 
