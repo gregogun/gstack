@@ -9,7 +9,6 @@
 //   models.md      default model and effort per role and a "Drop order:" line (required),
 //                  checked against ROLES_FILE
 //                  and shipped as MODEL_DEFAULTS_TARGET
-// A successful build also writes BUILD_INPUTS_TARGET: every file and folder it read, for the doctor's stale-build check.
 //   the manifest template named by harness.json
 
 import fs from "node:fs";

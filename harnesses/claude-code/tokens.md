@@ -82,8 +82,6 @@ ${CLAUDE_PLUGIN_ROOT}
 
 ## reload_plugins
 
-<!-- Used as "then {{reload_plugins}}" after a rebuild. -->
-
 run `/reload-plugins` or start a new session
 
 ## doctor_command

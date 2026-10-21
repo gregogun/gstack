@@ -63,7 +63,6 @@ const skillDirsIn = (root) =>
       ? [root]
       : fs.readdirSync(root).map((e) => path.join(root, e)).filter((d) => fs.existsSync(path.join(d, "SKILL.md")));
 
-// A personal or project skill also answers to its directory name; a plugin skill only to its name.
 function looseSkills(dir, kind) {
   return skillDirsIn(dir).filter((d) => d !== dir).map((d) => {
     const skill = readSkill(d);

@@ -25,7 +25,6 @@ function touch(file, when) {
   fs.utimesSync(file, when, when);
 }
 
-// A gstack repo built by the real build into dist/fx, added as a local directory marketplace and installed at user scope.
 function makeLocalMarketplaceInstall(t) {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "doctor-test-")));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
