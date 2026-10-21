@@ -6,12 +6,15 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const BUILD = path.join(path.dirname(fileURLToPath(import.meta.url)), "build.mjs");
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const BUILD = path.join(HERE, "build.mjs");
+const MODEL_TABLE = "skills/doctor/scripts/model-table.mjs";
 
 function makeFixture(skillBody, extra = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "build-test-"));
   const files = {
     "scripts/build.mjs": fs.readFileSync(BUILD, "utf8"),
+    [MODEL_TABLE]: fs.readFileSync(path.join(HERE, "..", MODEL_TABLE), "utf8"),
     "skills/go-mode/references/model-roles.md": "## Roles\n\n| Role | Entries | Can drop | Use | Notes |\n| --- | --- | --- | --- | --- |\n| `only role` | one | yes | x | y |\n",
     "skills/demo/SKILL.md": skillBody,
     "harnesses/fx/harness.json": "{}",

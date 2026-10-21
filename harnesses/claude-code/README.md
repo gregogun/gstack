@@ -18,6 +18,8 @@ node scripts/build.mjs claude-code
 
 This writes `dist/claude-code/`. The build fails, listing `file:line`, on an unknown or unrendered token, a Cursor name left in the rendered Markdown, or a `models.md` that is missing, misses a role, names an unknown role, or uses a model or effort outside `harness.json`. `dist/` is not committed.
 
+The build also writes the `model` and `effort` values from `harness.json` to `skills/go-mode/references/model-values.json`, so `/doctor` checks the override file against the same lists.
+
 ## Install
 
 The repo root is a local marketplace named `gstack` (`.claude-plugin/marketplace.json`). Its one plugin, also `gstack`, points at `./dist/claude-code`, so build first.
@@ -30,6 +32,8 @@ claude plugin install gstack@gstack
 Inside a session, `/plugin marketplace add /path/to/gstack` and `/plugin install gstack@gstack` do the same. Start a new session afterwards.
 
 Claude Code loads a plugin from a local-directory marketplace in place, so after a source change rerun the build and run `/reload-plugins` or start a new session. No reinstall or version bump is needed.
+
+If a gstack command runs a different skill, or a source change doesn't show up, run `/doctor`. It finds other skills with gstack's names, a build older than its source, and a non-user install scope.
 
 To remove it, run `claude plugin marketplace remove gstack`, which also uninstalls the plugin.
 
