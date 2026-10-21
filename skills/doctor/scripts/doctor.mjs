@@ -11,21 +11,31 @@ const MIN_EDIT_LENGTH = 5;
 const MIN_STEM = 5;
 const MIN_STEM_SHARE = 2 / 3;
 
-const { values: args } = parseArgs({
-  options: {
-    "plugin-root": { type: "string" },
-    "user-skills": { type: "string" },
-    "project-skills": { type: "string" },
-    "plugin-records": { type: "string" },
-    "marketplace-records": { type: "string" },
-    settings: { type: "string", multiple: true, default: [] },
-    "models-config": { type: "string" },
-  },
-});
-if (!args["plugin-root"]) {
-  console.error("usage: doctor.mjs --plugin-root <dir> [--user-skills <dir>] [--project-skills <dir>] [--plugin-records <file>] [--marketplace-records <file>] [--settings <file>]... [--models-config <file>]");
+const USAGE = "usage: doctor.mjs --plugin-root <dir> [--user-skills <dir>] [--project-skills <dir>] [--plugin-records <file>] [--marketplace-records <file>] [--settings <file>]... [--models-config <file>]";
+
+function usage(message) {
+  if (message) console.error(message);
+  console.error(USAGE);
   process.exit(2);
 }
+
+let args;
+try {
+  ({ values: args } = parseArgs({
+    options: {
+      "plugin-root": { type: "string" },
+      "user-skills": { type: "string" },
+      "project-skills": { type: "string" },
+      "plugin-records": { type: "string" },
+      "marketplace-records": { type: "string" },
+      settings: { type: "string", multiple: true, default: [] },
+      "models-config": { type: "string" },
+    },
+  }));
+} catch (e) {
+  usage(e.message);
+}
+if (!args["plugin-root"]) usage();
 
 const expand = (p) => (p?.startsWith("~/") ? path.join(os.homedir(), p.slice(2)) : p);
 const show = (p) => (p.startsWith(os.homedir() + path.sep) ? `~${p.slice(os.homedir().length)}` : p);

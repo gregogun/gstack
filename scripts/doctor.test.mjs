@@ -265,6 +265,13 @@ test("a malformed settings file stops only the checks that read it, and exits 2"
   assert.equal(r.rows.length, 6);
 });
 
+test("an unknown option prints the usage and exits 2", () => {
+  const r = spawnSync(process.execPath, [DOCTOR, "--plugin-root", REPO, "--bogus"], { encoding: "utf8" });
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /Unknown option '--bogus'/);
+  assert.match(r.stderr, /^usage: doctor\.mjs --plugin-root/m);
+});
+
 test("no skill sends users to the bare /doctor, which is the harness's own command", () => {
   const skills = path.join(REPO, "skills");
   const bare = [];
