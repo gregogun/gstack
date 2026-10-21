@@ -9,6 +9,7 @@
 //   models.md      default model and effort per role and a "Drop order:" line (required),
 //                  checked against ROLES_FILE
 //                  and shipped as MODEL_DEFAULTS_TARGET
+// A successful build also writes BUILD_INPUTS_TARGET: every file and folder it read, for the doctor's stale-build check.
 //   the manifest template named by harness.json
 
 import fs from "node:fs";
@@ -21,6 +22,7 @@ const SOURCE_DIRS = ["skills", "agents"];
 const EXCLUDE = new Set(["node_modules", ".DS_Store"]);
 const TOKEN = /\{\{([a-z_]+)\}\}/g;
 const MODEL_DEFAULTS_TARGET = "skills/go-mode/references/model-defaults.md";
+const BUILD_INPUTS_TARGET = "build-inputs.json";
 
 const rel = (p) => path.relative(ROOT, p);
 const lineOf = (text, index) => text.slice(0, index).split("\n").length;
@@ -97,14 +99,16 @@ function mergeFrontmatter(text, overlay, label, errors) {
 }
 
 function build(harness) {
+  const inputs = new Set([rel(fileURLToPath(import.meta.url))]);
+  const input = (p) => (inputs.add(rel(p)), p);
   const hdir = path.join(ROOT, "harnesses", harness);
   const out = path.join(ROOT, "dist", harness);
-  const config = JSON.parse(fs.readFileSync(path.join(hdir, "harness.json"), "utf8"));
-  const tokensFile = path.join(hdir, "tokens.md");
+  const config = JSON.parse(fs.readFileSync(input(path.join(hdir, "harness.json")), "utf8"));
+  const tokensFile = input(path.join(hdir, "tokens.md"));
   const tokens = fs.existsSync(tokensFile) ? parseTokens(tokensFile) : new Map();
   const deny = (config.denyList ?? []).map((p) => new RegExp(p));
   const allow = config.allowList ?? [];
-  const overlayDir = path.join(hdir, "agents");
+  const overlayDir = input(path.join(hdir, "agents"));
   const overlays = new Map(
     fs.existsSync(overlayDir)
       ? fs.readdirSync(overlayDir).filter((f) => f.endsWith(".yml")).map((f) => [f.slice(0, -4), fs.readFileSync(path.join(overlayDir, f), "utf8")])
@@ -117,13 +121,13 @@ function build(harness) {
 
   fs.rmSync(out, { recursive: true, force: true });
 
-  const modelDefaults = path.join(hdir, "models.md");
+  const modelDefaults = input(path.join(hdir, "models.md"));
   checkModelDefaults(modelDefaults, parseRoles(errors), config, errors);
   if (fs.existsSync(path.join(ROOT, MODEL_DEFAULTS_TARGET))) errors.push(`${MODEL_DEFAULTS_TARGET}: the build writes this file from harnesses/<harness>/models.md, so the source must not have it`);
   if (fs.existsSync(path.join(ROOT, MODEL_VALUES_PATH))) errors.push(`${MODEL_VALUES_PATH}: the build writes this file from harnesses/<harness>/harness.json, so the source must not have it`);
 
   for (const dir of SOURCE_DIRS) {
-    for (const src of walk(path.join(ROOT, dir))) {
+    for (const src of walk(input(path.join(ROOT, dir)))) {
       const dest = path.join(out, rel(src));
       fs.mkdirSync(path.dirname(dest), { recursive: true });
 
@@ -177,11 +181,11 @@ function build(harness) {
   fs.writeFileSync(path.join(out, MODEL_VALUES_PATH), `${JSON.stringify({ models: config.models ?? [], efforts: config.efforts ?? [] }, null, 2)}\n`);
 
   for (const file of config.copy ?? []) {
-    fs.copyFileSync(path.join(ROOT, file), path.join(out, file));
+    fs.copyFileSync(input(path.join(ROOT, file)), path.join(out, file));
   }
 
   if (config.manifest) {
-    const manifestSrc = path.join(hdir, config.manifest.source);
+    const manifestSrc = input(path.join(hdir, config.manifest.source));
     const manifestText = fs.readFileSync(manifestSrc, "utf8");
     try {
       JSON.parse(manifestText);
@@ -199,6 +203,7 @@ function build(harness) {
     console.error(`\n${harness}: build failed with ${errors.length} error(s). Output in ${rel(out)} is incomplete.`);
     return false;
   }
+  fs.writeFileSync(path.join(out, BUILD_INPUTS_TARGET), `${JSON.stringify({ harness, inputs: [...inputs] }, null, 2)}\n`);
   console.log(`${harness}: built ${rel(out)}`);
   return true;
 }

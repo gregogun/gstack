@@ -72,3 +72,26 @@ test("the build writes the harness's models and efforts for the doctor", (t) => 
   const values = JSON.parse(fs.readFileSync(path.join(root, "dist/fx/skills/go-mode/references/model-values.json"), "utf8"));
   assert.deepEqual(values, { models: ["opus", "sonnet"], efforts: ["low", "high"] });
 });
+
+test("the build records the harness and every file and folder it read, and nothing it skipped", (t) => {
+  const root = makeFixture("# Demo\n", {
+    "harnesses/fx/harness.json": '{"copy": ["LICENSE"]}',
+    "harnesses/fx/README.md": "# fx\n",
+    LICENSE: "MIT\n",
+  });
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  assert.equal(build(root).status, 0);
+  const record = JSON.parse(fs.readFileSync(path.join(root, "dist/fx/build-inputs.json"), "utf8"));
+  assert.equal(record.harness, "fx");
+  assert.deepEqual(new Set(record.inputs), new Set([
+    "scripts/build.mjs", "skills", "agents", "LICENSE",
+    "harnesses/fx/harness.json", "harnesses/fx/tokens.md", "harnesses/fx/models.md", "harnesses/fx/agents",
+  ]));
+});
+
+test("a failed build leaves no inputs record", (t) => {
+  const root = makeFixture("# Demo\n\nuse {{nope}}\n");
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  assert.equal(build(root).status, 1);
+  assert.equal(fs.existsSync(path.join(root, "dist/fx/build-inputs.json")), false);
+});
