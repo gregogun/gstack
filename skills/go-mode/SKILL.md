@@ -140,5 +140,5 @@ A large or cross-cutting effort (a migration across many call sites, an ambitiou
 - **Autonomous run.** A long task to drive to completion without stopping ("run until done", "{{loop_command}} until X").
 - **Session pickup.** Resuming or taking over a prior agent's in-flight work from a transcript, a remote-session link if the harness has one, or a pushed branch.
 - **Pause safely.** Suspending in-flight work cleanly so it can be resumed, on an explicit pause, going offline, a harness restart, or imminent context compaction. The complement to Session pickup.
-- **Worktree and simulator cleanup.** Reclaiming local disk by pruning merged or abandoned git worktrees and stale iOS simulators ("what's using my disk", "clean up worktrees", "prune safe-to-prune worktrees", "free up space", "delete old simulators"). File: `playbooks/worktree-cleanup.md`.
+- **Housekeeping.** Cleaning up worktrees, branches, stashes, stale PRs, scratch notes, orphaned processes, or disk ("what's using my disk", "clean up worktrees", "delete merged branches", "free up space", "delete old simulators"). File: `playbooks/worktree-cleanup.md`.
 - **Opening a PR.** Invoked at the end of every other playbook.

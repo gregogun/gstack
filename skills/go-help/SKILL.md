@@ -87,6 +87,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Vet a performance number before reporting or acting on it | [`/benchmark-checklist`](../benchmark-checklist/SKILL.md) |
 | Run a large or cross-cutting change, or one to review after stepping away | [`/figure-it-out`](../figure-it-out/SKILL.md) |
 | Keep a decision log during a run, and review it afterward | [`/show-me-your-work`](../show-me-your-work/SKILL.md) |
+| Clean up old worktrees, branches, stashes, stale PRs, scratch or disk caches, by hand or on a schedule | [`/housekeeping`](../housekeeping/SKILL.md) |
 | Pick a model and effort for each role | [`/setup-gstack`](../setup-gstack/SKILL.md) |
 | Find skills that take a gstack command's name, a stale build, or a bad model config | [{{doctor_command}}](../doctor/SKILL.md) |
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
