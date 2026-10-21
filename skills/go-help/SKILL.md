@@ -87,7 +87,9 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Vet a performance number before reporting or acting on it | [`/benchmark-checklist`](../benchmark-checklist/SKILL.md) |
 | Run a large or cross-cutting change, or one to review after stepping away | [`/figure-it-out`](../figure-it-out/SKILL.md) |
 | Keep a decision log during a run, and review it afterward | [`/show-me-your-work`](../show-me-your-work/SKILL.md) |
+| Clean up old worktrees, branches, stashes, stale PRs, scratch or disk caches, by hand or on a schedule | [`/housekeeping`](../housekeeping/SKILL.md) |
 | Pick a model and effort for each role | [`/setup-gstack`](../setup-gstack/SKILL.md) |
+| Find skills that take a gstack command's name, a stale build, or a bad model config | [{{doctor_command}}](../doctor/SKILL.md) |
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
@@ -133,6 +135,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 | A question got treated as the next step of the last task | Say "new task", or say the turn doesn't need the mode. |
 | A new model choice had no effect | Skills read {{models_config}} at each spawn, so a change applies to the next one. Check that the role name matches a role in [`model-roles.md`](../go-mode/references/model-roles.md) exactly, and that the row has Role, Model and Effort cells. |
 | Runs cost more than expected | See the cost paragraph under Get set up. |
+| A gstack command ran a different skill | Run [{{doctor_command}}](../doctor/SKILL.md). It finds the other skill with that name and offers a fix. |
 | A skill didn't load on its own | Only `/setup-gstack` loads from the user's words. The others load when the user types them or when `/go-mode` runs them, and it doesn't run every skill. |
 | Parallel agents overwrote each other | Give each agent its own worktree. |
 | An overnight run moved but finished nothing | {{loop_command}} needs a check that can pass or fail, not a duration. |

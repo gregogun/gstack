@@ -61,3 +61,37 @@ ${CLAUDE_PLUGIN_ROOT}
 <!-- A sentence or two that follows the directory. -->
 
 `<slug>` is the workspace's absolute path with each `/` and `.` changed to `-`, so `/Users/you/proj` becomes `-Users-you-proj`. Each session is one `<session-id>.jsonl` file directly in that directory, and the newest is the current session. Subagent transcripts are in `<session-id>/subagents/agent-<id>.jsonl`. Each line is a JSON object with `type`, `timestamp`, `cwd`, `gitBranch` and `sessionId`. User and assistant turns have `type` `user` or `assistant` and their text in `message.content`, a string or a list of text, tool-use and tool-result blocks. Skip the other types.
+
+## plugin_records
+
+<!-- Used as a doctor script argument. Claude Code's record of each plugin install: scope, install path and, for project or local scope, the project path. -->
+
+`~/.claude/plugins/installed_plugins.json`
+
+## marketplace_records
+
+<!-- Used as a doctor script argument. Claude Code's record of each added marketplace, including whether it was added from a local directory. -->
+
+`~/.claude/plugins/known_marketplaces.json`
+
+## plugin_settings
+
+<!-- Used as "pass --settings once for each of {{plugin_settings}}". The settings files whose enabledPlugins decide which plugins are on, lowest precedence first. Relative paths are from the project root. -->
+
+`~/.claude/settings.json`, `.claude/settings.json` and `.claude/settings.local.json`, in that order
+
+## reload_plugins
+
+run `/reload-plugins` or start a new session
+
+## doctor_command
+
+<!-- The full doctor command. The bare /doctor is Claude Code's built-in install check, so the doctor skill is always written with its plugin prefix. -->
+
+`/gstack:doctor`
+
+## disable_plugin
+
+<!-- Used as "disable that plugin with {{disable_plugin}}, using the plugin id from the row". Changes enabledPlugins in the settings file of the scope it finds. -->
+
+`claude plugin disable <plugin-id>`

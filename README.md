@@ -9,6 +9,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`go-mode`](skills/go-mode/SKILL.md): the entry point for any non-trivial task. Routes the task to a playbook.
 - [`go-help`](skills/go-help/SKILL.md): finds the skill, playbook or principle for a task.
 - [`setup-gstack`](skills/setup-gstack/SKILL.md): picks the model and effort for each role.
+- [`doctor`](skills/doctor/SKILL.md): finds skills that clash with gstack's names, a stale build, and model config errors.
 - [`in-your-own-words`](skills/in-your-own-words/SKILL.md): plays back the goal and the problem before work starts.
 - [`sharpen`](skills/sharpen/SKILL.md): aims a task higher without overspecifying it.
 - [`grilling`](skills/grilling/SKILL.md): interviews you about an idea until the product decisions are settled.
@@ -41,6 +42,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`benchmark-checklist`](skills/benchmark-checklist/SKILL.md): vets a measured number before you report or act on it.
 - [`figure-it-out`](skills/figure-it-out/SKILL.md): designs a rigorous run when no playbook fits.
 - [`show-me-your-work`](skills/show-me-your-work/SKILL.md): keeps a decision log you can review later.
+- [`housekeeping`](skills/housekeeping/SKILL.md): audits and cleans up worktrees, branches, stashes, stale PRs, scratch and disk caches.
 - [`automate-me`](skills/automate-me/SKILL.md): drafts a personal `-mode` skill from your own history.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
