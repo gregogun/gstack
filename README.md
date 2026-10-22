@@ -35,6 +35,8 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`technical-writing`](skills/technical-writing/SKILL.md): a standard for docs, READMEs, PR descriptions and commit messages.
 - [`writing-for-agents`](skills/writing-for-agents/SKILL.md): writes skills, prompts and `AGENTS.md` files that agents follow the same way every run.
 - [`bro`](skills/bro/SKILL.md): restates the last reply in plain words.
+- [`harvest`](skills/harvest/SKILL.md): saves moments worth writing about from your transcripts as notes in a writing inbox.
+- [`editor`](skills/editor/SKILL.md): edits your writing: finds the point, interviews you, and suggests edits in your voice.
 - [`control-cli`](skills/control-cli/SKILL.md): drives and inspects a CLI or TUI through a local harness.
 - [`control-ui`](skills/control-ui/SKILL.md): drives and inspects a web, IDE or Electron UI through a local browser or CDP harness.
 - [`create-verification-skill`](skills/create-verification-skill/SKILL.md): generates a project-local skill that proves app behavior.
