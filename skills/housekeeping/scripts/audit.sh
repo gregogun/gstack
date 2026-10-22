@@ -23,7 +23,8 @@
 #              merged PR's head contains the tip), review (upstream gone or a
 #              PR, but MERGED is not pr), keep. MERGED is base when the tip is in
 #              the base, which also holds for a branch with no commits of its
-#              own, so it never makes a branch safe. origin rows: merged-PR heads still on origin, bucket report.
+#              own, so it never makes a branch safe. origin rows: merged-PR
+#              heads still on origin, bucket report.
 #   prs        open PRs flagged head-gone (branch not on origin) or stale-draft
 #              (draft not updated in 14 days).
 #   Other sections have no bucket; they are report only. processes lists every
