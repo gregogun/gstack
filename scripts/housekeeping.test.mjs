@@ -92,7 +92,7 @@ test("audit buckets only branches whose PR merged as safe", (t) => {
   const bucket = (name) => branches.find((r) => r.BRANCH === name && r.WHERE === "local")?.BUCKET;
   assert.equal(bucket("shipped"), "safe", "branch merged via PR is deletable");
   assert.equal(bucket("empty"), "keep", "new branch at the base tip is kept");
-  assert.equal(bucket("reused"), "keep", "name reused at a stale base tip is kept");
+  assert.equal(bucket("reused"), "review", "name reused at a stale base tip is held, not safe");
   assert.equal(bucket("unmerged"), "keep", "branch with its own commits is kept");
 });
 
