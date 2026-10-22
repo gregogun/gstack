@@ -18,6 +18,7 @@ Write the brief in chat before any spawn:
 - **Target:** what the findings feed. One of `idea`, `design decision`, or `skill or tool change`. Name the idea, the decision with its options, or the skill or tool.
 - **Done when:** the call the findings must let the user make, such as "pick option A or B" or "know which three changes to make to the `how` skill".
 - **Out of scope:** what you will not look into.
+- **Trusted sources:** the rows of {{sources_config}} whose topic fits the question, plus any source the user names for this run. Skip the line if the file is missing and the user named none.
 
 If the target is unclear, state your reading and proceed. The user can redirect.
 
@@ -35,7 +36,9 @@ A narrow question with one obvious source gets one explorer. When in doubt, use 
 
 ## 3. Explore
 
-Spawn every explorer in one message, each with [`references/explorer-prompt.md`](references/explorer-prompt.md) and its angle filled in. The step is done when every explorer has returned or dropped out. Proceed with the ones that returned and list each dropout as a gap.
+Spawn every explorer in one message, each with [`references/explorer-prompt.md`](references/explorer-prompt.md), its angle, and the trusted sources that fit it filled in. The step is done when every explorer has returned or dropped out. Proceed with the ones that returned and list each dropout as a gap.
+
+An explorer may report a repo it wants cloned. Ask the user before you clone it, and say which repo and why. A clone puts the repo's files on disk where a later command could run them, so it needs the user's go-ahead every time. On a yes, clone it yourself into the scratch directory with the command in [`references/explorer-prompt.md`](references/explorer-prompt.md), then spawn a fresh explorer for that angle with the clone's path.
 
 ## 4. Synthesize
 
@@ -46,6 +49,17 @@ Spawn one synthesizer with [`references/synthesizer-prompt.md`](references/synth
 Present the synthesizer's findings in the format below. Light edits for context from the chat are fine. Before you present, open the source behind each finding the recommendation rests on and confirm it says what the finding claims. Drop or downgrade a finding that fails.
 
 When the user asks to keep the findings, write them to the path they name.
+
+## Trusted sources file
+
+{{sources_config}} is the user's list of sources they trust, outside the plugin. It is a Markdown table with the columns Source, Topic and Note, one row per source. A source is a person, a site, or a repo. For example:
+
+| Source | Topic | Note |
+|---|---|---|
+| Kent Beck | testing | trust his views on test design |
+| `docs.python.org` | Python | primary for language behavior |
+
+Trust ranks a source first in search and weighs it as primary for its topic. It does not raise a claim's tier: one trusted source is still one source. Edit the file by hand. The user creates it the first time they want one.
 
 ## Output format
 

@@ -20,7 +20,7 @@ You are turning evidence from several explorers into findings the user will act 
 
 ## Epistemics
 
-Read `{EPISTEMICS_PATH}` in full before writing. It defines the tiers **Direct**, **Supported**, **Inferred**, **Speculative** and **Unknown**. It was written for questions about code history. Here the evidence is external, so read "an author wrote why" as "a primary source states it". A vendor's claim about its own product is Supported at most until a second, independent source agrees.
+Read `{EPISTEMICS_PATH}` in full before writing. It defines the tiers **Direct**, **Supported**, **Inferred**, **Speculative** and **Unknown**. It was written for questions about code history. Here the evidence is external, so read "an author wrote why" as "a primary source states it". A vendor's claim about its own product is Supported at most until a second, independent source agrees. An item marked `trusted` is primary for its topic, but trust does not raise its tier: one trusted source is still one source.
 
 ## Instructions
 
