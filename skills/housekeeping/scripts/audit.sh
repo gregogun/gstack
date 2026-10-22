@@ -194,7 +194,8 @@ tip_in_merged_pr() {
 	awk -F'\t' -v b="$branch" '$3==b && $2=="merged" {print $4}' "$prs" | {
 		while read -r oid; do
 			[ "$oid" = "$tip" ] && exit 0
-			git merge-base --is-ancestor "$tip" "$oid" 2>/dev/null && exit 0
+			git merge-base --is-ancestor "$tip" "$oid" 2>/dev/null \
+				&& ! git merge-base --is-ancestor "$tip" "$base" 2>/dev/null && exit 0
 		done
 		exit 1
 	}
