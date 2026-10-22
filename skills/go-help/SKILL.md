@@ -40,7 +40,7 @@ When the model config is missing and it matters, ask whether the user wants to r
 
 Installing changes nothing until the user invokes a skill. Only `/setup-gstack` loads from the user's words. The [README](../../README.md) has the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
 
-If cost is the worry, say where the tokens go and how to spend fewer. gstack spends extra tokens on subagents and review panels. Rerun `/setup-gstack` and pick lower efforts or cheaper models. A role set to `inherit-parent` runs on the chat's model and effort, which saves tokens when the chat runs on a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/go-mode` for work that needs rigor.
+If cost is the worry, say where the tokens go and how to spend fewer. gstack spends extra tokens on subagents and review panels. Rerun `/setup-gstack` and pick lower efforts or cheaper models. A role set to `inherit-parent` runs on the chat's model and effort, which saves tokens when the chat runs on a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/go-mode` for work that needs rigor, and use `/lite-mode` for small work and `/chat-mode` for talk.
 
 ## Start a task with `/go-mode`
 
@@ -55,6 +55,8 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | The user wants to | Skill |
 |---|---|
 | Do any non-trivial task with rigor | [`/go-mode`](../go-mode/SKILL.md) |
+| Try a quick idea or make a small fix, without a playbook | [`/lite-mode`](../lite-mode/SKILL.md) |
+| Talk something through, with nothing changed | [`/chat-mode`](../chat-mode/SKILL.md) |
 | Check that the agent understood their goal and the problem before it starts | [`/in-your-own-words`](../in-your-own-words/SKILL.md) |
 | Aim a task higher before starting: more expert, more outcome-focused, not overspecified | [`/sharpen`](../sharpen/SKILL.md) |
 | Know how code works now, or where new code should live | [`/how`](../how/SKILL.md) |
@@ -99,6 +101,7 @@ If a skill directory next to this one is missing from the table, read its frontm
 
 Close calls:
 
+- `/chat-mode` only talks. `/lite-mode` does small work with one check. `/go-mode` runs a playbook. The newest mode in a chat wins.
 - `/how` explains what the code does. `/why` explains the reasons. `/teach` runs one or both and explains the result plainly.
 - `/arena` gives every worker the same brief and merges the best parts. `/swarm` splits work into slices or a race and returns one report.
 - `/architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
@@ -131,6 +134,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 
 | Symptom | Fix |
 |---|---|
+| The agent won't edit or run anything | `/chat-mode` is on. Send the request with `/lite-mode` or `/go-mode`. |
 | The mode stopped applying after a few turns | `/go-mode` applies to the message it was typed with. Start each task with `/go-mode`. |
 | A question got treated as the next step of the last task | Say "new task", or say the turn doesn't need the mode. |
 | A new model choice had no effect | Skills read {{models_config}} at each spawn, so a change applies to the next one. Check that the role name matches a role in [`model-roles.md`](../go-mode/references/model-roles.md) exactly, and that the row has Role, Model and Effort cells. |
