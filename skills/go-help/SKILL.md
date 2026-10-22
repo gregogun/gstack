@@ -82,6 +82,8 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Write docs, an RFC, a README, a PR description, or a commit message to a standard | [`/technical-writing`](../technical-writing/SKILL.md) |
 | Write a skill, playbook, subagent prompt, `AGENTS.md`, or `CLAUDE.md` that an agent reads | [`/writing-for-agents`](../writing-for-agents/SKILL.md) |
 | Hear the last reply again in plain words | [`/bro`](../bro/SKILL.md) |
+| Save moments worth writing about from their transcripts as notes | [`/harvest`](../harvest/SKILL.md) |
+| Turn a note, draft or brain dump into a blog post, thread or LinkedIn post, with an editor | [`/editor`](../editor/SKILL.md) |
 | Give agents a scripted way to drive the app and prove behavior | [`/create-verification-skill`](../create-verification-skill/SKILL.md) |
 | Bring a verification skill and its feature map back in line with the app | [`/maintain-verification-skill`](../maintain-verification-skill/SKILL.md) |
 | Vet a performance number before reporting or acting on it | [`/benchmark-checklist`](../benchmark-checklist/SKILL.md) |
@@ -103,7 +105,8 @@ Close calls:
 - `/arena` gives every worker the same brief and merges the best parts. `/swarm` splits work into slices or a race and returns one report.
 - `/architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
 - `/interrogate` reviews the diff. `/blast-radius` looks for breakage outside the diff and proves the one fact that makes the change safe.
-- `/technical-writing` is for documents people read. `/writing-for-agents` is for documents agents read.
+- `/technical-writing` is for documents people read. `/writing-for-agents` is for documents agents read. `/editor` is for the user's own posts, in their voice.
+- `/harvest` collects material to write about. `/reflect` turns the same transcripts into skill edits.
 - `/diagnosing-bugs` stops at a confirmed cause. `/go-mode fix …` runs it and then fixes the bug.
 - `/recall` rebuilds context across recent chats. `/ketchup` covers only this chat since the user's last message. Resuming one specific chat or branch is the Session pickup playbook.
 - `/figure-it-out` designs one rigorous run. The Autonomous run playbook drives one task to a finish condition.
