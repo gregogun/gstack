@@ -32,6 +32,12 @@ the Agent tool's `isolation: "remote"`, where the account has it
 
 `~/.claude/gstack-models.md`
 
+## sources_config
+
+<!-- The user's trusted-sources file for the research skill. Used as a noun, as in "read {{sources_config}}". Outside the plugin, so edits need no rebuild. -->
+
+`~/.claude/gstack-sources.md`
+
 ## project_skills_dir
 
 <!-- Used as {{project_skills_dir}}/verify-<app>/. No trailing slash. -->

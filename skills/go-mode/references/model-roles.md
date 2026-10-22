@@ -36,6 +36,8 @@ Skills read the files at each spawn, so an edit applies to the next spawn withou
 | `how explainer` | one | no | how | the strongest reasoning model |
 | `why investigators` | one | yes | why | a fast code model |
 | `why synthesizer` | one | no | why | the strongest reasoning model |
+| `research explorer` | one | yes | research | a fast, cheap model; gathering is search and quoting, not judgment |
+| `research synthesizer` | one | no | research | the strongest reasoning model |
 | `reflect tooling` | one | no | reflect | a fast code model, from a different family than the judgment role where possible |
 | `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model |
 | `swarm workers` | one | no | swarm, and go-mode verification | a fast code model |
