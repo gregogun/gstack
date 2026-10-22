@@ -2,11 +2,13 @@
 
 gstack is a personal fork of [pstack](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/pstack), a set of agent skills for rigorous engineering work. This fork removes pstack's dependence on Cursor so the skills can run in any agent harness. Claude Code is the first supported harness.
 
-Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for the task and runs the other skills when the steps need them. Ask [`/go-help`](skills/go-help/SKILL.md) when you are not sure which skill fits.
+Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks. [`/lite-mode`](skills/lite-mode/SKILL.md) tries an idea or makes a quick fix. [`/go-mode`](skills/go-mode/SKILL.md) picks a playbook for the task and runs the other skills when the steps need them. Ask [`/go-help`](skills/go-help/SKILL.md) when you are not sure which skill fits.
 
 ## Skills
 
 - [`go-mode`](skills/go-mode/SKILL.md): the entry point for any non-trivial task. Routes the task to a playbook.
+- [`lite-mode`](skills/lite-mode/SKILL.md): does a quick experiment or a small fix directly, with one real check.
+- [`chat-mode`](skills/chat-mode/SKILL.md): talks things through and changes nothing. In Claude Code a hook blocks tool calls that can change something.
 - [`go-help`](skills/go-help/SKILL.md): finds the skill, playbook or principle for a task.
 - [`setup-gstack`](skills/setup-gstack/SKILL.md): picks the model and effort for each role.
 - [`doctor`](skills/doctor/SKILL.md): finds skills that clash with gstack's names, a stale build, and model config errors.
