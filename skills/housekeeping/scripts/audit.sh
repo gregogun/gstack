@@ -151,8 +151,12 @@ section_worktrees() {
 			dirty="wip:$(printf '%s\n' "$porcelain" | grep -cv '^??')"
 		else dirty="scratch:$(printf '%s\n' "$porcelain" | grep -c '^??')"; fi
 
-		ignored=$(git -C "$wt" status --porcelain --ignored 2>/dev/null \
-			| awk -v re="$rebuildable" '/^!! /{p=substr($0, 4); sub(/\/$/, "", p); n=p; sub(/.*\//, "", n); if (n !~ re) print p}' | paste -sd, -)
+		ignored=$({
+			git -C "$wt" status --porcelain --ignored 2>/dev/null \
+				| awk -v re="$rebuildable" '/^!! /{p=substr($0, 4); sub(/\/$/, "", p); n=p; sub(/.*\//, "", n); if (n !~ re) print p}'
+			git -C "$wt" ls-files --others --ignored --exclude-standard 2>/dev/null \
+				| awk -F/ -v re="$rebuildable" '$NF ~ /^(\.env.*|.*\.(pem|key))$/ {f=0; for (i=1; i<NF; i++) {if ($i=="node_modules") {f=0; break} if ($i ~ re) f=1} if (f) print}'
+		} | paste -sd, -)
 		[ -z "$ignored" ] && ignored="-"
 
 		branch=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")
@@ -177,8 +181,8 @@ section_worktrees() {
 
 		case "$dirty" in wip:*) bucket=hold-wip ;; *)
 			case "$pr" in */open) bucket=hold-open-pr ;; *)
-				if [ "$ignored" != "-" ]; then bucket=hold-ignored
-				elif [ "$recent" = yes ]; then bucket=verify-recent-chat
+				if [ "$recent" = yes ]; then bucket=verify-recent-chat
+				elif [ "$ignored" != "-" ]; then bucket=hold-ignored
 				elif [ "$merged" = YES ] || [ "$pr" != "-" ]; then bucket=safe
 				else bucket=review; fi ;;
 			esac ;;

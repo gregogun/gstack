@@ -41,7 +41,7 @@ function fixture(t) {
   git(root, "init", "-q", "--bare", "-b", "main", origin);
   git(root, "clone", "-q", origin, repo);
   git(repo, "checkout", "-q", "-b", "main");
-  fs.writeFileSync(path.join(repo, ".gitignore"), ".env.local\nnode_modules/\n");
+  fs.writeFileSync(path.join(repo, ".gitignore"), ".env.local\nnode_modules/\ndist/\n");
   git(repo, "add", ".gitignore");
   commit(repo, "base.txt", "base");
   git(repo, "push", "-q", "-u", "origin", "main");
@@ -70,11 +70,17 @@ function fixture(t) {
   fs.mkdirSync(path.join(rebuildable, "node_modules"));
   fs.writeFileSync(path.join(rebuildable, "node_modules/x.js"), "x");
 
+  const buried = path.join(root, "wt-buried");
+  git(repo, "worktree", "add", "-q", "-b", "wt-buried", buried, "main");
+  fs.mkdirSync(path.join(buried, "dist"));
+  fs.writeFileSync(path.join(buried, "dist/.env.local"), "TOKEN=1\n");
+  fs.writeFileSync(path.join(buried, "dist/app.js"), "x");
+
   const bin = path.join(root, "bin");
   fs.mkdirSync(bin);
   const pr = (n, head) => [n, "merged", head, shippedTip, "false", "false", Math.floor(Date.now() / 1000), "ship it", "main"].join("\t");
   fs.writeFileSync(path.join(bin, "gh"), `#!/bin/sh\nprintf '%s\\n' '${pr(2, "reused")}' '${pr(1, "shipped")}'\n`, { mode: 0o755 });
-  return { repo, secrets, rebuildable, bin };
+  return { repo, secrets, rebuildable, buried, bin };
 }
 
 function audit(t) {
@@ -97,10 +103,13 @@ test("audit buckets only branches whose PR merged as safe", (t) => {
 });
 
 test("audit holds worktrees that contain ignored files", (t) => {
-  const { worktrees, secrets, rebuildable } = audit(t);
+  const { worktrees, secrets, rebuildable, buried } = audit(t);
   const row = (dir) => worktrees.find((r) => r.WORKTREE === dir);
   assert.equal(row(secrets).BUCKET, "hold-ignored", "ignored .env.local blocks removal");
   assert.match(row(secrets).IGNORED, /\.env\.local/);
   assert.doesNotMatch(row(secrets).IGNORED, /node_modules/);
+  assert.equal(row(buried).BUCKET, "hold-ignored", "dist/.env.local blocks removal");
+  assert.match(row(buried).IGNORED, /dist\/\.env\.local/);
+  assert.doesNotMatch(row(buried).IGNORED, /app\.js/);
   assert.equal(row(rebuildable).BUCKET, "safe", "ignored node_modules alone does not block removal");
 });
