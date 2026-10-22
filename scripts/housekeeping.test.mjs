@@ -25,8 +25,8 @@ function commit(cwd, file, text) {
 
 function tables(stdout) {
   const out = {};
-  for (const block of stdout.split("\n\n")) {
-    const [title, header, ...rows] = block.split("\n");
+  for (const block of stdout.trim().split("\n\n")) {
+    const [title, header, ...rows] = block.split("\n").filter((l) => !l.startsWith("# base"));
     const cols = header.split("\t");
     out[title.slice(2)] = rows.map((r) => Object.fromEntries(r.split("\t").map((v, i) => [cols[i], v])));
   }
@@ -76,22 +76,29 @@ function fixture(t) {
   return { repo, secrets, rebuildable, bin };
 }
 
-test("housekeeping audit buckets what an autonomous run may delete", (t) => {
-  const { repo, secrets, rebuildable, bin } = fixture(t);
-  const run = spawnSync("bash", [AUDIT, "--branches", "--worktrees", "-b", "origin/main", repo], {
-    env: { ...ENV, PATH: `${bin}:${process.env.PATH}` },
+function audit(t) {
+  const fx = fixture(t);
+  const run = spawnSync("bash", [AUDIT, "--branches", "--worktrees", "-b", "origin/main", fx.repo], {
+    env: { ...ENV, PATH: `${fx.bin}:${process.env.PATH}` },
     encoding: "utf8",
   });
   assert.equal(run.status, 0, run.stderr);
-  const { branches, worktrees } = tables(run.stdout);
-  const branchBucket = (name) => branches.find((r) => r.BRANCH === name && r.WHERE === "local")?.BUCKET;
-  const worktreeBucket = (dir) => worktrees.find((r) => r.WORKTREE === dir)?.BUCKET;
+  return { ...fx, ...tables(run.stdout) };
+}
 
-  assert.equal(branchBucket("shipped"), "safe", "branch merged via PR is deletable");
-  assert.equal(branchBucket("empty"), "keep", "new branch at the base tip is kept");
-  assert.equal(branchBucket("unmerged"), "keep", "branch with its own commits is kept");
-  assert.equal(worktreeBucket(secrets), "hold-ignored", "ignored .env.local blocks removal");
-  assert.match(worktrees.find((r) => r.WORKTREE === secrets).IGNORED, /\.env\.local/);
-  assert.doesNotMatch(worktrees.find((r) => r.WORKTREE === secrets).IGNORED, /node_modules/);
-  assert.equal(worktreeBucket(rebuildable), "safe", "ignored node_modules alone does not block removal");
+test("autonomous run deletes only branches whose PR merged", (t) => {
+  const { branches } = audit(t);
+  const bucket = (name) => branches.find((r) => r.BRANCH === name && r.WHERE === "local")?.BUCKET;
+  assert.equal(bucket("shipped"), "safe", "branch merged via PR is deletable");
+  assert.equal(bucket("empty"), "keep", "new branch at the base tip is kept");
+  assert.equal(bucket("unmerged"), "keep", "branch with its own commits is kept");
+});
+
+test("autonomous run holds worktrees that contain ignored files", (t) => {
+  const { worktrees, secrets, rebuildable } = audit(t);
+  const row = (dir) => worktrees.find((r) => r.WORKTREE === dir);
+  assert.equal(row(secrets).BUCKET, "hold-ignored", "ignored .env.local blocks removal");
+  assert.match(row(secrets).IGNORED, /\.env\.local/);
+  assert.doesNotMatch(row(secrets).IGNORED, /node_modules/);
+  assert.equal(row(rebuildable).BUCKET, "safe", "ignored node_modules alone does not block removal");
 });

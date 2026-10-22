@@ -16,14 +16,14 @@ The mode sets what a run removes without asking. A run started by {{loop_command
 
 | Area | Audit rows | Autonomous run removes | User-invoked run removes |
 |---|---|---|---|
-| Worktrees | `worktrees` | `safe` rows that are `clean`, whose MERGED is `YES` or PR is `#N/merged`, that have no `processes` row, and that are not this run's own worktree | rows the user picks |
-| Local branches | `branches`, `local` | `safe` rows | rows the user picks |
+| Worktrees | `worktrees` | `safe` rows (a worktree with ignored files outside the rebuildable list is `hold-ignored`, not `safe`) that are `clean`, whose MERGED is `YES` or PR is `#N/merged`, that have no `processes` row, and that are not this run's own worktree | rows the user picks |
+| Local branches | `branches`, `local` | `safe` rows, which are branches whose PR merged | rows the user picks |
 | Remote branches | `branches`, `origin` | nothing | rows the user picks |
 | Stashes | `stashes` | nothing | rows the user picks |
 | PRs | `prs` | nothing | rows the user picks |
 | Scratch | `scratch` | nothing | rows the user picks |
 | Processes | `processes` | nothing | rows the user picks |
-| Package caches | `disk`, `cache` | every row, with its prune command | rows the user picks |
+| Package caches | `disk`, `cache` | nothing | rows the user picks |
 | Xcode and simulators | `disk`, `xcode` and `simulator` | nothing | rows the user picks |
 
 An autonomous run removes worktrees only when it audited `worktrees` and `processes` in the same run and saw no transcripts-dir warning in step 1. A chat that is still open shows as a process whose cwd is in its worktree, and an unscanned `LAST_CHAT` can hide one that a recent chat used. Every row an autonomous run keeps goes to the report.
@@ -45,7 +45,7 @@ An autonomous run removes worktrees only when it audited `worktrees` and `proces
    - **PR:** `gh pr close <number>`.
    - **Resume note:** `rm <path>`.
    - **Process:** `kill <pid>`. Use `kill -9` only on a process still alive after that.
-   - **Package cache:** from `$HOME`, so no repo's own cache is cleaned, run `pnpm store prune`, `npm cache verify`, `yarn cache clean`, `rm -rf "$(brew --cache)"` or `uv cache prune`. Use `brew --cache`, not `brew cleanup`, since `brew cleanup` also uninstalls old formula versions. Clear only caches the user has not said to keep.
+   - **Package cache:** from `$HOME`, so no repo's own cache is cleaned, run `pnpm store prune`, `npm cache verify`, `yarn cache clean`, `rm -rf "$(brew --cache)"` or `uv cache prune`. Use `brew --cache`, not `brew cleanup`, since `brew cleanup` also uninstalls old formula versions. A user-invoked run clears only caches the user picks.
    - **Simulators and Xcode:** `xcrun simctl --set testing delete all` for test clones, `xcrun simctl delete unavailable`, and `xcrun simctl runtime list` then `xcrun simctl runtime delete <id>` for old runtimes. `rm -rf` a `DerivedData` or `iOS DeviceSupport` folder.
 4. **Confirm.** Rerun the audit on the same sections and record `df -h /` again. Done when every removed row is gone and every kept row is still there.
 5. **Report.** The report is `$(git rev-parse --git-common-dir)/housekeeping-report.md`. Each run appends to the entry it started in step 3, so earlier restore lines stay. An autonomous run's entry also holds `df -h /` before and after, each removed row, and each kept row with its reason.
