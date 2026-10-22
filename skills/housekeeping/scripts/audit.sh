@@ -15,12 +15,16 @@
 #   PR columns need gh and cover only your own PRs (gh pr list --author @me).
 #
 # Buckets:
-#   worktrees  hold-wip (tracked edits), hold-open-pr, verify-recent-chat (a chat
-#              touched it in the last 4 days), safe (merged, or has a PR), review.
-#   branches   local rows: hold-worktree, hold-open-pr, safe (MERGED is YES, the
-#              tip is in the base, or pr, a merged PR's head contains the tip),
-#              review (upstream gone or a closed or merged PR, but MERGED is no),
-#              keep. origin rows: merged-PR heads still on origin, bucket report.
+#   worktrees  hold-wip (tracked edits), hold-open-pr, hold-ignored (IGNORED lists
+#              ignored paths outside the rebuildable ones), verify-recent-chat (a
+#              chat touched it in the last 4 days), safe (merged, or has a PR),
+#              review.
+#   branches   local rows: hold-worktree, hold-open-pr, safe (MERGED is pr: a
+#              merged PR's head contains the tip), review (upstream gone or a
+#              PR, but MERGED is not pr), keep. MERGED is base when the tip is in
+#              the base, which also holds for a branch with no commits of its
+#              own, so it never makes a branch safe. origin rows: merged-PR
+#              heads still on origin, bucket report.
 #   prs        open PRs flagged head-gone (branch not on origin) or stale-draft
 #              (draft not updated in 14 days).
 #   Other sections have no bucket; they are report only. processes lists every
@@ -28,6 +32,7 @@
 #   when they hold a port or are orphans (ORPHAN is yes).
 set -u
 
+rebuildable='^(node_modules|dist|build|\.next|\.turbo|coverage|\.cache|__pycache__)$'
 all="worktrees branches stashes prs scratch processes disk"
 sections=""
 base=""
@@ -129,7 +134,7 @@ section_worktrees() {
 	done
 
 	echo "# worktrees"
-	printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
+	printf "SIZE\tAGE\tMERGED\tDIRTY\tIGNORED\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
 	while IFS= read -r wt; do
 		[ "$wt" = "$main_wt" ] && continue
 
@@ -145,6 +150,14 @@ section_worktrees() {
 		elif printf '%s\n' "$porcelain" | grep -qv '^??'; then
 			dirty="wip:$(printf '%s\n' "$porcelain" | grep -cv '^??')"
 		else dirty="scratch:$(printf '%s\n' "$porcelain" | grep -c '^??')"; fi
+
+		ignored=$({
+			git -C "$wt" status --porcelain --ignored 2>/dev/null \
+				| awk -v re="$rebuildable" '/^!! /{p=substr($0, 4); sub(/\/$/, "", p); n=p; sub(/.*\//, "", n); if (n !~ re) print p}'
+			git -C "$wt" ls-files --others --ignored --exclude-standard 2>/dev/null \
+				| awk -F/ -v re="$rebuildable" '$NF ~ /^(\.env.*|.*\.(pem|key))$/ {f=0; for (i=1; i<NF; i++) {if ($i=="node_modules") {f=0; break} if ($i ~ re) f=1} if (f) print}'
+		} | paste -sd, -)
+		[ -z "$ignored" ] && ignored="-"
 
 		branch=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")
 		if [ -z "$branch" ]; then remote=detached
@@ -169,13 +182,14 @@ section_worktrees() {
 		case "$dirty" in wip:*) bucket=hold-wip ;; *)
 			case "$pr" in */open) bucket=hold-open-pr ;; *)
 				if [ "$recent" = yes ]; then bucket=verify-recent-chat
+				elif [ "$ignored" != "-" ]; then bucket=hold-ignored
 				elif [ "$merged" = YES ] || [ "$pr" != "-" ]; then bucket=safe
 				else bucket=review; fi ;;
 			esac ;;
 		esac
 
-		printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-			"$size" "$age" "$merged" "$dirty" "$remote" "$pr" "$last" "$bucket" "$wt"
+		printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+			"$size" "$age" "$merged" "$dirty" "$ignored" "$remote" "$pr" "$last" "$bucket" "$wt"
 	done < "$tmp/worktrees" | sort -t$'\t' -k1,1 -rh
 }
 
@@ -184,7 +198,8 @@ tip_in_merged_pr() {
 	awk -F'\t' -v b="$branch" '$3==b && $2=="merged" {print $4}' "$prs" | {
 		while read -r oid; do
 			[ "$oid" = "$tip" ] && exit 0
-			git merge-base --is-ancestor "$tip" "$oid" 2>/dev/null && exit 0
+			git merge-base --is-ancestor "$tip" "$oid" 2>/dev/null \
+				&& ! git merge-base --is-ancestor "$tip" "$base" 2>/dev/null && exit 0
 		done
 		exit 1
 	}
@@ -206,8 +221,8 @@ section_branches() {
 	{
 		while IFS="$field" read -r name sha ts up track _; do
 			[ "$name" = "$base_branch" ] || [ "$name" = "$default_branch" ] && continue
-			if git merge-base --is-ancestor "$sha" "$base" 2>/dev/null; then merged=YES
-			elif tip_in_merged_pr "$name" "$sha"; then merged=pr
+			if tip_in_merged_pr "$name" "$sha"; then merged=pr
+			elif git merge-base --is-ancestor "$sha" "$base" 2>/dev/null; then merged=base
 			else merged=no; fi
 			upstream=$(upstream_state "$up" "$track")
 			pr=$(pr_for "$name"); [ -z "$pr" ] && pr="-"
@@ -215,7 +230,7 @@ section_branches() {
 			if [ "$wt" != "-" ]; then bucket=hold-worktree
 			else case "$pr" in
 				*/open) bucket=hold-open-pr ;;
-				*) if [ "$merged" != no ]; then bucket=safe
+				*) if [ "$merged" = pr ]; then bucket=safe
 				   elif [ "$upstream" = gone ] || [ "$pr" != "-" ]; then bucket=review
 				   else bucket=keep; fi ;;
 			esac; fi
