@@ -54,6 +54,7 @@ function fixture(t) {
   git(repo, "push", "-q", "origin", "main");
 
   git(repo, "branch", "empty", "main");
+  git(repo, "branch", "reused", "main~1");
   git(repo, "checkout", "-q", "-b", "unmerged");
   commit(repo, "unmerged.txt", "unmerged");
   git(repo, "checkout", "-q", "main");
@@ -71,8 +72,8 @@ function fixture(t) {
 
   const bin = path.join(root, "bin");
   fs.mkdirSync(bin);
-  const pr = ["1", "merged", "shipped", shippedTip, "false", "false", Math.floor(Date.now() / 1000), "ship it", "main"].join("\t");
-  fs.writeFileSync(path.join(bin, "gh"), `#!/bin/sh\nprintf '%s\\n' '${pr}'\n`, { mode: 0o755 });
+  const pr = (n, head) => [n, "merged", head, shippedTip, "false", "false", Math.floor(Date.now() / 1000), "ship it", "main"].join("\t");
+  fs.writeFileSync(path.join(bin, "gh"), `#!/bin/sh\nprintf '%s\\n' '${pr(2, "reused")}' '${pr(1, "shipped")}'\n`, { mode: 0o755 });
   return { repo, secrets, rebuildable, bin };
 }
 
@@ -86,15 +87,16 @@ function audit(t) {
   return { ...fx, ...tables(run.stdout) };
 }
 
-test("autonomous run deletes only branches whose PR merged", (t) => {
+test("audit buckets only branches whose PR merged as safe", (t) => {
   const { branches } = audit(t);
   const bucket = (name) => branches.find((r) => r.BRANCH === name && r.WHERE === "local")?.BUCKET;
   assert.equal(bucket("shipped"), "safe", "branch merged via PR is deletable");
   assert.equal(bucket("empty"), "keep", "new branch at the base tip is kept");
+  assert.equal(bucket("reused"), "keep", "name reused at a stale base tip is kept");
   assert.equal(bucket("unmerged"), "keep", "branch with its own commits is kept");
 });
 
-test("autonomous run holds worktrees that contain ignored files", (t) => {
+test("audit holds worktrees that contain ignored files", (t) => {
   const { worktrees, secrets, rebuildable } = audit(t);
   const row = (dir) => worktrees.find((r) => r.WORKTREE === dir);
   assert.equal(row(secrets).BUCKET, "hold-ignored", "ignored .env.local blocks removal");
