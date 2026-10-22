@@ -59,6 +59,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Aim a task higher before starting: more expert, more outcome-focused, not overspecified | [`/sharpen`](../sharpen/SKILL.md) |
 | Know how code works now, or where new code should live | [`/how`](../how/SKILL.md) |
 | Know why code is shaped this way, or where a number came from | [`/why`](../why/SKILL.md) |
+| Research a question across the web, papers and docs, and get cited findings for an idea, a design decision, or a skill or tool change | [`/research`](../research/SKILL.md) |
 | Understand a change or subsystem, explained plainly | [`/teach`](../teach/SKILL.md) |
 | Catch up on their own recent work on a topic | [`/recall`](../recall/SKILL.md) |
 | Catch up on what changed in this chat since their last message, in a few plain sentences and small visuals, with enough context to decide each action item | [`/ketchup`](../ketchup/SKILL.md) |

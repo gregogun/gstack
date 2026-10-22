@@ -17,6 +17,7 @@ Start a task with [`/go-mode`](skills/go-mode/SKILL.md). It picks a playbook for
 - [`to-tickets`](skills/to-tickets/SKILL.md): splits a spec into labeled vertical-slice tickets.
 - [`how`](skills/how/SKILL.md): explains how a subsystem works.
 - [`why`](skills/why/SKILL.md): finds out why code is shaped the way it is.
+- [`research`](skills/research/SKILL.md): researches a question across the web, papers, docs and code, and turns it into cited findings for an idea, a design decision or a skill change.
 - [`teach`](skills/teach/SKILL.md): runs `how` and `why` and gives one plain explanation.
 - [`recall`](skills/recall/SKILL.md): rebuilds recent context on a topic from chat history.
 - [`ketchup`](skills/ketchup/SKILL.md): summarizes what changed in this chat since the last message.

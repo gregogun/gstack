@@ -20,6 +20,8 @@ A role marked "Can drop" in `model-roles.md` may move one step down this order f
 | `how explainer` | opus | high |
 | `why investigators` | opus | medium |
 | `why synthesizer` | opus | high |
+| `research explorer` | haiku | medium |
+| `research synthesizer` | opus | high |
 | `reflect tooling` | opus | medium |
 | `reflect judgment, divergent, synthesizer` | opus | high |
 | `swarm workers` | opus | medium |
