@@ -10,9 +10,9 @@ Write these into the repo (the deploy runbook or the top of the workflow) before
 
 1. The smoke job exits non-zero. It runs with `--retries=0`: a smoke failure is never retried into a pass.
 2. The smoke job does not finish inside its timeout. A hang counts as a failure.
-3. The deploy URL is empty or unreachable. The smoke job reads `needs.deploy.outputs.url`, and a blank value fails the run instead of testing an empty base URL.
-4. A main-path check returns a 5xx, or the page logs a console error. Name the main paths in the smoke suite: load the home page, sign in, and the one action users come for.
-5. The health endpoint reports a version other than the commit just deployed, so the old build is still serving.
+3. The deploy URL is empty or unreachable. The smoke job reads `needs.deploy.outputs.url` into `BASE_URL`. Its first step fails the run on a blank value, so the suite never falls back to a default base URL, and on a URL that does not answer.
+4. A main-path check returns a 5xx, or the page logs a console error. The workflow does not check this. The smoke suite must assert it, on every main path: load the home page, sign in, and the one action users come for.
+5. The health endpoint reports a version other than the commit just deployed, so the old build is still serving. The `Check deployed version` step greps the health response for `$GITHUB_SHA`. Replace its `/health` path with the endpoint that reports the running commit.
 
 Add a trigger for each failure that ever reached production. A trigger needs a rule a script can decide, not a judgment call such as "looks slow".
 

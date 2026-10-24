@@ -33,7 +33,21 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      BASE_URL: ${{ needs.deploy.outputs.url }}
     steps:
+      - name: Check deploy URL
+        shell: bash
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "::error::Deploy URL is empty. Refusing to smoke test the default base URL."
+            exit 1
+          fi
+          curl --fail --silent --show-error --max-time 30 "$BASE_URL" > /dev/null
+      - name: Check deployed version
+        shell: bash
+        # Replace /health with the endpoint that reports the running commit.
+        run: curl --fail --silent --show-error --max-time 30 "$BASE_URL/health" | grep --fixed-strings --quiet "$GITHUB_SHA"
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -42,8 +56,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Smoke checks
-        env:
-          BASE_URL: ${{ needs.deploy.outputs.url }}
         run: npx playwright test --project=smoke --retries=0
       - name: Upload report
         if: failure()
