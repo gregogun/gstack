@@ -75,6 +75,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
 | Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
 | Find the root cause of a bug without fixing it yet | [`/diagnosing-bugs`](../diagnosing-bugs/SKILL.md) |
+| Turn a failed Playwright run into one readable file per failure, with a safe rerun command | [`/dossier`](../dossier/SKILL.md) |
 | Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
 | Apply TypeScript rules to `.ts` or `.tsx` work | [`/typescript-best-practices`](../typescript-best-practices/SKILL.md) |
 | Strip comments before review, using a reviewer that didn't write them | [`/no-comments`](../no-comments/SKILL.md) |
