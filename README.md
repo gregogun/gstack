@@ -49,6 +49,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`automate-me`](skills/automate-me/SKILL.md): drafts a personal `-mode` skill from your own history.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
+- [`loop-audit`](skills/loop-audit/SKILL.md): lists a project's eight feedback loops with a command or a proposal for each, and builds the fix for the weakest one.
 - `principle-*`: 24 one-rule skills that `go-mode` indexes and cites, such as [`principle-prove-it-works`](skills/principle-prove-it-works/SKILL.md).
 
 ## Install
