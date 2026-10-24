@@ -7,6 +7,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 ## Skills
 
 - [`go-mode`](skills/go-mode/SKILL.md): the entry point for any non-trivial task. Routes the task to a playbook.
+  - [Flaky test](skills/go-mode/playbooks/flaky-test.md): reruns a flaky test ten times, classifies the flake from its trace, and fixes or quarantines it without raising retries.
 - [`lite-mode`](skills/lite-mode/SKILL.md): does a quick experiment or a small fix directly, with one real check.
 - [`chat-mode`](skills/chat-mode/SKILL.md): talks things through and changes nothing. In Claude Code a hook blocks tool calls that can change something.
 - [`go-help`](skills/go-help/SKILL.md): finds the skill, playbook or principle for a task.
