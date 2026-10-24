@@ -1,0 +1,87 @@
+# Replace the deploy, rollback, and smoke commands with the project's own.
+# The deploy job declares the URL as a job-level output, since a step output is
+# invisible to other jobs and needs.deploy.outputs.url would be empty.
+# Stop-ship triggers: post-deploy-smoke.md. Write them before the first deploy.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+      previous: ${{ steps.deploy.outputs.previous }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: deploy
+        shell: bash
+        run: ./scripts/deploy.sh
+        # The script appends url=<deployed URL> and previous=<last good release> to $GITHUB_OUTPUT.
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: ${{ needs.deploy.outputs.url }}
+    steps:
+      - name: Check deploy URL
+        shell: bash
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "::error::Deploy URL is empty. Refusing to smoke test the default base URL."
+            exit 1
+          fi
+          curl --fail --silent --show-error --max-time 30 "$BASE_URL" > /dev/null
+      - name: Check deployed version
+        shell: bash
+        # Replace /health with the endpoint that reports the running commit.
+        run: curl --fail --silent --show-error --max-time 30 "$BASE_URL/health" | grep --fixed-strings --quiet "$GITHUB_SHA"
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Smoke checks
+        run: npx playwright test --project=smoke --retries=0
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-report
+          path: playwright-report
+          if-no-files-found: ignore
+  rollback:
+    needs: [deploy, smoke]
+    if: ${{ failure() && needs.deploy.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Roll back
+        shell: bash
+        env:
+          PREVIOUS: ${{ needs.deploy.outputs.previous }}
+        run: ./scripts/rollback.sh "$PREVIOUS"
+      - name: File issue
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create deploy-rollback --color B60205 --force
+          gh issue create --title "Deploy rolled back: ${GITHUB_SHA::7}" --label deploy-rollback --body "The smoke check failed, so the deploy was rolled back by rule: $RUN_URL. The report is the smoke-report artifact on that run."
