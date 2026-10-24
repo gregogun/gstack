@@ -10,7 +10,7 @@ A feedback loop is any check that tells an agent its work is wrong before a huma
 
 ## 1. Find each loop
 
-Walk the loops in this table. For each one, find the real command that runs it in the config, then run it and time it. Run only local, read-only checks. For a deploy, release, or publish step, read the config and its recent runs (`gh run list --workflow <file> --limit 3`) and never run it.
+Walk the loops in this table. For each one, find the real command that runs it in the config, then run it and time each check that step 2 will place on its own. Agent rules have no command: their evidence is the file path and what enforces each rule. For failure output, the evidence is the output of one run with a planted failure. Run only local, read-only checks. For a deploy, release, or publish step, read the config and its recent runs (`gh run list --workflow <file> --limit 3`) and never run it.
 
 A loop counts as missing when it never runs, or when it cannot run: a tool error, a bad config, a hang, or a red result on a clean checkout of the default branch for a reason other than a bug in the code. A loop that goes red on a real bug is working.
 
@@ -22,14 +22,14 @@ A loop counts as missing when it never runs, or when it cannot run: a tool error
 | End-to-end proof | A script drives the real app the way a user does and fails when the behavior breaks | e2e suites, a `verify-*` skill, Playwright or similar config |
 | Failure output | A failing run leaves a short readable account (error, location, reproduce command, trace or log path) an agent can act on without help | test reporter config, CI artifacts, failure scripts |
 | CI | Every push or PR runs the full set of checks in a clean environment, and a red run blocks merge | `.github/workflows/`, other CI configs, branch rules (`gh api repos/<owner>/<repo>/rules/branches/<branch>`, then `gh api repos/<owner>/<repo>/branches/<branch>/protection`, where a 404 means no classic protection, not no rules) |
-| Nightly | Slow drift checks run on a schedule, and each failure lands as an issue, a PR, or a file an agent reads | scheduled workflows, cron jobs |
+| Nightly | Slow drift checks run on a schedule, and each failure lands as an issue, a PR, or a file an agent reads. A schedule runs only from the default branch, and GitHub disables it after 60 days with no repo activity, so `gh workflow list --all` must show it active with a recent run | scheduled workflows, cron jobs |
 | Post-deploy smoke | A check runs against the deployed URL after each deploy, with stop-ship triggers written before the deploy | deploy workflows, release scripts |
 
 Step 1 is done when every row has a command you ran with its exit code and duration, a workflow file with its latest runs, or the evidence that the loop is missing.
 
 ## 2. Check the stage of each check
 
-Place every check you found on a stage by its measured speed, per [`references/stage-placement.md`](references/stage-placement.md). A check on the wrong stage is a weak loop even when it passes. A slow check on pre-commit trains agents to skip hooks, and a fast check that runs only in CI makes the agent wait a full CI run for the result.
+Place every check you found on a stage by its measured speed, per [`references/stage-placement.md`](references/stage-placement.md). A check on the wrong stage is a weak loop even when it passes.
 
 Step 2 is done when every check has a stage and every misplaced check is listed with its measured time.
 
@@ -46,7 +46,7 @@ Write one row per loop, all eight rows, in this shape:
 | Loop | Stage | Command | Evidence |
 |---|---|---|---|
 | Static checks | pre-push, CI | `npm run check` (exit 0, 41 s) | `package.json` `check` script |
-| Nightly | none | missing, proposed: scheduled workflow from `references/nightly.yml` running `npm run test:e2e` | no `schedule:` trigger in `.github/workflows/` |
+| Nightly | none | missing, proposed: scheduled workflow from `references/nightly.yml` running `npm run test:nightly` | no `schedule:` trigger in `.github/workflows/` |
 
 Every Command cell holds a real command you ran, a workflow with its latest runs, or `missing, proposed: <the concrete command or file to add>`. Put each bypass in its loop's Evidence cell. Under the table, list every misplaced check and every bypass.
 

@@ -5,7 +5,7 @@ Place each check on the earliest enforced stage it is fast enough for, starting 
 | Stage | Runs | Budget | Put here |
 |---|---|---|---|
 | Edit loop | after each meaningful edit, by the agent | seconds | type check or test of the touched file, watch mode |
-| pre-commit | `git commit`, on staged files only | under 10 s in total | format, lint, and type checks scoped to staged files, secret scan |
+| pre-commit | `git commit`, on staged files only | under 10 s in total | format and lint of staged files, secret scan, and the full type check only if it fits the budget |
 | pre-push | `git push` | under 2 min in total | unit tests, full type check, build |
 | CI | every push and PR, clean environment | as long as merge can wait | the superset: every check above on a fresh checkout and install, plus integration and end-to-end suites |
 | Nightly | on a schedule | no limit | slow checks that catch drift: full cross-browser end-to-end, dependency and license audits, fresh-install from the lockfile, link checks, flaky-test reruns |
@@ -24,8 +24,8 @@ Use the manager the repo already has. With none, take the one that fits the stac
 
 | Manager | Fits | Config | Install on clone | Staged files | Stage a hook |
 |---|---|---|---|---|---|
-| Husky v9 | Node | one shell file per hook in `.husky/` | `"prepare": "husky"` in `package.json` | pair with `lint-staged` in `.husky/pre-commit` | `.husky/pre-push` |
-| Lefthook v2 | any stack, one binary | `lefthook.yml` | `lefthook install`, or the npm package's postinstall | `{staged_files}` in `run`, filtered by `glob` | a top-level `pre-push:` key |
+| Husky v9 | Node | one shell file per hook in `.husky/` | `"prepare": "husky"` in `package.json`, or `postinstall` on Yarn Berry, which skips `prepare` | pair with `lint-staged` in `.husky/pre-commit` | `.husky/pre-push` |
+| Lefthook v2 | any stack, one binary | `lefthook.yml` | `lefthook install`, or the npm package's postinstall, which pnpm 10 runs only when `lefthook` is in `onlyBuiltDependencies` | `{staged_files}` in `run`, filtered by `glob` | a top-level `pre-push:` key |
 | pre-commit | Python or polyglot | `.pre-commit-config.yaml` | `pre-commit install` | passes staged files by default | `stages: [pre-push]` on the hook, and `default_install_hook_types: [pre-commit, pre-push]` so `pre-commit install` installs both |
 
 Lefthook example with staged-file checks on pre-commit and tests on pre-push:

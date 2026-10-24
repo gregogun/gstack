@@ -4,7 +4,7 @@ A guardrail is bypassed when a change makes a check pass without making the code
 
 ## Guardrail files
 
-These files hold the loops. A change to any of them needs a reason in the commit or PR that a human approved.
+These files hold the loops. Flag a change to any of them whose commit states no reason, or whose PR has no approving review (`gh pr view <n> --json reviews`).
 
 - Hook configs: `.husky/`, `lefthook.yml` and `lefthook-local.yml`, `.pre-commit-config.yaml`, the `lint-staged` config, the `prepare` script, `core.hooksPath`.
 - CI and deploy workflows: `.github/workflows/`, other CI configs, branch protection.
@@ -18,7 +18,7 @@ List recent changes to them:
 git log --since=90.days -p -- .husky lefthook.yml .pre-commit-config.yaml .github/workflows package.json 'eslint.config.*' 'tsconfig*.json'
 ```
 
-Add the repo's other guardrail paths to the command, and widen the window if the repo is quiet. Check each diff against the list below.
+Add the repo's other guardrail paths to the command, and widen the window if the repo is quiet. Check each diff against the list below. History cannot see gitignored local configs such as `lefthook-local.yml` or `~/.config/husky/init.sh`, so read those files directly.
 
 ## What to flag
 
@@ -41,6 +41,7 @@ These skip hooks. Flag any of them in agent instructions, package scripts, and s
 |---|---|
 | `git commit --no-verify`, `git commit -n`, a cluster such as `-nm` or `-anm`, an abbreviation such as `--no-veri` | Skips the pre-commit and commit-msg hooks |
 | `git push --no-verify` | Skips the pre-push hook |
+| `git merge --no-verify` | Skips the pre-merge-commit and commit-msg hooks |
 | `git -c core.hooksPath=<dir>`, or a changed `core.hooksPath` | Runs hooks from another directory, or none |
 | `HUSKY=0`, or `export HUSKY=0` in `~/.config/husky/init.sh` | Skips Husky hooks, for one command or on the whole machine |
 | `LEFTHOOK=0`, `LEFTHOOK=false` | Skips Lefthook |

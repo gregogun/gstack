@@ -11,6 +11,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
 jobs:
   drift:
     runs-on: ubuntu-latest
