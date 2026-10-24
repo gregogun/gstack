@@ -24,7 +24,7 @@ A review-bot finding becomes a class once it shows up in a third PR. Count PRs, 
 2. **Enforce it with types so the bad state can't be written.** If bad code still compiles, add a lint or CI check whose error names the file, type, or function to use instead. If the pattern is already common, fail only when a change adds more.
 3. **Run it every time with a hook.** Use a hook when the lesson is an action that must happen at a fixed moment, not a property of the code: format after each edit, block a command, or run a check before a commit or push. A harness hook fires on the agent's tool calls. A git hook fires on commit and push for every contributor. Reach for a hook when an agent rule for the action keeps being skipped. Like a lint error, its failure message names the fix.
 4. **Test the behavior.** Fix or delete any test that still passes when the behavior it checks breaks, or that fails when only the internals change.
-5. **Write docs or agent rules last, only for judgment calls.** Nothing fails when an agent skips them. Write them with the **writing-for-agents** skill.
+5. **Write docs or agent rules last, only for judgment calls.** Nothing fails when an agent skips them. Write them with the **writing-for-agents** skill ([`../writing-for-agents/SKILL.md`](../writing-for-agents/SKILL.md)).
 
 ## Fix and prove
 
