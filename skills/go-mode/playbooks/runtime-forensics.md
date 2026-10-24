@@ -2,9 +2,9 @@
 
 **You own the diagnosis. Instrument the live process, don't theorize from source.** The deliverable is a cited diagnosis, not a fix.
 
-1. Capture the live signal on the matching surface via the control skill: a CPU profile for a spinning process, a heap snapshot for a leak, a CDP trace for a visual glitch. A real artifact, not a guess.
+1. Capture the live signal on the matching surface via the control skill: a CPU profile for a spinning process, a performance trace for a visual glitch or slow interaction, heap snapshots before and after the suspect flow for a leak, network requests and console messages for a failing call. On a web page, take each with the `chrome-devtools` CLI per the **control-ui** skill. A real artifact, not a guess.
 2. Reduce the artifact to the smoking gun: the function on the hot path, the retainer chain from the leaked object to a GC root, the loop firing without input. Parse large artifacts in a subagent (the **guard-the-context-window** principle skill), keep the reduced finding in the main thread. Set each subagent's model and effort per the Subagents section.
-3. Prove the mechanism before believing it. Inject instrumentation via CDP eval on the running process, or hotfix the live code without reloading, to confirm the hypothesis cheaply.
+3. Prove the mechanism before believing it. On a web page, run a script on the live page with the CLI's `evaluate_script`. Elsewhere, inject instrumentation via CDP eval on the running process, or hotfix the live code without reloading. Either way, confirm the hypothesis cheaply.
 4. Map the finding back to source: file, symbol, the line that allocates or schedules.
 5. Throughput checkpoint stays one line: `throughput checkpoint: n/a, read-only forensics`.
 
