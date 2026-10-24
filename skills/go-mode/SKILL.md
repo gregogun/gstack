@@ -128,6 +128,7 @@ A large or cross-cutting effort (a migration across many call sites, an ambitiou
 
 - **Investigation.** Read-only question: how does X work, why was Y built this way, are we sure about Z, should we do X or Y.
 - **Bug fix.** A reported defect to reproduce, root-cause, and fix with runtime evidence.
+- **Flaky test.** A test that passes and fails on the same code: count failures over ten reruns, classify the flake from its trace, then fix or quarantine it without raising retries.
 - **Perf issue.** A measured slowness to trace and improve against a baseline.
 - **Hillclimb.** Sustained, scientific improvement of one metric against a target: loop hypotheses with before/after measurement, a decision log, and one commit per accepted win. Distinct from Perf issue, which is a one-off fix.
 - **Runtime forensics.** Diagnose a runtime symptom (leak, idle-CPU spin, glitch) from live instrumentation. The deliverable is a diagnosis, not a fix.
