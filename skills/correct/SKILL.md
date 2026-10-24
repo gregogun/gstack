@@ -30,6 +30,13 @@ A review-bot finding becomes a class once it shows up in a third PR. Count PRs, 
 
 Then fix the most frequent classes now, one commit each. Prove each new check fails on a real past mistake. Run the same command locally and in CI. Exceptions go on the offending line with a reason, an expiry date, and a human's approval.
 
+## Protect the guardrails
+
+The guardrail files are hook configs, CI workflows, and lint, type, and test configs. An agent that can edit them can pass a check by weakening it. When a check fails, fix the code, not the check.
+
+- Make a harness hook ask the human before an agent edits a guardrail file, and require a code owner's review on those paths in the forge. Your own changes to them pass the same gate.
+- Read every guardrail diff for quiet bypasses: a narrowed glob, a removed or renamed check, or a step moved to a later stage.
+
 ## Keep the rule table
 
 Last, keep a table in the agent instruction file that pairs each rule with what enforces it. When the operator corrects you, fix the mistake and add the rule. If the rule was already there and nothing enforces it, that's a repeat, so fix it at the highest level in the same change. A skipped rule for an action that must happen every time usually becomes a hook. Drop a rule once its mistake can't happen.
