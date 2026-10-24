@@ -145,6 +145,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 | Parallel agents overwrote each other | Give each agent its own worktree. |
 | An overnight run moved but finished nothing | {{loop_command}} needs a check that can pass or fail, not a duration. |
 | The reply claims success from a green build | Ask for the real command, flow, stored value, or profile. That's the prove-it-works principle. |
+| A login or other browser-server flow got only mocked component tests | Ask for one real end-to-end test of the main path. That's the test-where-the-bug-lives principle. |
 
 For a run that drifts, [`references/prompting.md`](references/prompting.md) has one-line steers.
 
