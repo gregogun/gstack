@@ -7,7 +7,7 @@ A feedback loop is one command that goes red on this bug and green once it's fix
 1. **Failing test** at whatever seam reaches the bug: unit, integration, e2e.
 2. **Curl or HTTP script** against a running dev server.
 3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
-4. **Headless browser script** (via the **control-ui** skill, or Playwright) that drives the UI and asserts on DOM, console, or network.
+4. **Headless browser script** that asserts on DOM, console, or network. Use Playwright for a loop that drives the page, and the `chrome-devtools` CLI for a loop that reads console or network. The **control-ui** skill sets up both.
 5. **Replay a captured trace.** Save a real request, payload, or event log to disk and replay it through the code path in isolation.
 6. **Throwaway harness.** Spin up the smallest subset of the system (one service, mocked dependencies) that reaches the bug with a single call.
 7. **Property or fuzz loop.** For "sometimes wrong output", run 1000 random inputs and look for the failure.

@@ -39,7 +39,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`writing-for-agents`](skills/writing-for-agents/SKILL.md): writes skills, prompts and `AGENTS.md` files that agents follow the same way every run.
 - [`bro`](skills/bro/SKILL.md): restates the last reply in plain words.
 - [`control-cli`](skills/control-cli/SKILL.md): drives and inspects a CLI or TUI through a local harness.
-- [`control-ui`](skills/control-ui/SKILL.md): drives and inspects a web, IDE or Electron UI through a local browser or CDP harness.
+- [`control-ui`](skills/control-ui/SKILL.md): picks Playwright to drive a web UI, the `chrome-devtools` CLI to debug it, and a local CDP harness for Electron and IDEs.
 - [`create-verification-skill`](skills/create-verification-skill/SKILL.md): generates a project-local skill that proves app behavior.
 - [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md): brings a verification skill back in line with the app.
 - [`benchmark-checklist`](skills/benchmark-checklist/SKILL.md): vets a measured number before you report or act on it.
