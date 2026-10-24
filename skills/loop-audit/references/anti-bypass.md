@@ -15,10 +15,10 @@ These files hold the loops. A change to any of them needs a reason in the commit
 List recent changes to them:
 
 ```sh
-git log --since=90.days --stat -- .husky lefthook.yml .pre-commit-config.yaml .github/workflows package.json 'eslint.config.*' 'tsconfig*.json'
+git log --since=90.days -p -- .husky lefthook.yml .pre-commit-config.yaml .github/workflows package.json 'eslint.config.*' 'tsconfig*.json'
 ```
 
-Add the repo's other guardrail paths to the command. Read each diff and check it against the list below.
+Add the repo's other guardrail paths to the command, and widen the window if the repo is quiet. Check each diff against the list below.
 
 ## What to flag
 
@@ -35,16 +35,16 @@ Add the repo's other guardrail paths to the command. Read each diff and check it
 
 ## Hook skips
 
-These skip hooks for one command. Flag any of them in agent instructions, scripts, CI, or a commit an agent made.
+These skip hooks. Flag any of them in agent instructions, package scripts, and shell aliases. `HUSKY=0` or `LEFTHOOK=0` on a CI install step is expected, since CI runs the checks itself. A commit made with a skip leaves no trace in history, so CI must rerun the hook checks on every change.
 
 | Skip | Effect |
 |---|---|
-| `git commit --no-verify`, `git commit -n` | Skips the pre-commit and commit-msg hooks |
+| `git commit --no-verify`, `git commit -n`, a cluster such as `-nm` or `-anm`, an abbreviation such as `--no-veri` | Skips the pre-commit and commit-msg hooks |
 | `git push --no-verify` | Skips the pre-push hook |
 | `git -c core.hooksPath=<dir>`, or a changed `core.hooksPath` | Runs hooks from another directory, or none |
-| `HUSKY=0` | Skips Husky hooks |
+| `HUSKY=0`, or `export HUSKY=0` in `~/.config/husky/init.sh` | Skips Husky hooks, for one command or on the whole machine |
 | `LEFTHOOK=0`, `LEFTHOOK=false` | Skips Lefthook |
 | `LEFTHOOK_EXCLUDE=<tags or names>` | Skips those Lefthook jobs |
 | `SKIP=<hook ids>` | Skips those pre-commit framework hooks |
 
-`-n` is a hook skip only on `git commit`. On `git log -n 5` or `grep -n`, it means something else. Facts checked against the git, Husky, Lefthook, and pre-commit docs in October 2026.
+`-n` is a hook skip only on `git commit`. On `git log -n 5` or `grep -n`, it means something else.

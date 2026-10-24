@@ -1,6 +1,5 @@
-# Nightly drift checks. Replace `npm run test:nightly` with the project's slow checks.
-# A failure files one open issue labeled nightly-failure, or comments on it if one is open,
-# and uploads the full log as an artifact.
+# Replace the setup, install, and check steps with the project's stack and slow checks.
+# The step timeout makes a hang fail the step, so the issue step still runs.
 name: nightly
 
 on:
@@ -25,6 +24,7 @@ jobs:
       - run: npm ci
       - name: Slow checks
         shell: bash
+        timeout-minutes: 45
         run: npm run test:nightly 2>&1 | tee nightly.log
       - name: Upload log
         if: failure()
@@ -42,8 +42,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           gh label create nightly-failure --color B60205 --force
-          tail_log=$(tail -n 80 nightly.log 2>/dev/null || echo "no log")
-          body=$(printf 'Run: %s\n\n```\n%s\n```\n' "$RUN_URL" "$tail_log")
+          body="Nightly checks failed: $RUN_URL. The full log is the nightly-log artifact on that run: gh run download ${{ github.run_id }} -n nightly-log"
           open=$(gh issue list --state open --label nightly-failure --json number --jq '.[0].number')
           if [ -n "$open" ]; then
             gh issue comment "$open" --body "$body"

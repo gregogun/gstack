@@ -1,6 +1,6 @@
 # Stage placement
 
-Place each check on the earliest stage it is fast enough for. Measure the speed with a warm cache on the machine that runs the stage, not from memory. A check can run on more than one stage. CI runs all of them again.
+Place each check on the earliest enforced stage it is fast enough for, starting at pre-commit. The edit loop is where the agent runs checks for itself, and nothing enforces it. Measure the speed with a warm cache on the machine that runs the stage, not from memory. A check can run on more than one stage. CI runs all of them again.
 
 | Stage | Runs | Budget | Put here |
 |---|---|---|---|
@@ -13,7 +13,7 @@ Place each check on the earliest stage it is fast enough for. Measure the speed 
 
 Rules:
 
-- A check over its stage's budget moves one stage later. Do not drop it.
+- When a stage's total runs over its budget, move its slowest check one stage later. Do not drop it.
 - CI is the clean-environment superset. A check that runs only in a hook is not enforced, since hooks can be skipped and are not installed on every clone.
 - Nightly holds only checks too slow for CI or that catch drift with no code change. Each nightly failure becomes an issue, a PR, or a file an agent reads. A red run nobody sees is a missing loop. [`nightly.yml`](nightly.yml) files an issue and uploads the log.
 - A required CI check is named in branch protection. Renaming the job silently drops the requirement, so check branch protection after a rename.
@@ -32,7 +32,6 @@ Lefthook example with staged-file checks on pre-commit and tests on pre-push:
 
 ```yaml
 pre-commit:
-  parallel: true
   jobs:
     - name: lint
       run: npx eslint --fix {staged_files}
@@ -49,6 +48,6 @@ pre-push:
       run: npm test
 ```
 
-`stage_fixed: true` adds the fixed files back to the commit, and works only on pre-commit.
+The jobs run in order, so the two fixers never rewrite the same file at once. `stage_fixed: true` adds the fixed files back to the commit, and works only on pre-commit.
 
-Each manager has its own off switch, listed in [`anti-bypass.md`](anti-bypass.md). Facts checked against the Husky, Lefthook (v2.2.2), and pre-commit (v4.7.0) docs in October 2026.
+Each manager has its own off switch, listed in [`anti-bypass.md`](anti-bypass.md).
