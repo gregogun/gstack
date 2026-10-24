@@ -14,6 +14,10 @@ Assume every contributor is an agent that sees only the files it opened, copies 
 
 First, read recent commits, reverts, review comments, agent instruction files, and comments that explain workarounds. Group the mistakes into classes. A class counts once it has happened twice.
 
+### Review-bot repeats
+
+A review-bot finding becomes a class once it shows up in a third PR. Count PRs, not comments, because a bot repeats one finding across many lines of one diff. Bots also file noise, and a third PR separates a pattern from a one-off. Start the class as an agent rule. If the finding shows up again after the rule lands, it is a repeat, so move it to a lint or a test.
+
 ## Fix each class at the highest level that works
 
 1. **Eliminate it with architecture.** Give each piece of state one owner and each task one supported way. Hide internals so the wrong import fails. Replace hand-synced lists with one source of truth. Delete old ways and dead code an agent would copy.
