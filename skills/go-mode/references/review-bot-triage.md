@@ -12,6 +12,10 @@ Classify each review bot thread before acting:
 
 When in doubt, ask. Skipping a noisy code-quality comment is cheap; skipping a real data or security bug is not.
 
+## Repeat findings
+
+A finding that shows up in a third PR is a class, not a thread to triage again. Hand it to the **correct** skill ([`../../correct/SKILL.md#review-bot-repeats`](../../correct/SKILL.md#review-bot-repeats)), which turns it into an agent rule, then a lint or a test if it repeats.
+
 ## Learned pattern format
 
 Add future patterns in this shape:
@@ -82,6 +86,16 @@ Do not auto-skip these categories, even if a previous PR dismissed something sim
 - Comments where the suggested fix is small and clearly reduces risk without changing product intent.
 
 Historical data showed humans sometimes dismiss security/data-flow comments. Treat those as owner judgment calls, not team-wide skip rules.
+
+## Reviewer config
+
+A reviewer config is the instruction file the review bot reads. Give it three parts:
+
+- **Flag.** The bug classes to report and the paths where each matters, such as auth checks under the API routes.
+- **Ignore.** What to stay silent on: style the formatter or lint already enforces, generated files, and the `strong` skip patterns in this file.
+- **Comment.** Name the file and line, and state one specific fix in plain words.
+
+Test the config with a planted bug. On a throwaway branch, plant a bug that passes every local check (lint, types, tests) and open a PR. The config passes when the reviewer flags the planted line and a fresh agent fixes the bug from that comment alone. A miss means the class belongs under Flag. An agent that cannot fix it means the comment instruction needs sharpening. Close the PR and delete the branch.
 
 ## Candidate learnings from recent babysits
 
