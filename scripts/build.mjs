@@ -7,7 +7,8 @@
 //                  and an optional skillPrefix put on every `/<skill>` mention of a gstack skill
 //   tokens.md      one "## name" section per {{name}} token; HTML comments are ignored
 //   agents/*.yml   frontmatter lines merged into agents/<name>.md
-//   models.md      default model and effort per role and a "Drop order:" line (required),
+//   models.md      default model and effort per role and a "Drop order:" effort line (required),
+//                  an optional "Never drops:" model line,
 //                  checked against ROLES_FILE
 //                  and shipped as MODEL_DEFAULTS_TARGET
 //   the manifest template named by harness.json
@@ -68,13 +69,18 @@ function checkModelDefaults(file, roles, config, errors) {
     return;
   }
   const models = config.models ?? [];
+  const efforts = config.efforts ?? [];
   const text = fs.readFileSync(file, "utf8");
-  const order = text.match(/^Drop order: *(.+)$/m)?.[1].split(",").map((m) => m.trim());
-  if (!order) errors.push(`${label}: missing a "Drop order: <model>, <model>, ..." line, strongest model first`);
-  for (const model of order ?? []) {
-    if (models.length && !models.includes(model)) errors.push(`${label}: drop order model "${model}" is not one of ${models.join(", ")}`);
+  const list = (name) => text.match(new RegExp(`^${name}: *(.+)$`, "m"))?.[1].split(",").map((m) => m.trim());
+  const order = list("Drop order");
+  if (!order) errors.push(`${label}: missing a "Drop order: <effort>, <effort>, ..." line, highest effort first`);
+  for (const effort of order ?? []) {
+    if (efforts.length && !efforts.includes(effort)) errors.push(`${label}: drop order effort "${effort}" is not one of ${efforts.join(", ")}`);
   }
-  if (order && new Set(order).size !== order.length) errors.push(`${label}: drop order lists a model twice`);
+  if (order && new Set(order).size !== order.length) errors.push(`${label}: drop order lists an effort twice`);
+  for (const model of list("Never drops") ?? []) {
+    if (models.length && !models.includes(model)) errors.push(`${label}: never-drops model "${model}" is not one of ${models.join(", ")}`);
+  }
   const { problems, counts } = checkModelRows(text, roles, config);
   for (const { line, message } of problems) errors.push(`${label}${line ? `:${line}` : ""}: ${message}`);
   for (const name of roles.keys()) {
