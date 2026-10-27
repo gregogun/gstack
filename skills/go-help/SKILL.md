@@ -75,12 +75,13 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
 | Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
 | Find the root cause of a bug without fixing it yet | [`/diagnosing-bugs`](../diagnosing-bugs/SKILL.md) |
+| Turn a failed Playwright run into one readable file per failure, with a safe rerun command | [`/dossier`](../dossier/SKILL.md) |
 | Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
 | Apply TypeScript rules to `.ts` or `.tsx` work | [`/typescript-best-practices`](../typescript-best-practices/SKILL.md) |
 | Strip comments before review, using a reviewer that didn't write them | [`/no-comments`](../no-comments/SKILL.md) |
 | Clean AI slop out of a diff before commit | [`/deslop`](../deslop/SKILL.md) |
 | Drive a CLI or TUI to reproduce or verify a change | [`/control-cli`](../control-cli/SKILL.md) |
-| Drive a browser, Electron, or web UI to reproduce or verify a change | [`/control-ui`](../control-ui/SKILL.md) |
+| Drive a browser, Electron, or web UI to reproduce or verify, or debug it to find a cause | [`/control-ui`](../control-ui/SKILL.md) |
 | Clean AI tells out of prose | [`/unslop`](../unslop/SKILL.md) |
 | Write docs, an RFC, a README, a PR description, or a commit message to a standard | [`/technical-writing`](../technical-writing/SKILL.md) |
 | Write a skill, playbook, subagent prompt, `AGENTS.md`, or `CLAUDE.md` that an agent reads | [`/writing-for-agents`](../writing-for-agents/SKILL.md) |
@@ -96,6 +97,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
+| See which feedback loops a project has and lacks, and fix the weakest one | [`/loop-audit`](../loop-audit/SKILL.md) |
 | Find their way around gstack | `/go-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
@@ -124,6 +126,7 @@ Playbooks are step lists inside `/go-mode`, not skills, so they have no slash co
 - "take over this branch" runs Session pickup.
 - "pause safely" runs Pause safely.
 - "run the eval playbook" runs Eval.
+- "this test is flaky" runs Flaky test. It fixes or quarantines the flake and never raises retries to make it pass.
 
 The Playbooks section of [`go-mode`](../go-mode/SKILL.md) lists every playbook and when it applies.
 

@@ -1,11 +1,41 @@
 ---
 name: control-ui
-description: Build or adapt a local browser/CDP harness to drive and inspect a web, IDE, or Electron UI. Use for local UI verification, screenshots, accessibility snapshots, perf profiles, visual diffs, or reproducing UI bugs.
+description: Route browser work by the job. Playwright drives a web UI, the chrome-devtools CLI debugs it, and a local CDP harness covers Electron, IDEs, and fallbacks. Use for UI verification, screenshots, perf traces, heap snapshots, console or network logs, or reproducing UI bugs.
 ---
 
 # Control UI
 
-Use local browser automation to verify UI behavior with evidence. First reuse the repo's own Playwright, browser, or Electron harness if it exists; otherwise assemble a temporary local harness around the app's dev server or Chromium debug port.
+Pick the tool by the verb, then collect evidence with it. **Drive** a page to prove a change works. **Debug** a page to find out why something is wrong. A bug fix does both. Debug to find the cause, then drive to prove the fix.
+
+## Pick the tool
+
+Take the first tool in the row that is available and reaches the surface.
+
+| Verb | First | Next | Last resort |
+|---|---|---|---|
+| Drive | The repo's own test runner or harness, such as Playwright, Cypress, or an Electron launch script | `@playwright/cli`, when the repo has none | [Generic Web Harness](#generic-web-harness) |
+| Debug | The `chrome-devtools` CLI, per [Debug with the chrome-devtools CLI](#debug-with-the-chrome-devtools-cli) | Chrome DevTools MCP, for a tool the CLI lacks or when the CLI can't be installed | [Generic CDP Harness](#generic-cdp-harness) |
+
+Electron apps and IDEs with no harness of their own go to the Generic CDP Harness for both verbs. A bug that needs the user's sign-in goes to [Live session](#live-session).
+
+## Debug with the chrome-devtools CLI
+
+1. **Check the install.** Run `chrome-devtools status`. If its `args` line shows `--autoConnect`, the daemon is a leftover live session, so run `chrome-devtools stop` before you go on. If the command is not found, ask the user to allow `npm i -g chrome-devtools-mcp@latest`, which installs it globally. If they decline or the install fails, use the Chrome DevTools MCP server when the harness has it connected. With neither, use the Generic CDP Harness, and offer to add `npx -y chrome-devtools-mcp@latest` to the harness's MCP config for the next session.
+2. **Read the bundled skill.** The package ships its command reference at `$(npm root -g)/chrome-devtools-mcp/skills/chrome-devtools-cli/SKILL.md`. Read it before the first command. For a leak, also read `memory-leak-debugging/SKILL.md` in the same folder. The MCP server's tools have the same names as the CLI's commands. The CLI takes required arguments by position and optional ones as flags. The MCP server turns on the heap tools other than `take_heapsnapshot` only with `--memoryDebugging=true` in its args.
+3. **Capture the signal.** Run the tool in the row for the signal, and save each trace and heap snapshot to a file, so a later run can compare against it. In a live session, ask before you save anything, per [Live session](#live-session). The step is done when the output names the cause or the saved files exist.
+
+| Signal | Tool |
+|---|---|
+| Slow load | `performance_start_trace` with `reload` and `autoStop`, then `performance_analyze_insight` on each insight the trace summary lists |
+| Slow interaction or visual glitch | `performance_start_trace`, do the interaction, `performance_stop_trace`, then `performance_analyze_insight` on each insight the summary lists |
+| Memory leak | `take_heapsnapshot` before and after the suspect flow, then `compare_heapsnapshots` |
+| Failing call or error | `list_network_requests`, `get_network_request`, and `list_console_messages` |
+| A hypothesis about live state | `evaluate_script` on the live page |
+| Accessibility, SEO, or best practices | `lighthouse_audit`. It leaves out performance, so measure performance with a trace. |
+
+The CLI runs a background daemon that keeps the browser, its pages, and their cookies between commands. By default the daemon launches its own headless Chrome in a separate profile. `chrome-devtools start <flags>` restarts it with new flags, and `chrome-devtools stop` ends it. The CLI lacks a few of the MCP server's tools, such as `wait_for` and `fill_form`, and `chrome-devtools --help` lists the commands it has.
+
+Trace tools send the page URL to Google's CrUX API for field data. Unless the URL is public, start the daemon with `--performanceCrux=false`.
 
 ## What It Is Used For
 
@@ -43,7 +73,7 @@ Do not add Playwright as a project dependency just for this probe unless the use
 
 ## Generic CDP Harness
 
-For Electron or a Chromium app launched with `--remote-debugging-port=<port>`, connect over CDP:
+This harness is the fallback. Use it for Electron, an IDE, or a debugging task when neither the `chrome-devtools` CLI nor its MCP server is available. For Electron or a Chromium app launched with `--remote-debugging-port=<port>`, connect over CDP:
 
 ```javascript
 import { chromium } from "playwright";
@@ -83,7 +113,7 @@ Replace `<app-root-selector>` with a stable marker from the current repo, such a
 
 ## CDP Capabilities
 
-Use raw CDP only when higher-level browser APIs are insufficient:
+These are the fallback for debugging. Reach for raw CDP when the `chrome-devtools` CLI and MCP server can't reach the surface or lack the capability, and higher-level browser APIs are insufficient:
 
 - Performance: CPU profiles, traces, paint flashing, FPS meter, layout shift inspection.
 - Memory: heap snapshots and forced GC for leak investigations.
@@ -107,3 +137,16 @@ When multiple app windows/tabs share a debug port:
 - Do not store screenshots or heap snapshots from privacy-sensitive workspaces unless the user explicitly agrees.
 - Do not hard-code selectors, ports, or script paths from another repository. Discover the current repo's local app markers.
 - Clean up dev servers, debug sessions, and temp profiles when done.
+
+### Live session
+
+A bug that needs the user's sign-in runs in the user's own Chrome. Connect to it only after the user hands it over.
+
+1. The user starts the handoff. They open `chrome://inspect/#remote-debugging` in Chrome 144 or later, allow remote debugging, name the tab to debug, and ask you to take over.
+2. Run `chrome-devtools start --autoConnect --performanceCrux=false --usageStatistics=false`, then any command. Chrome asks the user to allow the connection. On the MCP server, or if `start` rejects a flag, pass the same flags in the MCP server's args for this session only.
+3. Select the tab the user named. Ask before you read any other tab.
+4. In that tab, read what comes back to you without a file: the page snapshot, console messages, and network requests.
+5. Ask before any action that changes data or the tab, such as submitting a form, clicking a control that writes, an `evaluate_script` that mutates state, a navigation, a reload, a trace with `reload`, or a `lighthouse_audit` in its default navigation mode. Pass `dialogAction` and `handleBeforeUnload` as `dismiss`, since both default to accept. Ask even under a full-autonomy grant, as go-mode does for its Always-pause list ([`../go-mode/SKILL.md`](../go-mode/SKILL.md)).
+6. Save no heap snapshot, trace, Lighthouse report, network log, or screenshot to disk unless the user agrees, per the privacy guardrail above. `take_heapsnapshot` and `lighthouse_audit` always write a file, so ask before you run them. A heap snapshot holds the page's memory, tokens included.
+7. Redact auth headers, cookies, and tokens in everything you show, per the Redact section of the **diagnosing-bugs** skill ([`../diagnosing-bugs/SKILL.md`](../diagnosing-bugs/SKILL.md)).
+8. When done, run `chrome-devtools stop`, remove `--autoConnect` from any MCP server args you set, and tell the user they can turn remote debugging off.

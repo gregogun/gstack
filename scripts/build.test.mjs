@@ -18,7 +18,7 @@ function makeFixture(skillBody, extra = {}) {
     "skills/go-mode/references/model-roles.md": "## Roles\n\n| Role | Entries | Can drop | Use | Notes |\n| --- | --- | --- | --- | --- |\n| `only role` | one | yes | x | y |\n",
     "skills/demo/SKILL.md": skillBody,
     "harnesses/fx/harness.json": "{}",
-    "harnesses/fx/models.md": "Drop order: opus, sonnet\n\n| Role | Model | Effort |\n| --- | --- | --- |\n| `only role` | opus | high |\n",
+    "harnesses/fx/models.md": "Drop order: high, low\n\n| Role | Model | Effort |\n| --- | --- | --- |\n| `only role` | opus | high |\n",
     "harnesses/fx/tokens.md": "## known_token\n\nKNOWN-VALUE\n",
     ...extra,
   };
@@ -52,15 +52,15 @@ test("unknown token fails the build with file:line", (t) => {
   assert.ok(r.stderr.includes("{{nope}}"), `stderr should name the token: ${r.stderr}`);
 });
 
-test("drop order with an unknown model fails the build", (t) => {
+test("drop order with an unknown effort fails the build", (t) => {
   const root = makeFixture("# Demo\n", {
-    "harnesses/fx/harness.json": '{"models": ["opus", "sonnet"]}',
-    "harnesses/fx/models.md": "Drop order: opus, gpt\n\n| Role | Model | Effort |\n| --- | --- | --- |\n| `only role` | opus | high |\n",
+    "harnesses/fx/harness.json": '{"efforts": ["low", "high"]}',
+    "harnesses/fx/models.md": "Drop order: high, extreme\n\n| Role | Model | Effort |\n| --- | --- | --- |\n| `only role` | opus | high |\n",
   });
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const r = build(root);
-  assert.equal(r.status, 1, "build should exit 1 on an unknown drop-order model");
-  assert.match(r.stderr, /drop order model "gpt"/);
+  assert.equal(r.status, 1, "build should exit 1 on an unknown drop-order effort");
+  assert.match(r.stderr, /drop order effort "extreme"/);
 });
 
 test("the build writes the harness's models and efforts for the doctor", (t) => {

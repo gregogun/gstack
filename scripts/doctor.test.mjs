@@ -45,7 +45,7 @@ function makeLocalMarketplaceInstall(t) {
       efforts: ["low", "high"],
     },
     "repo/harnesses/fx/plugin.json": { name: "gstack" },
-    "repo/harnesses/fx/models.md": "Drop order: opus, sonnet\n\n| Role | Model | Effort |\n|---|---|---|\n| `bug-fix` | opus | high |\n",
+    "repo/harnesses/fx/models.md": "Drop order: high, low\n\n| Role | Model | Effort |\n|---|---|---|\n| `bug-fix` | opus | high |\n",
     "repo/harnesses/fx/README.md": "# fx\n",
     "plugins/installed.json": { plugins: { "gstack@gstack": [{ scope: "user", installPath: path.join(root, "cache/gstack") }] } },
     "plugins/marketplaces.json": { gstack: { source: { source: "directory" }, installLocation: path.join(root, "repo") } },

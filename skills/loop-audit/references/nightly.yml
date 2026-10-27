@@ -1,0 +1,55 @@
+# Replace the setup, install, and check steps with the project's stack and slow checks.
+# The step timeout makes a hang fail the step, so the issue step still runs.
+name: nightly
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - name: Slow checks
+        shell: bash
+        timeout-minutes: 45
+        run: npm run test:nightly 2>&1 | tee nightly.log
+      - name: Upload log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-log
+          path: nightly.log
+          if-no-files-found: ignore
+      - name: File issue
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create nightly-failure --color B60205 --force
+          body="Nightly checks failed: $RUN_URL. The full log is the nightly-log artifact on that run: gh run download ${{ github.run_id }} -n nightly-log"
+          open=$(gh issue list --state open --label nightly-failure --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body "$body"
+          else
+            gh issue create --title "Nightly checks failed" --label nightly-failure --body "$body"
+          fi

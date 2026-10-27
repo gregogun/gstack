@@ -7,6 +7,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 ## Skills
 
 - [`go-mode`](skills/go-mode/SKILL.md): the entry point for any non-trivial task. Routes the task to a playbook.
+  - [Flaky test](skills/go-mode/playbooks/flaky-test.md): reruns a flaky test ten times, classifies the flake from its trace, and fixes or quarantines it without raising retries.
 - [`lite-mode`](skills/lite-mode/SKILL.md): does a quick experiment or a small fix directly, with one real check.
 - [`chat-mode`](skills/chat-mode/SKILL.md): talks things through and changes nothing. In Claude Code a hook blocks tool calls that can change something.
 - [`go-help`](skills/go-help/SKILL.md): finds the skill, playbook or principle for a task.
@@ -29,6 +30,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`swarm`](skills/swarm/SKILL.md): runs parallel workers over slices or races and returns one report.
 - [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff, try to break it, and check it against the spec.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
+- [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
 - [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md): TypeScript rules for `.ts` and `.tsx` work.
@@ -39,7 +41,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`writing-for-agents`](skills/writing-for-agents/SKILL.md): writes skills, prompts and `AGENTS.md` files that agents follow the same way every run.
 - [`bro`](skills/bro/SKILL.md): restates the last reply in plain words.
 - [`control-cli`](skills/control-cli/SKILL.md): drives and inspects a CLI or TUI through a local harness.
-- [`control-ui`](skills/control-ui/SKILL.md): drives and inspects a web, IDE or Electron UI through a local browser or CDP harness.
+- [`control-ui`](skills/control-ui/SKILL.md): picks Playwright to drive a web UI, the `chrome-devtools` CLI to debug it, and a local CDP harness for Electron and IDEs.
 - [`create-verification-skill`](skills/create-verification-skill/SKILL.md): generates a project-local skill that proves app behavior.
 - [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md): brings a verification skill back in line with the app.
 - [`benchmark-checklist`](skills/benchmark-checklist/SKILL.md): vets a measured number before you report or act on it.
@@ -49,6 +51,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`automate-me`](skills/automate-me/SKILL.md): drafts a personal `-mode` skill from your own history.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
+- [`loop-audit`](skills/loop-audit/SKILL.md): lists a project's eight feedback loops with a command or a proposal for each, and builds the fix for the weakest one.
 - `principle-*`: 25 one-rule skills that `go-mode` indexes and cites, such as [`principle-prove-it-works`](skills/principle-prove-it-works/SKILL.md) and [`principle-test-where-the-bug-lives`](skills/principle-test-where-the-bug-lives/SKILL.md), which picks the layer to test a change at.
 
 ## Install
