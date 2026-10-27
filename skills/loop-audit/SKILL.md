@@ -72,6 +72,7 @@ Build the fix for the weakest loop on a branch, not on the default branch:
 - **Static checks.** If the **project-guardrails** skill is installed (your skill list names it, or `{{project_skills_dir}}/project-guardrails/SKILL.md` or `{{user_skills_dir}}/project-guardrails/SKILL.md` exists), read it and set up the static checks through it, with the audit table as input. This applies to any fix that needs a new static check, such as a hook that runs a lint the repo lacks. Without that skill, add the check to the one command that runs the static layer.
 - **Git hooks.** Use the hook manager the repo already has, and place each check per [`references/stage-placement.md`](references/stage-placement.md). With no manager, pick the one that matches the stack from that reference.
 - **Nightly.** Start from [`references/nightly.yml`](references/nightly.yml). Replace its setup, install, and check steps with the project's stack and slow checks. Keep its upload and issue steps.
+- **Post-deploy smoke.** Start from [`references/post-deploy-smoke.md`](references/post-deploy-smoke.md) and its workflow, and write the stop-ship triggers before the first deploy.
 - **End-to-end proof.** Use the **create-verification-skill** skill ([`../create-verification-skill/SKILL.md`](../create-verification-skill/SKILL.md)).
 - **Agent rules.** Use the **correct** skill ([`../correct/SKILL.md`](../correct/SKILL.md)), so each rule points at what enforces it.
 - **Any other loop.** Add the smallest config or script that makes the loop present, enforced, and placed right.
