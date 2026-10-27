@@ -52,7 +52,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
 - [`loop-audit`](skills/loop-audit/SKILL.md): lists a project's eight feedback loops with a command or a proposal for each, and builds the fix for the weakest one.
-- `principle-*`: 24 one-rule skills that `go-mode` indexes and cites, such as [`principle-prove-it-works`](skills/principle-prove-it-works/SKILL.md).
+- `principle-*`: 25 one-rule skills that `go-mode` indexes and cites, such as [`principle-prove-it-works`](skills/principle-prove-it-works/SKILL.md) and [`principle-test-where-the-bug-lives`](skills/principle-test-where-the-bug-lives/SKILL.md), which picks the layer to test a change at.
 
 ## Install
 
