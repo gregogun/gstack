@@ -125,6 +125,7 @@ Playbooks are step lists inside `/go-mode`, not skills, so they have no slash co
 - "take over this branch" runs Session pickup.
 - "pause safely" runs Pause safely.
 - "run the eval playbook" runs Eval.
+- "this test is flaky" runs Flaky test. It fixes or quarantines the flake and never raises retries to make it pass.
 
 The Playbooks section of [`go-mode`](../go-mode/SKILL.md) lists every playbook and when it applies.
 
