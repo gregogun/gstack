@@ -96,6 +96,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
+| See which feedback loops a project has and lacks, and fix the weakest one | [`/loop-audit`](../loop-audit/SKILL.md) |
 | Find their way around gstack | `/go-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
