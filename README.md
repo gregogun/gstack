@@ -30,6 +30,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`swarm`](skills/swarm/SKILL.md): runs parallel workers over slices or races and returns one report.
 - [`interrogate`](skills/interrogate/SKILL.md): has different models review a diff, try to break it, and check it against the spec.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
+- [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
 - [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md): TypeScript rules for `.ts` and `.tsx` work.
