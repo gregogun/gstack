@@ -1,6 +1,6 @@
 ---
 name: motion
-description: "Build, audit, find, remove, or speed up web UI motion against exact easing, duration, and spring values. Use for /motion, animating a component, auditing a codebase's animations into plans, reviewing motion in a diff, finding where motion belongs, removing animations an interface doesn't need, or fixing an animation that drops frames."
+description: "Build, audit, find, remove, or speed up web UI motion against exact easing, duration, and spring values. Use for /motion, animating a component, auditing a codebase's animations, reviewing motion in a diff, finding where motion belongs, removing animations an interface doesn't need, or fixing an animation that drops frames."
 disable-model-invocation: true
 ---
 
@@ -27,9 +27,6 @@ Take the mode the request names. A bare `/motion` infers it from the request and
 
 - `quick` or `deep` sets the audit depth, per the effort table in [`references/audit.md`](references/audit.md).
 - A category name (`easing`, `performance`, `accessibility`, or another of the eight) audits that category only.
-- `plan <description>` skips the audit and writes one plan for the described change.
-- `execute <plan>` runs a plan in a worktree and reviews the diff.
-- `reconcile` re-checks existing plans against the current code.
 - `review <target>` reviews the motion in one diff against the review bar.
 
 When the user describes an effect without naming it ("the bouncy thing when it opens"), map their words through [`references/vocabulary.md`](references/vocabulary.md) before you build or judge it.
@@ -150,15 +147,15 @@ Make the call from the spec and state it in one line. Never offer motion options
 
 ### audit
 
-Audit never modifies source. It writes plans that another agent executes.
+Audit never modifies source and writes no files. It reports findings for the user to pick.
 
 1. Run Recon, Audit, and Vet per [`references/audit.md`](references/audit.md).
-2. Present the confirm table, then stop for the user to pick findings. Running non-interactively, take the top 3 to 5 by leverage.
-3. Write one plan per picked finding per [`references/plan-template.md`](references/plan-template.md), into `plans/` with a `plans/README.md` index.
+2. Present the confirm table, then stop for the user to pick findings. Running non-interactively, report the top 3 to 5 by leverage and stop.
+3. For picked findings, offer `build` to fix them now, or the **to-tickets** skill ([`../to-tickets/SKILL.md`](../to-tickets/SKILL.md)) to file them. Each ticket carries the exact values, the `file:line` and the [feel check](references/audit.md#feel-check), since its executor has none of this conversation.
 
-`plan`, `execute`, and `reconcile` follow the sections of the same names in [`references/plan-template.md`](references/plan-template.md). `review` follows the review bar in [`references/audit.md`](references/audit.md).
+`review` follows the review bar in [`references/audit.md`](references/audit.md).
 
-**Output.** The confirm table ordered by leverage, 2 to 4 missed opportunities listed apart from it, then the plan paths and the plans README. "The motion here is already right" is a valid result. `review` outputs the Before, After, Why table and a Block or Approve decision instead.
+**Output.** The confirm table ordered by leverage, then 2 to 4 missed opportunities listed apart from it. "The motion here is already right" is a valid result. `review` outputs the Before, After, Why table and a Block or Approve decision instead.
 
 ### find
 
@@ -172,7 +169,7 @@ Find is read-only and proposes motion with exact values. Restraint is the postur
 
 1. An opportunities table, at most 5 to 7 rows for a whole app and fewer for one view, ordered by leverage. Columns are #, Location, Today, Purpose, Frequency, Suggested motion. Every Suggested motion cell names the exact curve, duration, and properties from Values, plus reduced-motion handling and hover gating where they apply.
 2. **Rejected** (required). Two to five candidates you considered and dropped, each with the gate question that killed it.
-3. **Verdict.** One paragraph on how much motion the interface needs, whether it is close to right, and the single highest-leverage row. Close by pointing at `/motion plan <row>` to turn a row into a plan.
+3. **Verdict.** One paragraph on how much motion the interface needs, whether it is close to right, and the single highest-leverage row. Close by offering `build` for a row, or **to-tickets** to file the rows.
 
 Nothing surviving the gate is a good result. Say so plainly.
 
