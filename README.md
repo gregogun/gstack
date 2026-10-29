@@ -32,6 +32,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
 - [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
+- [`ui-review`](skills/ui-review/SKILL.md): reviews a change, screen or repo against a written UI standard and returns a Block or Approve verdict.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.
 - [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md): TypeScript rules for `.ts` and `.tsx` work.
 - [`deslop`](skills/deslop/SKILL.md): removes AI-generated code slop from a diff before commit.
@@ -64,6 +65,10 @@ This repo is a snapshot fork of pstack from [cursor/plugins at commit `182f2ce`]
 
 The `deslop`, `control-cli` and `control-ui` skills come from the `cursor-team-kit` plugin in [cursor/plugins at the same commit](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/cursor-team-kit/skills).
 
+The `ui-review` skill is adapted from Jakub Krehel's skills in [jakubkrehel/skills at `592aedc`](https://github.com/jakubkrehel/skills/tree/592aedc44d7d5b3e29740984252902f3e5402a1c/skills).
+
 ## License
 
 MIT. See [LICENSE](LICENSE). The `deslop`, `control-cli` and `control-ui` skills are MIT, Copyright (c) 2026 Cursor, under the [cursor-team-kit license](https://github.com/cursor/plugins/blob/182f2ce414e83224915c190d2f63239c1608d0a5/cursor-team-kit/LICENSE).
+
+The `ui-review` skill is MIT, Copyright (c) 2026 Jakub Krehel. See [its LICENSE](skills/ui-review/LICENSE).
