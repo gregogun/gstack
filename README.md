@@ -53,7 +53,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`figure-it-out`](skills/figure-it-out/SKILL.md): designs a rigorous run when no playbook fits.
 - [`show-me-your-work`](skills/show-me-your-work/SKILL.md): keeps a decision log you can review later.
 - [`housekeeping`](skills/housekeeping/SKILL.md): audits and cleans up worktrees, branches, stashes, stale PRs, scratch and disk caches.
-- [`report`](skills/report/SKILL.md): sends a short status report to your phone through Telegram, or prints it.
+- [`report`](skills/report/SKILL.md): sends a short status report to your phone through Telegram, or prints it. It also schedules a daily unattended run that reports when it ends.
 - [`automate-me`](skills/automate-me/SKILL.md): drafts a personal `-mode` skill from your own history.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
