@@ -28,7 +28,7 @@ Show the zoom percentage and bound its range. A useful starting range is 25–40
 
 Keep enlarged artwork in a scrollable viewport so every edge remains reachable with a keyboard or touch. Reserve space for controls, including their wrapped height on narrow screens.
 
-Use the project's existing components and fonts when integrating there. [`better-layout`](../ui-review/references/layout.md) owns responsive arrangement, [`better-accessibility`](../ui-review/references/accessibility.md) owns control semantics and keyboard behavior while `better-writing` owns control copy.
+Use the project's existing components and fonts when integrating there. [`better-layout`](../ui-review/references/layout.md) owns responsive arrangement, [`better-accessibility`](../ui-review/references/accessibility.md) owns control semantics and keyboard behavior while the [**unslop**](../unslop/SKILL.md) skill owns control copy.
 
 ## Follow the system appearance and allow an override
 
