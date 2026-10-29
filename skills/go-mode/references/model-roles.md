@@ -30,18 +30,19 @@ Skills read the files at each spawn, so an edit applies to the next spawn withou
 | `bug-fix` | one | yes | bug-fix playbook | a fast code model |
 | `perf-issue` | one | yes | perf-issue playbook | a fast code model |
 | `hillclimb` | one | yes | hillclimb playbook | a fast code model |
-| `hardest tasks` | one | no | go-mode code delegates for the hardest changes | the strongest reasoning model |
-| `judgment and prose` | one | no | go-mode prose and judgment delegates | the strongest reasoning model |
-| `how explorer` | one | yes | how | a fast code model |
-| `how explainer` | one | no | how | the strongest reasoning model |
-| `why investigators` | one | yes | why | a fast code model |
-| `why synthesizer` | one | no | why | the strongest reasoning model |
+| `hardest tasks` | one | no | go-mode code delegates for the hardest changes | the strongest reasoning model, at moderate effort |
+| `judgment and prose` | one | no | go-mode prose and judgment delegates | a capable mid-tier model; the parent reviews the work |
+| `how explorer` | one | yes | how | a fast, cheap model |
+| `how explainer` | one | no | how | a capable mid-tier model |
+| `why investigators` | one | yes | why | a fast, cheap model |
+| `why synthesizer` | one | no | why | the strongest reasoning model, at low effort |
 | `research explorer` | one | yes | research | a fast, cheap model; gathering is search and quoting, not judgment |
-| `research synthesizer` | one | no | research | the strongest reasoning model |
-| `reflect tooling` | one | no | reflect | a fast code model, from a different family than the judgment role where possible |
-| `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model |
-| `swarm workers` | one | no | swarm, and go-mode verification | a fast code model |
+| `research synthesizer` | one | no | research | the strongest reasoning model, at low effort |
+| `reflect tooling` | one | no | reflect | a fast, cheap model, from a different family than the judgment role where possible |
+| `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model, at low effort |
+| `swarm workers` | one | no | swarm, and go-mode verification | a fast, cheap model |
+| `code reviewer` | one | no | opening-a-pr review | the strongest reasoning model, at moderate effort |
 | `arena runners` | list | no | arena | 1: the strongest reasoning model. 2: a second, different model for diversity |
-| `arena cross-judge pool` | list | no | arena | the same two, preferring a family other than the parent's |
+| `arena cross-judge pool` | list | no | arena | a capable mid-tier model, from a family other than the parent's where possible |
 | `architect runners` | list | no | architect, via arena | 1: the strongest reasoning model. 2: a second, different model for diversity |
 | `interrogate reviewers` | list | no | interrogate | Reviewer A: the strongest reasoning model. Reviewer B: a second, different model for diversity |

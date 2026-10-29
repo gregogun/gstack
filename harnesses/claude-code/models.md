@@ -12,26 +12,26 @@ A role marked "Can drop" in `model-roles.md` may move its effort one step down t
 
 | Role | Model | Effort |
 |---|---|---|
-| `feature, refactoring` | opus | medium |
-| `bug-fix` | opus | medium |
-| `perf-issue` | opus | medium |
-| `hillclimb` | opus | medium |
-| `hardest tasks` | opus | high |
-| `judgment and prose` | opus | high |
-| `how explorer` | opus | medium |
-| `how explainer` | opus | high |
-| `why investigators` | opus | medium |
-| `why synthesizer` | opus | high |
+| `feature, refactoring` | sonnet | medium |
+| `bug-fix` | sonnet | medium |
+| `perf-issue` | sonnet | medium |
+| `hillclimb` | sonnet | medium |
+| `hardest tasks` | opus | medium |
+| `judgment and prose` | sonnet | medium |
+| `how explorer` | haiku | medium |
+| `how explainer` | sonnet | high |
+| `why investigators` | haiku | medium |
+| `why synthesizer` | opus | low |
 | `research explorer` | haiku | medium |
-| `research synthesizer` | opus | high |
-| `reflect tooling` | opus | medium |
-| `reflect judgment, divergent, synthesizer` | opus | high |
-| `swarm workers` | opus | medium |
-| `arena runners` | opus | high |
-| `arena runners` | sonnet | high |
-| `arena cross-judge pool` | opus | high |
-| `arena cross-judge pool` | sonnet | high |
-| `architect runners` | opus | high |
-| `architect runners` | sonnet | high |
-| `interrogate reviewers` | opus | high |
-| `interrogate reviewers` | sonnet | high |
+| `research synthesizer` | opus | low |
+| `reflect tooling` | haiku | medium |
+| `reflect judgment, divergent, synthesizer` | opus | low |
+| `swarm workers` | haiku | medium |
+| `code reviewer` | opus | medium |
+| `arena runners` | opus | low |
+| `arena runners` | sonnet | medium |
+| `arena cross-judge pool` | sonnet | medium |
+| `architect runners` | opus | low |
+| `architect runners` | sonnet | medium |
+| `interrogate reviewers` | opus | low |
+| `interrogate reviewers` | sonnet | medium |
