@@ -131,7 +131,12 @@ async function main() {
   }
   if (positionals.length > 1) throw new ReportError(2, USAGE);
   if (values["new-run"] !== undefined) {
-    console.log(newRunDir(values["new-run"]));
+    if (positionals.length || values.adapter) throw new ReportError(2, `report: --new-run takes no other arguments\n${USAGE}`);
+    try {
+      console.log(newRunDir(values["new-run"]));
+    } catch (e) {
+      throw new ReportError(2, `report: cannot create a run folder (${e.message})`);
+    }
     return;
   }
   const name = values.adapter ?? process.env.GSTACK_REPORT_ADAPTER ?? "telegram";
