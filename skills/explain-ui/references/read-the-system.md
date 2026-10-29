@@ -1,7 +1,5 @@
 # Reading the whole system
 
-Adapted from Jakub Krehel's `explain-interface` (`read-the-system.md`).
-
 Use this where no specific effect was named and the question is how the interface is built in general. For one named thing, use [find-the-effect.md](find-the-effect.md).
 
 Every recipe is a function that returns its data, so the result comes back whole. Run the stack first and tokens second, because a page that hands you its custom properties has already told you most of the answer.

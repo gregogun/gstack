@@ -1,7 +1,5 @@
 # Reading a screenshot
 
-Adapted from Jakub Krehel's `explain-interface` (`from-an-image.md`).
-
 The method for a screenshot, where the answer is a reconstruction rather than a reading. A pixel value you sample is measured. A ratio you compute from samples is inferred. Every claim about the CSS, the tokens, or the stack behind them is a guess.
 
 | Exact from pixels | Ratios only | Unavailable |

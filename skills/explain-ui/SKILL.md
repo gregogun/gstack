@@ -6,8 +6,6 @@ disable-model-invocation: true
 
 # Explain UI
 
-Adapted from Jakub Krehel's `explain-interface`.
-
 Answer "how was this built?" about a web page. `/explain-ui how the gradient on example.com was built` finds the layers that produce the gradient and explains what each one contributes.
 
 It explains and gives no verdict, because how someone else built their page is not a finding. Two neighbours own the other questions:

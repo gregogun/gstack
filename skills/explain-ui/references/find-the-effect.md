@@ -1,7 +1,5 @@
 # Finding the layers behind an effect
 
-Adapted from Jakub Krehel's `explain-interface` (`find-the-effect.md`).
-
 Search by property signature, not by guessing the element. You rarely know the markup, but you always know which CSS properties could produce what you see. Every value a recipe returns is measured. What you conclude from the set is inferred.
 
 ## Three things that cost you the answer
