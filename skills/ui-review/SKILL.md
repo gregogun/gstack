@@ -1,12 +1,14 @@
 ---
 name: ui-review
-description: Use for /ui-review or when asked to review the UI of a change, a screen or a repo against a written standard for accessibility, layout, typography, colour, surfaces and mobile. Reports findings with severity and a Block or Approve verdict. Read-only.
+description: Use for /ui-review or when asked to review the UI of a change, a screen or a repo against a written standard for accessibility, layout, typography, colour, surfaces, motion and mobile. Name a domain, as in /ui-review motion, to review only that domain. Reports findings with severity and a Block or Approve verdict. Read-only.
 disable-model-invocation: true
 ---
 
 # UI review
 
 Review interface code against a written standard and report what breaks it. Two modes share one standard. **Change review** covers a diff and the surfaces it touches. **Screen or repo review** covers a screen, a flow or the whole repository with no scope block.
+
+Name one or more domains to review only those, in either mode. `/ui-review motion` reviews the repo's motion, and `/ui-review motion <target>` reviews the motion in a change. The coverage table lists the other domains as `Not inspected`, with the reason `Not requested`.
 
 ## The standard
 
@@ -27,7 +29,8 @@ Read a domain's reference before judging that domain. Review in this order.
 3. [typography](references/typography.md)
 4. [colors](references/colors.md)
 5. [surfaces](references/surfaces.md)
-6. [mobile](references/mobile.md)
+6. [motion](references/motion.md)
+7. [mobile](references/mobile.md)
 
 Ranking, the fix ladder, the cap and the verdict come from [severity](references/severity.md).
 
