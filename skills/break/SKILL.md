@@ -30,8 +30,8 @@ disable-model-invocation: true
 
    The step is done when every scenario and environment pair that `scenarios.md` names has a screenshot and a verdict. If no browser can reach the surface, say so, report the scenario list and the fixture URL with no findings, and stop.
 5. **Report and stop.** Use the format in [Report](#report). Leave the fixture running and give its URL or path. When the task asked for fixes up front, write the report first and go on to step 6.
-6. **Fix on request, test first.** Fix only the items the user picks, or every item when the task asked for fixes. For each one, follow the **tdd** skill ([`../tdd/SKILL.md`](../tdd/SKILL.md)). Write a test that loads the scenario at the width where it broke and asserts what a user observes, such as the trailing action sitting inside the row and taking a click, the container having no horizontal scroll, or focus reaching the full value. Never assert the CSS that fixed it. Watch it fail, fix at the owner, and watch it pass. Look up the rules for the fix in the **ui-review** skill ([`../ui-review/SKILL.md`](../ui-review/SKILL.md)) and the symptom table in [`references/signatures.md`](references/signatures.md). Then drive every scenario again, typical data included, since a fix for one scenario often breaks another.
-7. **Keep the fixture.** It is the regression suite for the next change to the target. Keep it dev-only and named as a break fixture, and delete it only when the user says so.
+6. **Fix on request, test first.** Fix only the items the user picks, or every item when the task asked for fixes. For each one, follow the **tdd** skill ([`../tdd/SKILL.md`](../tdd/SKILL.md)). Write a test that renders the target with that scenario's data at the width where it broke, without going through the fixture, and asserts what a user observes, such as the trailing action sitting inside the row and taking a click, the container having no horizontal scroll, or focus reaching the full value. Never assert the CSS that fixed it. Watch it fail, fix at the owner, and watch it pass. Look up the rules for the fix in the **ui-review** skill ([`../ui-review/SKILL.md`](../ui-review/SKILL.md)) and the symptom table in [`references/signatures.md`](references/signatures.md). Then drive every scenario again, typical data included, since a fix for one scenario often breaks another.
+7. **Remove the fixture.** Once the user has the report and any fixes have landed, delete the fixture and anything it added. Keep it only when the user asks, and then say where it lives.
 
 ## Report
 
@@ -86,4 +86,4 @@ Order each table worst first. Unreadable content, an unreachable action, or wron
 | A fix made before the report | Revert it, write the report, then fix on request |
 | A row with no owner | Name one of the four owners |
 | A clean run padded with suggestions | "Everything held" plus the scenario list |
-| The fixture deleted after the fix | Keep it as the regression suite until the user says otherwise |
+| The fixture left in the project at the end | Delete it unless the user asked to keep it |

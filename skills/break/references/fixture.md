@@ -1,6 +1,6 @@
 # The fixture
 
-The fixture is a page or story that renders the real target once per scenario, with each scenario's data and state under your control. It is the surface step 4 drives, the page the user reads alongside the report, and the regression suite afterwards.
+The fixture is a page or story that renders the real target once per scenario, with each scenario's data and state under your control. It is the surface step 4 drives and the page the user reads alongside the report. It is temporary, and step 7 removes it.
 
 ## Where it lives
 
