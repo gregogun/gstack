@@ -2,8 +2,9 @@
 
 import fs from "node:fs";
 import { parseArgs } from "node:util";
+import { newRunDir } from "./state.mjs";
 
-const USAGE = "usage: report.mjs [--adapter <name>] [<report.json>]   (reads stdin when no file is given)";
+const USAGE = "usage: report.mjs [--adapter <name>] [<report.json>]   (reads stdin when no file is given)\n       report.mjs --new-run <slug>   (creates a run folder and prints its path)";
 const STATUS_ICON = { done: "✅", running: "⏳", blocked: "⛔", failed: "❌" };
 const SECTIONS = [
   ["completed", "Completed"],
@@ -124,11 +125,15 @@ function readInput(file) {
 async function main() {
   let values, positionals;
   try {
-    ({ values, positionals } = parseArgs({ options: { adapter: { type: "string" } }, allowPositionals: true }));
+    ({ values, positionals } = parseArgs({ options: { adapter: { type: "string" }, "new-run": { type: "string" } }, allowPositionals: true }));
   } catch (e) {
     throw new ReportError(2, `${e.message}\n${USAGE}`);
   }
   if (positionals.length > 1) throw new ReportError(2, USAGE);
+  if (values["new-run"] !== undefined) {
+    console.log(newRunDir(values["new-run"]));
+    return;
+  }
   const name = values.adapter ?? process.env.GSTACK_REPORT_ADAPTER ?? "telegram";
   const adapter = Object.hasOwn(ADAPTERS, name) ? ADAPTERS[name] : null;
   if (!adapter) throw new ReportError(2, `report: no adapter "${name}" (have: ${Object.keys(ADAPTERS).join(", ")})`);
