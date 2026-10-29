@@ -1,7 +1,5 @@
 # Failure signatures
 
-Adapted from Emil Kowalski's `break-ui`, with the truncation row following Jakub Krehel's `better-layout`.
-
 Consult this in step 6 of [`../SKILL.md`](../SKILL.md), after the report. Each row starts from what a screenshot shows. The cause in the middle column is the usual one. Confirm it on the live page before fixing, since the same symptom has other causes. The domain rules behind each fix live in the **ui-review** skill's references.
 
 | What you see | Usual cause | Fix |

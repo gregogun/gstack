@@ -1,10 +1,8 @@
 # Scenarios
 
-Adapted from Jakub Krehel's `break` (its scenario axes) and `state-machine`, and Emil Kowalski's `break-ui` (its worst-case catalog).
-
 The menu step 2 of [`../SKILL.md`](../SKILL.md) walks. Each axis carries a **cue**, the property of the target that makes the axis worth running. When the cue matches, the axis stays. When it fails, drop the axis and name the drop. An axis that stays contributes the scenarios below. Add any worse value the target's own data holds, such as the longest option in a real dataset copied into a fixture.
 
-The widths and values here are defaults. Jakub's values win for type, layout, and accessibility, and Emil's win for motion. Project tokens and documented project decisions override both.
+The widths and values here are defaults. Project tokens and documented project decisions override them.
 
 ## Data axes
 

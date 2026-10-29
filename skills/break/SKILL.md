@@ -8,8 +8,6 @@ disable-model-invocation: true
 
 **You own the evidence, not the design.** Put one component or screen in front of the worst realistic data, every state it can reach, and every environment it ships into. Watch it in the running UI, report what broke, then stop. Most UI is built against kind data like "Jane Doe, jane@acme.com, 12 members". The job is to undo that choice one value at a time.
 
-Adapted from Jakub Krehel's `break` and `state-machine` and Emil Kowalski's `break-ui`.
-
 ## Rules
 
 - **Observed means seen on screen.** A finding is something you watched break in the running UI through the **control-ui** skill ([`../control-ui/SKILL.md`](../control-ui/SKILL.md)). Reading the code tells you where to look. It never makes a finding.
