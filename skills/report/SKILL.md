@@ -1,6 +1,6 @@
 ---
 name: report
-description: "Send a short status report on the current work to the user's phone through Telegram, or print it. Use for /report, \"send me an update\", or to set up the Telegram bot the report goes through."
+description: "Send a short status report on the current work to the user's phone through Telegram, or print it. Use for /report, \"send me an update\", to set up the Telegram bot the report goes through, or to schedule an unattended daily run that reports when it ends."
 disable-model-invocation: true
 ---
 
@@ -42,6 +42,10 @@ Run this once per machine, when the user asks or when Send exits 3. The user doe
 2. Send any message to the new bot. Then open `https://api.telegram.org/bot<token>/getUpdates` in a browser, find the update that holds that message, and copy its `message.chat.id`. Clear that page from the browser history afterwards, because the URL holds the token.
 3. Store both as user environment variables, never in a repo.
    - Windows, in PowerShell: `[Environment]::SetEnvironmentVariable('TELEGRAM_BOT_TOKEN', (Read-Host 'Token'), 'User')`, then the same for `TELEGRAM_CHAT_ID`. `Read-Host` keeps the token out of the shell history, which `setx` on the command line does not. A Task Scheduler task sees both when it runs as this user.
-   - macOS and Linux: export both in the shell profile. A launchd job does not read the profile, so set them in the job's `EnvironmentVariables` too.
+   - macOS and Linux: export both in the shell profile. A scheduled job does not read the profile, so `schedule.mjs add` records both in the job's task file.
    - Then restart Claude Code and the terminal or IDE it runs in. A variable reaches only processes started after it was set.
 4. Check it. Done when `--adapter stdout` prints a sample report and the same file without the flag arrives on the phone.
+
+## Schedule
+
+To run an agent unattended each day and get its report when it ends, follow [references/schedule.md](references/schedule.md).

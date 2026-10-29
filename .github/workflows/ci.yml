@@ -19,3 +19,19 @@ jobs:
           node-version: lts/*
       - run: npm run build
       - run: npm test
+
+  report-and-schedule:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - run: node --test scripts/report.test.mjs scripts/schedule.test.mjs
+        env:
+          GSTACK_TEST_SCHEDULER: "1"
