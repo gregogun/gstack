@@ -1,6 +1,6 @@
 # Motion
 
-Whether an element moves, then how. Frequency, purpose, easing, duration, springs, origin, interruptibility, compositor cost and cohesion. Reduced-motion rules belong to [accessibility](accessibility.md), and hover gating to [surfaces](surfaces.md). Fixes use plain CSS or WAAPI and the project's own tokens.
+Whether an element moves, then how. Frequency, purpose, easing, duration, springs, origin, interruptibility, compositor cost and cohesion. Reduced-motion rules belong to [accessibility](accessibility.md), and hover gating to [surfaces](surfaces.md). Fixes use plain CSS or WAAPI and the project's own tokens. The **motion** skill ([`../../motion/SKILL.md`](../../motion/SKILL.md)) builds them.
 
 ## Frequency
 
