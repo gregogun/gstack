@@ -74,7 +74,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn a settled conversation into a short feature spec | [`/to-spec`](../to-spec/SKILL.md) |
 | Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
 | Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
-| Review a change, screen or repo for accessibility, layout, type, colour and surfaces | [`/ui-review`](../ui-review/SKILL.md) |
+| Review a change, screen or repo for accessibility, layout, type, colour, surfaces and motion | [`/ui-review`](../ui-review/SKILL.md) |
 | Find the root cause of a bug without fixing it yet | [`/diagnosing-bugs`](../diagnosing-bugs/SKILL.md) |
 | Turn a failed Playwright run into one readable file per failure, with a safe rerun command | [`/dossier`](../dossier/SKILL.md) |
 | Fix a bug test-first when a cheap local test exists | [`/tdd`](../tdd/SKILL.md) |
