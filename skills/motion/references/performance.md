@@ -1,7 +1,5 @@
 # Performance
 
-Adapted from Emil Kowalski's `animation-performance` and performance cheatsheet.
-
 This reference does one thing. It makes motion land every frame. It does not pick easing or duration, and it does not judge whether the motion should exist. The question is never "does it look right?" but "does each frame finish in time?".
 
 ## Posture

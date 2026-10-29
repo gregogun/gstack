@@ -36,7 +36,7 @@ When the user describes an effect without naming it ("the bouncy thing when it o
 
 ## Shared core
 
-Every mode applies this section. The source is Emil Kowalski's skills, licensed in [`LICENSE`](LICENSE).
+Every mode applies this section.
 
 ### Frequency
 
@@ -135,7 +135,7 @@ Flag what breaks this spec or the repo's own tokens. Never flag preference.
 
 ### build
 
-Adapted from Emil Kowalski's `animate`. It writes the implementation.
+Build writes the implementation.
 
 1. **Gate.** Place the element in a frequency tier and name its purpose. If it fails either, write no animation. Say which check failed and offer the non-motion alternative, such as an instant state change.
 2. **Tool.** Walk the tool ladder.
@@ -150,7 +150,7 @@ Make the call from the spec and state it in one line. Never offer motion options
 
 ### audit
 
-Adapted from Emil Kowalski's `improve-animations` and `review-animations`. It never modifies source. It writes plans that another agent executes.
+Audit never modifies source. It writes plans that another agent executes.
 
 1. Run Recon, Audit, and Vet per [`references/audit.md`](references/audit.md).
 2. Present the confirm table, then stop for the user to pick findings. Running non-interactively, take the top 3 to 5 by leverage.
@@ -162,7 +162,7 @@ Adapted from Emil Kowalski's `improve-animations` and `review-animations`. It ne
 
 ### find
 
-Adapted from Emil Kowalski's `find-animation-opportunities`. It is read-only and proposes motion with exact values. Restraint is the posture, so expect to reject most candidates.
+Find is read-only and proposes motion with exact values. Restraint is the posture, so expect to reject most candidates.
 
 1. **Recon.** Note the stack, the motion tokens, any motion library, and a rough frequency map of the surfaces you will judge.
 2. **Sweep** the hunt list in category 8 of [`references/audit.md`](references/audit.md). The step is done when every seam class has yielded a candidate with `file:line` evidence or been cleared.
@@ -178,7 +178,7 @@ Nothing surviving the gate is a good result. Say so plainly.
 
 ### remove
 
-Adapted from Emil Kowalski's `remove-animations`. It edits code, only to subtract. It never adds motion, changes a curve, or retunes a spring. The burden of proof is reversed, so an animation stays only if it passes the gate. Deleting everything is also wrong, since motion that bridges a jarring change earns its place.
+Remove edits code, only to subtract. It never adds motion, changes a curve, or retunes a spring. The burden of proof is reversed, so an animation stays only if it passes the gate. Deleting everything is also wrong, since motion that bridges a jarring change earns its place.
 
 1. **Recon** as in find.
 2. **Sweep** the hunt list in [`references/removal-hazards.md`](references/removal-hazards.md). The step is done when every hunt class has yielded a candidate with `file:line` evidence or been cleared.
@@ -195,7 +195,7 @@ Adapted from Emil Kowalski's `remove-animations`. It edits code, only to subtrac
 
 ### perf
 
-Adapted from Emil Kowalski's `animation-performance`. It finds why motion misses the frame budget. The question is never "does it look right?" but "does each frame finish in time?".
+Perf finds why motion misses the frame budget. The question is never "does it look right?" but "does each frame finish in time?".
 
 1. **Inventory** every animation in scope per [`references/performance.md`](references/performance.md).
 2. **Diagnose** in the seven-step order there. Name the cause before you change any code.

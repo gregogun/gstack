@@ -1,7 +1,5 @@
 # Gestures
 
-Adapted from Emil Kowalski's `animate` drag recipe and `emil-design-eng`, plus the UI cheatsheet.
-
 A gesture-driven value needs a spring, because the user can reverse or interrupt it mid-motion. A fixed-duration tween, a CSS transition, or keyframes can't carry the velocity through that change.
 
 ## Springs

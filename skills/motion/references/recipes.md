@@ -1,7 +1,5 @@
 # Recipes
 
-Adapted from Emil Kowalski's `animate` recipes.
-
 Start from the recipe that matches the request and adapt it. Don't rebuild from scratch. Curves are the `--ease-out`, `--ease-in-out`, and `--ease-drawer` tokens in the Values section of [`../SKILL.md`](../SKILL.md). A repo's own tokens override them.
 
 Open and closed state below is a class or attribute the repo's component already toggles. Use the repo's own primitive for the component itself, per the tool ladder.

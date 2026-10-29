@@ -1,7 +1,5 @@
 # Plan template
 
-Adapted from Emil Kowalski's `improve-animations` plan template.
-
 Every plan written by `audit` follows this structure. The executor may be a less capable model with zero context and zero taste, so the plan must contain everything, exactly. No references to "the audit above" or "the easing we discussed".
 
 ## Where plans live

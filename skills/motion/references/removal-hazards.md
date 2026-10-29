@@ -1,8 +1,6 @@
 # Removal hazards
 
-Adapted from Emil Kowalski's `remove-animations`.
-
-The premise is Emil Kowalski's essay "You Don't Need Animations". Sometimes the best animation is no animation. Agents add motion by default, such as a fade-in on scroll, hover-scale on cards, and an animated command palette. Each one is defensible alone, and together they make the product feel slow.
+Sometimes the best animation is no animation. Agents add motion by default, such as a fade-in on scroll, hover-scale on cards, and an animated command palette. Each one is defensible alone, and together they make the product feel slow.
 
 The burden of proof is reversed. An animation stays only if it passes the gate. "It's already there" and "it looks nice" are not defenses.
 

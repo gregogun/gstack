@@ -1,8 +1,6 @@
 # Audit
 
-Adapted from Emil Kowalski's `improve-animations` and `review-animations`.
-
-The audit surveys a repo's motion, finds the fixes with the most leverage, and turns each into a plan precise enough that an executor with no context and no taste can apply it. Use the strongest model for recon, vetting, and plan writing, since that is where judgment compounds. Execution can go to any agent.
+The audit surveys a repo's motion, finds the fixes with the most leverage, and turns each into a plan precise enough that an executor with no context and no taste can apply it. Execution can go to any agent.
 
 Values come from the Values section of [`../SKILL.md`](../SKILL.md). Copy them, and never approximate one.
 
@@ -18,11 +16,11 @@ Values come from the Values section of [`../SKILL.md`](../SKILL.md). Copy them, 
 
 The default is `standard`.
 
-| Effort | Coverage | Subagents | Findings |
-|---|---|---|---|
-| `quick` | High-traffic components only | 0 or 1 | About 5, HIGH only |
-| `standard` | All interactive UI | Up to 4 | Full table |
-| `deep` | The whole repo, marketing pages included | Up to 8 | Full table plus LOW polish |
+| Effort | Coverage | Findings |
+|---|---|---|
+| `quick` | High-traffic components only | About 5, HIGH only |
+| `standard` | All interactive UI | Full table |
+| `deep` | The whole repo, marketing pages included | Full table plus LOW polish |
 
 ## Phase 1, recon
 
@@ -38,7 +36,7 @@ Sweeps that find most of it: grep for `transition`, `animation`, `@keyframes`, `
 
 ## Phase 2, audit
 
-Audit against the eight categories below. Past a small repo, fan out read-only subagents, one per category, or one per app area in a large monorepo. Spawn them per go-mode's Subagents section ([`../../go-mode/SKILL.md`](../../go-mode/SKILL.md)). Each prompt carries the absolute path to this file and the category heading, the recon facts (stack, library, tokens, frequency map), an instruction to return findings only as `file:line` plus evidence with no fixes, and hard rule 4 verbatim.
+Audit against the eight categories below, inline by default. Only a `deep` audit of a large repo spawns helpers, one at a time, one per category or one per app area. Spawn them per go-mode's Subagents section ([`../../go-mode/SKILL.md`](../../go-mode/SKILL.md)). Each prompt carries the absolute path to this file and the category heading, the recon facts (stack, library, tokens, frequency map), an instruction to return findings only as `file:line` plus evidence with no fixes, and hard rule 4 verbatim.
 
 A `review <target>` run skips the fan-out. It reads the diff, audits the changed motion against all eight categories, and reports with the review bar below.
 

@@ -1,7 +1,5 @@
 # Vocabulary
 
-Adapted from Emil Kowalski's `animation-vocabulary`.
-
 This is a reverse-lookup glossary. It turns a vague description of a motion effect into the precise term, so the user knows what to ask for and `build` knows what to make. It names effects. It does not design or build them.
 
 ## How to use it
