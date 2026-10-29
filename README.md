@@ -32,6 +32,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
 - [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
+- [`teardown`](skills/teardown/SKILL.md): draws an exploded view or technical illustration of an object or mechanism, with an offline viewer and SVG, PNG and PDF export.
 - [`explain-ui`](skills/explain-ui/SKILL.md): explains how a visible effect or a whole site's frontend was built, from a live page or a screenshot.
 - [`motion`](skills/motion/SKILL.md): builds, finds, removes and speeds up web UI motion against exact easing, duration and spring values.
 - [`break`](skills/break/SKILL.md): stress-tests one component or screen with hostile data, every reachable state and hostile environments, then reports what visibly broke before fixing anything.
@@ -76,6 +77,8 @@ The `motion` skill is adapted from Emil Kowalski's skills in [emilkowalski/skill
 
 The `explain-ui` skill is adapted from Jakub Krehel's skills in [jakubkrehel/skills at `592aedc`](https://github.com/jakubkrehel/skills/tree/592aedc44d7d5b3e29740984252902f3e5402a1c/skills).
 
+The `teardown` skill is vendored from Jakub Krehel's skills in [jakubkrehel/skills at `592aedc`](https://github.com/jakubkrehel/skills/tree/592aedc44d7d5b3e29740984252902f3e5402a1c/skills).
+
 ## License
 
 MIT. See [LICENSE](LICENSE). The `deslop`, `control-cli` and `control-ui` skills are MIT, Copyright (c) 2026 Cursor, under the [cursor-team-kit license](https://github.com/cursor/plugins/blob/182f2ce414e83224915c190d2f63239c1608d0a5/cursor-team-kit/LICENSE).
@@ -87,3 +90,5 @@ The `break` skill is MIT, Copyright (c) 2026 Jakub Krehel, Copyright (c) 2026 Em
 The `motion` skill is MIT, Copyright (c) 2026 Emil Kowalski. See [its LICENSE](skills/motion/LICENSE).
 
 The `explain-ui` skill is MIT, Copyright (c) 2026 Jakub Krehel. See [its LICENSE](skills/explain-ui/LICENSE).
+
+The `teardown` skill is MIT, Copyright (c) 2026 Jakub Krehel. See [its LICENSE](skills/teardown/LICENSE).
