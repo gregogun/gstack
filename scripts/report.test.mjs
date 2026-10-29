@@ -70,7 +70,7 @@ test("reads a file argument, including one saved with a UTF-8 BOM by Windows Pow
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "report-test-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const file = path.join(dir, "report.json");
-  fs.writeFileSync(file, `﻿${JSON.stringify({ title: "Done", status: "done" })}`);
+  fs.writeFileSync(file, `\uFEFF${JSON.stringify({ title: "Done", status: "done" })}`);
   const result = await run(["--adapter", "stdout", file]);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout, "✅ DONE · Done\n");

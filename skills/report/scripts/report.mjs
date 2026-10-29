@@ -114,7 +114,7 @@ const ADAPTERS = {
 
 function readInput(file) {
   try {
-    const text = fs.readFileSync(file ?? 0, "utf8").replace(/^﻿/, "");
+    const text = fs.readFileSync(file ?? 0, "utf8").replace(/^\uFEFF/, "");
     return JSON.parse(text);
   } catch (e) {
     throw new ReportError(2, `report: cannot read ${file ?? "stdin"} (${e.message})\n${USAGE}`);
