@@ -27,7 +27,7 @@ A role marked "Can drop" in `model-roles.md` may move its effort one step down t
 | `reflect tooling` | haiku | medium |
 | `reflect judgment, divergent, synthesizer` | opus | low |
 | `swarm workers` | haiku | medium |
-| `code reviewer` | sonnet | medium |
+| `code reviewer` | opus | medium |
 | `arena runners` | opus | low |
 | `arena runners` | sonnet | medium |
 | `arena cross-judge pool` | sonnet | medium |

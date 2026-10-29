@@ -41,7 +41,7 @@ Skills read the files at each spawn, so an edit applies to the next spawn withou
 | `reflect tooling` | one | no | reflect | a fast, cheap model, from a different family than the judgment role where possible |
 | `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model, at low effort |
 | `swarm workers` | one | no | swarm, and go-mode verification | a fast, cheap model |
-| `code reviewer` | one | no | opening-a-pr review | a capable mid-tier model |
+| `code reviewer` | one | no | opening-a-pr review | the strongest reasoning model, at moderate effort |
 | `arena runners` | list | no | arena | 1: the strongest reasoning model. 2: a second, different model for diversity |
 | `arena cross-judge pool` | list | no | arena | a capable mid-tier model, from a family other than the parent's where possible |
 | `architect runners` | list | no | architect, via arena | 1: the strongest reasoning model. 2: a second, different model for diversity |
