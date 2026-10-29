@@ -35,12 +35,13 @@ Skills read the files at each spawn, so an edit applies to the next spawn withou
 | `how explorer` | one | yes | how | a fast, cheap model |
 | `how explainer` | one | no | how | a capable mid-tier model |
 | `why investigators` | one | yes | why | a fast, cheap model |
-| `why synthesizer` | one | no | why | a capable mid-tier model |
+| `why synthesizer` | one | no | why | the strongest reasoning model, at low effort |
 | `research explorer` | one | yes | research | a fast, cheap model; gathering is search and quoting, not judgment |
-| `research synthesizer` | one | no | research | a capable mid-tier model |
+| `research synthesizer` | one | no | research | the strongest reasoning model, at low effort |
 | `reflect tooling` | one | no | reflect | a fast, cheap model, from a different family than the judgment role where possible |
-| `reflect judgment, divergent, synthesizer` | one | no | reflect | a capable mid-tier model |
+| `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model, at low effort |
 | `swarm workers` | one | no | swarm, and go-mode verification | a fast, cheap model |
+| `code reviewer` | one | no | opening-a-pr review | a capable mid-tier model |
 | `arena runners` | list | no | arena | 1: the strongest reasoning model. 2: a second, different model for diversity |
 | `arena cross-judge pool` | list | no | arena | a capable mid-tier model, from a family other than the parent's where possible |
 | `architect runners` | list | no | architect, via arena | 1: the strongest reasoning model. 2: a second, different model for diversity |

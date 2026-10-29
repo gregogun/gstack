@@ -8,6 +8,8 @@ Invoked at the end of every other playbook.
 
 **PRs.** Run `/deslop` over the diff before commit and `/no-comments` before review. Write every PR title, description, and commit body with `/technical-writing` (every layer except Diátaxis, and apply the STE vocabulary rules: one word per action, keep articles, a plain verb over `-ing` where one works), then apply `/unslop`.
 
+**Review.** Before you open the PR, spawn one fresh subagent on the `code reviewer` model role. Give it the diff (`git diff main...HEAD`), the ticket or brief's acceptance criteria, and the repo's documented standards. Never give it the writer's reasoning: no plan, transcript, delegate report, commit bodies, or PR description. It reads the code cold, reports findings, and edits nothing. Fix each finding or dismiss it with a concrete reason, and name the dismissals in the PR body. This review runs on every PR. `interrogate` is the heavier, opt-in version.
+
 **Titles.** Conventional Commits `type(scope): subject`, no trailing period. Type such as `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `perf`. Scope is the area, such as `gstack` or `go-mode`. Subject is short, imperative, and names a real symbol when one carries the change, for example `fix(gstack): retarget opening-a-pr babysit trigger`.
 
 **Descriptions.** The PR body is a one-minute briefing, not a lab notebook, for a reviewer who has the diff. It says why the change exists, what it leaves out, what it could break, and how you proved it works. Write short, simple sentences with few identifiers, no walls of text. The body becomes the squash commit body, so keep that commit under about 40 lines. Use `##` headings, not bold lead-ins, in this order, and drop a section with nothing to say:
@@ -29,4 +31,4 @@ After the sections, attach videos or screenshots when they prove a claim. Full S
 
 **Babysit.** Opening a PR does not start a babysit. Post the URL and keep building. Finish the phase or stack first. Run a separate babysit pass only when the user asks for one after the whole stack exists. A babysit for each new PR stalls the build and spends checks on commits later waves restart. Push back when feedback drifts from intent.
 
-A subagent that opens a PR runs `/deslop` and `/no-comments`, plus `interrogate` when its brief asks for it, and posts the URL. It returns to the parent without babysitting.
+A subagent that opens a PR runs `/deslop`, `/no-comments`, and the **Review** step, plus `interrogate` when its brief asks for it, and posts the URL. It returns to the parent without babysitting.

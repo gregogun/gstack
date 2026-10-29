@@ -21,16 +21,17 @@ A role marked "Can drop" in `model-roles.md` may move its effort one step down t
 | `how explorer` | haiku | medium |
 | `how explainer` | sonnet | high |
 | `why investigators` | haiku | medium |
-| `why synthesizer` | sonnet | high |
+| `why synthesizer` | opus | low |
 | `research explorer` | haiku | medium |
-| `research synthesizer` | sonnet | high |
+| `research synthesizer` | opus | low |
 | `reflect tooling` | haiku | medium |
-| `reflect judgment, divergent, synthesizer` | sonnet | high |
+| `reflect judgment, divergent, synthesizer` | opus | low |
 | `swarm workers` | haiku | medium |
-| `arena runners` | opus | medium |
+| `code reviewer` | sonnet | medium |
+| `arena runners` | opus | low |
 | `arena runners` | sonnet | medium |
 | `arena cross-judge pool` | sonnet | medium |
-| `architect runners` | opus | medium |
+| `architect runners` | opus | low |
 | `architect runners` | sonnet | medium |
-| `interrogate reviewers` | opus | medium |
+| `interrogate reviewers` | opus | low |
 | `interrogate reviewers` | sonnet | medium |
