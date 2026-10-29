@@ -47,6 +47,15 @@ Every step ends on a **completion criterion**, the condition that tells the agen
 
 The strongest criteria are both checkable and exhaustive.
 
+## Closing checks
+
+A skill that applies a list of rules opens with a **calibration line** and closes with a **Before you finish** table.
+
+- **Calibration line.** One or two sentences under the title that say how hard to press: which values are exact, what counts as a finding rather than a preference, and when the right output is nothing. "Measured, not preferred" sets the bar in three words.
+- **Before you finish.** A two-column table, `You notice | Correct it`, as the last section. The left column is a pattern the agent can detect in its own output, such as "Every variant has the same layout", never a vague quality like "Low polish". A heading like "Common mistakes" is one an agent reads past. A detectable pattern is one it checks.
+
+The table holds only mistakes the steps don't already prevent. Don't repeat the steps in it.
+
 ## Leading words
 
 A **leading word** is a compact concept the model already knows from pretraining (_tracer bullet_, _fog of war_, _red_). Repeated as a token, never re-explained, it anchors a whole region of behavior in a few tokens. Reach for an existing word before coining one: a coined word recruits no priors, so you pay for its definition.
