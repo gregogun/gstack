@@ -26,7 +26,11 @@ Hold each variant to:
 
 - The page's purpose and the data it has access to.
 - The project's component library and styling system.
-- A clear component name, such as `VariantA`, `VariantB`, `VariantC`.
+- A name that states its position on the axis, such as `DenseTable`, `EditorialList`, `QuietCards`. A name like `VariantA` tells the user nothing when they flip to it.
+- Real content: product-shaped copy, plausible names, and the number of items the page will really carry. Lorem ipsum and three rows make every structure look good.
+- The same quality floor. Every variant clears the escalation triggers in the **ui-review** skill's [`severity.md`](../../ui-review/references/severity.md): accessible names, visible focus, keyboard reach, reduced motion, nothing clipped at 320px or 200% zoom, contrast, and the rest of that list. The floor is not an axis and never trades against one. If a direction only works by breaking it, say so and drop the direction.
+
+Write the set down before any code: a name and an axis position for each. No two variants share a position.
 
 Variants must be **structurally different**: different layout, different information hierarchy, different primary affordance. Three slightly-tweaked card grids is wallpaper, not a prototype. If two drafts come out too similar, redo one with explicit "do not use a card grid" guidance.
 
@@ -36,13 +40,13 @@ One switcher on the route:
 
 ```tsx
 // pseudo-code, adapt to the project's framework
-const variant = searchParams.get('variant') ?? 'A';
+const variant = searchParams.get('variant') ?? 'dense';
 return (
   <>
-    {variant === 'A' && <VariantA {...data} />}
-    {variant === 'B' && <VariantB {...data} />}
-    {variant === 'C' && <VariantC {...data} />}
-    <PrototypeSwitcher variants={['A','B','C']} current={variant} />
+    {variant === 'dense' && <DenseTable {...data} />}
+    {variant === 'editorial' && <EditorialList {...data} />}
+    {variant === 'quiet' && <QuietCards {...data} />}
+    <PrototypeSwitcher variants={['dense','editorial','quiet']} current={variant} />
   </>
 );
 ```
@@ -54,7 +58,7 @@ On an existing page, keep all the data fetching above the switcher. Only the ren
 A small fixed-position bar at the bottom centre of the screen:
 
 - **Left arrow**: previous variant (wraps around).
-- **Variant label**: the current key and name, such as `B (Sidebar layout)`.
+- **Variant label**: the current variant's name, such as `Editorial`.
 - **Right arrow**: next variant (wraps around).
 
 Behaviour:
@@ -66,7 +70,9 @@ Behaviour:
 
 ### 4. Hand it over
 
-Give the URL and the `?variant=` keys. The useful feedback is usually "I want the header from B with the sidebar from C", which is the design they actually want.
+Render one variant at a time, full size, in its real surroundings. Side-by-side thumbnails distort spacing and scale, and spacing is usually what the user is choosing between. Switching is instant, with no transition.
+
+Give the URL, the `?variant=` keys, the key that flips variants, and the width you judged them at. The useful feedback is usually "I want the header from B with the sidebar from C", which is the design they actually want.
 
 ### 5. Clean up
 
