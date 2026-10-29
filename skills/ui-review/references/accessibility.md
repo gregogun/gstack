@@ -1,7 +1,5 @@
 # Accessibility
 
-Adapted from Jakub Krehel's `better-accessibility`.
-
 Semantics, keyboard and focus behavior, accessible names, forms, announcements, motion and zoom, reported against WCAG 2.2. Fixes go in the project's own styling system.
 
 Review in two walks. Keyboard-only, where every flow completes without a mouse. Then screen-reader, where every control announces a name, a role and its state. When unsure, take the platform default over a custom rebuild, and remove ARIA rather than add it.

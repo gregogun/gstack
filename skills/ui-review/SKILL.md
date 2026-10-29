@@ -6,13 +6,11 @@ disable-model-invocation: true
 
 # UI review
 
-Adapted from Jakub Krehel's `better-interface` and `interface-review`.
-
 Review interface code against a written standard and report what breaks it. Two modes share one standard. **Change review** covers a diff and the surfaces it touches. **Screen or repo review** covers a screen, a flow or the whole repository with no scope block.
 
 ## The standard
 
-Exact values in the references are the default spec. Jakub's values win for type, colour, layout and accessibility. Project tokens and documented project decisions override both. Check the project's tokens and docs first, and never report a project's own documented choice as a defect.
+Exact values in the references are the default spec. Project tokens and documented project decisions override them. Check the project's tokens and docs first, and never report a project's own documented choice as a defect.
 
 No taste calls. Flag only what breaks a written rule. A finding that says "I prefer" or "feels off" has no rule behind it, so drop it.
 
@@ -36,8 +34,8 @@ Ranking, the fix ladder, the cap and the verdict come from [severity](references
 ## Procedure
 
 1. **Recon.** Read the project's design docs, tokens, theme files and styling setup. Note the styling system, so fixes use its idiom. Note the dark selector and the radius, spacing and shadow tokens.
-2. **Resolve scope.** In change review, follow [scope resolution](references/scope-resolution.md) and record `$BASE`. In screen or repo review, list the screens or files you will cover.
-3. **Blast radius.** In change review, a changed file is evidence, not the subject. Expand to consumers as scope resolution says, and state how many you did not expand.
+2. **Resolve scope.** In change review, follow the shared [change scope](../go-mode/references/change-scope.md) and record `$BASE`. Keep fonts and images in scope as [consumers](references/consumers.md) says. In screen or repo review, list the screens or files you will cover.
+3. **Blast radius.** In change review, a changed file is evidence, not the subject. Expand to consumers as [consumers](references/consumers.md) says, and state how many you did not expand.
 4. **Removed signals.** In change review, scan the `-` side of the diff per [removed signals](references/removed-signals.md). Report a removal as `Regression` only when the owning domain confirms it and nothing replaces it.
 5. **Inspect by domain.** Apply each reference. Cite a file and line, or a rendered check, for every finding. A rendering claim backed only by source is `Not verified`.
 6. **Absent states.** Check the states the code defines and the ones it lacks, such as focus, disabled, loading, error, empty, long content, hover on touch, reduced motion and dark mode. Report a missing state that a rule requires.
@@ -50,7 +48,7 @@ In change review, tag every finding.
 
 - **Introduced.** The change added the problem.
 - **Regression.** The change removed something that prevented it.
-- **Pre-existing.** The line predates the change. Classify with `git blame` as scope resolution describes.
+- **Pre-existing.** The line predates the change. Classify with `git blame` as [change scope](../go-mode/references/change-scope.md#classifying-a-line) describes.
 
 The cap and the verdict count `Introduced` and `Regression` only. Report `Pre-existing` findings in their own section after the table, and keep them out of the verdict.
 

@@ -1,7 +1,5 @@
 # Mobile
 
-Adapted from Jakub Krehel's `better-accessibility` hit areas, with touch and small-screen rules from `better-typography`, `better-layout` and `better-ui`.
-
 Touch targets, hit areas, gestures, input zoom, viewport units, safe areas and hover on touch. The rules live in their owning domains. This file collects what changes on a phone.
 
 ## Target sizes

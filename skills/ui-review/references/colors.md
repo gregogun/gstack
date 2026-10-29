@@ -1,7 +1,5 @@
 # Colors
 
-Adapted from Jakub Krehel's `better-colors`.
-
 How color systems are built and checked. This covers ramps, role mapping, token names, notation and measured contrast pairs. Never report a contrast value you did not measure, and never estimate a color you could compute. Notation, a tinted neutral and a gradient's interpolation space are project choices, not findings. A broken role mapping, a failing pair and an out-of-gamut step are findings. Perceived lightness throughout means OKLCH `L`, from `0` to `1`.
 
 Whether a pair is required to pass belongs to [accessibility](accessibility.md). Surfaces, shadows and icon color belong to [surfaces](surfaces.md).

@@ -2,8 +2,6 @@
 
 How a confirmed finding is ranked, which fix to propose, how findings are consolidated and how the verdict is reached. The domain references decide whether a symptom is present. This file decides what it costs.
 
-Adapted from Jakub Krehel's `better-interface`, with the delete-first posture of Emil Kowalski's `review-animations`.
-
 ## Levels
 
 - `HIGH` blocks a task, misleads the user, hides content or controls, risks data loss, or is a repeated systemic failure.

@@ -1,8 +1,6 @@
-# Scope resolution
+# Change scope
 
-How a change-review target becomes a file list, and the traps that fail quietly and leave the scope block claiming a count it never delivered.
-
-Adapted from Jakub Krehel's `interface-review`.
+How a review target becomes a commit range and a file list. Every skill that reviews a change resolves it this way, so the scope it reports is the scope it read. The traps here fail quietly and leave a report claiming a file count it never delivered.
 
 ## Default branch
 
@@ -16,7 +14,7 @@ Diff a branch against the merge base, with three dots. Two dots report every ups
 
 When the user wrote a range, use the dots they wrote. `<a>..<b>` compares the endpoints. `<a>...<b>` compares `merge-base(<a>, <b>)` with `<b>`. Rewriting `release..feature` to three dots drops everything between `release` and the merge base, which is often exactly what was asked for. State the resolved range in the scope block.
 
-`git diff HEAD` reports tracked changes only. Any target that includes uncommitted work must pair it with `git ls-files --others --exclude-standard`. Otherwise a newly added component is silently dropped from a scope the report claims to cover in full.
+`git diff HEAD` reports tracked changes only. Any target that includes uncommitted work must pair it with `git ls-files --others --exclude-standard`. Otherwise a newly added file is silently dropped from a scope the report claims to cover in full.
 
 ## No target given
 
@@ -26,7 +24,7 @@ Resolve in this order and stop at the first match.
 2. The working tree is dirty. Review the uncommitted changes.
 3. Neither. Follow [Nothing to review](#nothing-to-review).
 
-Record the base commit of the resolved range as `$BASE` and name it in the scope block. Every command in this skill and its references uses it.
+Record the base commit of the resolved range as `$BASE` and name it in the scope block. Every later command uses it.
 
 ## Pull requests
 
@@ -65,8 +63,7 @@ State the facts, then offer these routes and wait.
 - **The open pull request** on the current branch, first when there is one. A branch whose commits already landed resolves to no change, while its pull request is still exactly what the user meant.
 - **The last commit**, `HEAD~1..HEAD`, named by short SHA and subject so the user sees what they would get.
 - **A target they name**, such as `pr <n>`, a branch, a ref or a range.
-- **A surface review** of a screen or flow they name.
-- **A whole-repository audit**, which runs the surface procedure without the scope block, the statuses or the pre-existing section.
+- **Any wider scope the calling skill offers**, such as a screen review or a whole-repository audit.
 
 Where exclusions emptied the scope, name the excluded files in the offer.
 
@@ -78,7 +75,7 @@ Review a rename as a move, not a delete plus an add. Everything that survived th
 
 ## Excluded paths
 
-Exclude these and name what you excluded in the scope block. They are machine-authored and carry no interface rules.
+Exclude these and name what you excluded in the scope block. They are machine-authored, so a review of them finds nothing a human wrote.
 
 | Category | Patterns |
 | --- | --- |
@@ -89,7 +86,7 @@ Exclude these and name what you excluded in the scope block. They are machine-au
 | Vendored code | `vendor/`, `third_party/`, `node_modules/` |
 | Binaries and media | `*.png`, `*.jpg`, `*.webp`, `*.avif`, `*.woff2`, `*.mp4`, `*.pdf` |
 
-Two exceptions stay in scope. A font file added or swapped is a [typography](typography.md) change. An image added to a component is a [surfaces](surfaces.md) and [accessibility](accessibility.md) change, through its outline and its `alt` text. Review the code that references them, not the bytes.
+A calling skill may pull a category back into scope. Say which and why.
 
 Apply the exclusions as pathspecs, so the file count in the scope block is the reviewed count.
 
@@ -100,26 +97,6 @@ git diff --name-only "$BASE" <head-ref> -- . ':(exclude)pnpm-lock.yaml' ':(glob,
 Two traps under-exclude silently. `*.lock` catches `yarn.lock` and `Cargo.lock` but not `package-lock.json` or `pnpm-lock.yaml`, so cover every suffix in the table. And without `glob` magic, `**/dist/**` needs a literal `/` before `dist`, so it misses a root-level `dist/`. Run the diff with and without the pathspecs, and confirm the count dropped by exactly the files you named.
 
 If nothing survives the exclusions, treat it as no change.
-
-## Expanding to consumers
-
-A changed file is evidence, not the review subject. Its blast radius is the set of surfaces it renders in, and those are what you review.
-
-Expand one hop by default, to the direct importers and callers. Expand a second hop only for design tokens, theme values and shared primitives, where one line reaches the whole product. Review at most five consumers in total across both hops, and state how many you did not expand, since an unstated cutoff reads as completeness.
-
-Use the project's own resolver where one exists, otherwise import paths.
-
-`git grep` searches the working tree by default. Pass the reviewed ref after the pattern, or on a pull request you search a different revision and miss importers the change itself added. Results come back as `<rev>:path/to/file`, so read them with `git show`, never the working-tree copy. Pass `-e` when the pattern starts with a dash, such as a `--color-*` token, or git parses it as an option.
-
-For a changed token or theme value, search the token name rather than the file, since consumers reference the name and never import it.
-
-Order the consumers by a rule you can evaluate, so the cutoff is reproducible.
-
-1. **Route and layout entry points first**, whatever the framework treats as a rendered surface, such as `app/**/page.*`, `app/**/layout.*`, `pages/**`, `routes/**`, `src/views/**` or `*.astro` pages. Everything else only appears inside one.
-2. **Then by importer count**, since a component pulled in by twenty files carries more of the change than one pulled in by two.
-3. **Break ties by proximity**, same package or feature directory first.
-
-Say plainly if the ordering was arbitrary past a point.
 
 ## Classifying a line
 

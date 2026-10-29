@@ -2,8 +2,6 @@
 
 What to look for on the `-` side of a hunk in a change review, and which domain reference owns the judgement. A signal is a lead, not a finding.
 
-Adapted from Jakub Krehel's `interface-review`.
-
 ## Signal table
 
 | Removed from the `-` side | Owner | What to check |
@@ -36,7 +34,7 @@ These clear the signal. Drop a removal that one of them explains before routing 
 
 ## Searching the removed side
 
-Restrict the search to deleted lines so additions do not mask a removal. Pass the exclusion pathspecs from [Excluded paths](scope-resolution.md#excluded-paths) after `--`.
+Restrict the search to deleted lines so additions do not mask a removal. Pass the exclusion pathspecs from [Excluded paths](../../go-mode/references/change-scope.md#excluded-paths) after `--`.
 
 ```bash
 git diff -U0 "$BASE" <head-ref> -- . <exclusions> \

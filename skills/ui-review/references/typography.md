@@ -1,7 +1,5 @@
 # Typography
 
-Adapted from Jakub Krehel's `better-typography`.
-
 How text renders, from the type scale and spacing to font loading, wrapping, truncation and punctuation. Fixes go in the project's own styling system. The words belong to copy review, semantic heading structure to [accessibility](accessibility.md) and spatial RTL layout to [layout](layout.md). Measure contrast with [colors](colors.md). Whether it passes is accessibility's call.
 
 ## Measured, not preferred

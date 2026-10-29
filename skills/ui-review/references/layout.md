@@ -1,7 +1,5 @@
 # Layout
 
-Adapted from Jakub Krehel's `better-layout`.
-
 Grouping, alignment, spacing and responsive structure, then a stress test by resizing, translating and mirroring for RTL. Write every fix in the project's styling system. The numbers below apply only where the project has no spacing scale or density system. Otherwise use its tokens. A finding needs a failure you can show, such as a clip, an overlap, a broken mirror or a misread group. A value that differs from these starting points is not one.
 
 Hit areas and focus behavior belong to [accessibility](accessibility.md) and [mobile](mobile.md). Radius, shadows and animation belong to [surfaces](surfaces.md). Line length, text spacing and truncation mechanics belong to [typography](typography.md).

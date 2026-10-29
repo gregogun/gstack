@@ -1,7 +1,5 @@
 # Surfaces
 
-Adapted from Jakub Krehel's `better-ui` surfaces recipes and the hover and overlay rules of `better-interface`.
-
 Concentric radius, optical alignment, shadow rings, image outlines, hover on touch and scroll containment. Fixes use plain CSS and the project's own tokens.
 
 ## Concentric border radius

@@ -13,7 +13,7 @@ Spawn one reviewer per configured model to adversarially review code changes. Th
 Identify what to review from context:
 
 - If the user points at specific files or a diff, use that.
-- If on a feature branch, run `git diff main...HEAD` (or the appropriate base branch) for the full changeset.
+- If on a feature branch, resolve the range per [change scope](../go-mode/references/change-scope.md) and diff it for the full changeset.
 - If the user's message references recent work, gather the relevant files.
 
 Before spawning anyone, check that the base ref resolves (`git rev-parse <base>`) and the diff is not empty. A bad ref or empty diff fails here.
