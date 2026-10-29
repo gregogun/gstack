@@ -129,8 +129,18 @@ When multiple app windows/tabs share a debug port:
 - Use a negative marker to avoid the wrong surface when necessary.
 - If no page matches, list available page titles and URLs instead of guessing.
 
+## Motion and Modes
+
+Motion and viewing modes are claims about feel, so check them on the running page.
+
+- **Record before you call motion smooth.** Capture a Performance trace and read it for dropped frames and long tasks. A fast laptop hides almost every problem, so don't call motion smooth from watching it.
+- **Slow it down to see it.** Play the animation at 10% in the Animations panel, or step it frame by frame. Easing, origin, and overlap errors show only when the motion is slowed.
+- **Know what throttling models.** CPU throttling on a desktop models a slow CPU. It doesn't model a weak GPU or a small memory budget. For gestures and compositing, profile a real mid-range phone over remote debugging, and say which findings still need that device.
+- **Check modes when the change touches them.** Run reduced motion when it touches motion, dark scheme when it touches colour tokens, and narrow width and 200% zoom when it touches layout or type. Emulate the real media feature (`prefers-reduced-motion`, `prefers-color-scheme`) or set the real zoom. Re-declaring tokens under a class tests a different page.
+
 ## Guardrails
 
+- Never kill a browser you did not start. A `pkill` pattern that matches `chrome` also kills an MCP server's browser and every session attached to it. Quit the process you launched by its pid.
 - Do not rely on stale element references after navigation or structural changes.
 - Avoid coordinate clicks unless a fresh screenshot was captured immediately before the click.
 - Keep test data local and disposable.
