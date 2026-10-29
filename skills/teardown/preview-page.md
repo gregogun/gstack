@@ -28,7 +28,7 @@ Show the zoom percentage and bound its range. A useful starting range is 25–40
 
 Keep enlarged artwork in a scrollable viewport so every edge remains reachable with a keyboard or touch. Reserve space for controls, including their wrapped height on narrow screens.
 
-Use the project's existing components and fonts when integrating there. `better-layout` owns responsive arrangement, `better-accessibility` owns control semantics and keyboard behavior while `better-writing` owns control copy.
+Use the project's existing components and fonts when integrating there. [`better-layout`](../ui-review/references/layout.md) owns responsive arrangement, [`better-accessibility`](../ui-review/references/accessibility.md) owns control semantics and keyboard behavior while `better-writing` owns control copy.
 
 ## Follow the system appearance and allow an override
 
@@ -68,7 +68,7 @@ Name the edited property explicitly, such as `Line color`. A surface-fill option
 
 Keep color choices in drawing state alongside the selected view. Reset restores the original appearance without changing geometry or zoom.
 
-`better-colors` owns palette choices and rendered contrast. Decorative part colors do not imply established materials or safety classifications.
+[`better-colors`](../ui-review/references/colors.md) owns palette choices and rendered contrast. Decorative part colors do not imply established materials or safety classifications.
 
 ## Export the selected view and colors
 

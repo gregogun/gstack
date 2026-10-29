@@ -1,6 +1,7 @@
 ---
 name: teardown
-description: Creates technical illustrations of physical objects and of how things work, such as display pixels or interface layers, with coherent views, fine linework and part fills.
+description: Creates technical illustrations of physical objects and of how things work, such as display pixels or interface layers, with coherent views, fine linework and part fills. Use for /teardown or requests to draw an exploded view, teardown or technical illustration of an object or mechanism.
+disable-model-invocation: true
 ---
 
 # Teardown
@@ -11,7 +12,7 @@ The result explains and presents. It is not a manufacturing drawing: nothing is 
 
 Treat geometry and annotation correspondence as exact. Treat sheet proportions and line weights as starting recipes, adjusted to the reference and output size.
 
-`better-typography` owns text rendering, `better-colors` owns palette and `better-accessibility` owns accessible embedding, while `better-layout` owns the surrounding interface.
+[`better-typography`](../ui-review/references/typography.md) owns text rendering, [`better-colors`](../ui-review/references/colors.md) owns palette and [`better-accessibility`](../ui-review/references/accessibility.md) owns accessible embedding, while [`better-layout`](../ui-review/references/layout.md) owns the surrounding interface.
 
 ## 1. Read the object and the reference separately
 
@@ -61,7 +62,7 @@ This step is done when each view has a purpose and a scale policy. Annotated she
 
 ## 3. Construct one object, then project it
 
-Set up the project before modeling. Copy the skill's `assets/` and `scripts/` folders into `tools/teardown/`, leaving out the `test-*.cjs` files, which check the skill itself. Write `drawing.json` and a model script as [viewer-assets.md](viewer-assets.md) describes under **Describe the drawings and their controls** and **Implement the model boundary**.
+Set up the project before modeling. Copy the skill's `assets/` and `scripts/` folders into `tools/teardown/`, leaving out the `test-*.cjs` files, which check the skill itself. The builder inlines `jspdf`, `svg2pdf.js` and `@fontsource-variable/inter` from a local `node_modules`, so run `npm install` once with network access. The built page then works offline. Write `drawing.json` and a model script as [viewer-assets.md](viewer-assets.md) describes under **Describe the drawings and their controls** and **Implement the model boundary**.
 
 Derive every view from one model, including the parts list when the drawing needs one. Read [geometry.md](geometry.md) before modeling, since its rules apply whatever builds the geometry. For a concept, also read its **Draw concepts as layered parts** section.
 
