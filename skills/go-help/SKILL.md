@@ -74,7 +74,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn a settled conversation into a short feature spec | [`/to-spec`](../to-spec/SKILL.md) |
 | Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
 | Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
-| Animate, audit, find, remove or fix the performance of UI motion | [`/motion`](../motion/SKILL.md) |
+| Animate, find, remove or fix the performance of UI motion | [`/motion`](../motion/SKILL.md) |
 | Stress-test a component with worst-case data and states | [`/break`](../break/SKILL.md) |
 | Review a change, screen or repo for accessibility, layout, type, colour, surfaces and motion | [`/ui-review`](../ui-review/SKILL.md) |
 | Find the root cause of a bug without fixing it yet | [`/diagnosing-bugs`](../diagnosing-bugs/SKILL.md) |

@@ -32,7 +32,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`diagnosing-bugs`](skills/diagnosing-bugs/SKILL.md): finds the root cause of a reproducible bug without fixing it.
 - [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
-- [`motion`](skills/motion/SKILL.md): builds, audits, finds, removes and speeds up web UI motion against exact easing, duration and spring values.
+- [`motion`](skills/motion/SKILL.md): builds, finds, removes and speeds up web UI motion against exact easing, duration and spring values.
 - [`break`](skills/break/SKILL.md): stress-tests one component or screen with hostile data, every reachable state and hostile environments, then reports what visibly broke before fixing anything.
 - [`ui-review`](skills/ui-review/SKILL.md): reviews a change, screen or repo against a written UI standard and returns a Block or Approve verdict.
 - [`tdd`](skills/tdd/SKILL.md): fixes a bug test-first when a cheap local test exists.

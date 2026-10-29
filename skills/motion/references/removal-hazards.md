@@ -8,7 +8,7 @@ Deleting everything is also wrong. Motion that bridges a jarring change, such as
 
 ## Hard rules
 
-1. **Only subtract.** Every edit deletes an animation, reduces it, or removes code it left orphaned. Never add motion, change an easing curve, or retune a spring. If an animation should stay but is badly built, list it for `/motion audit` and leave it untouched.
+1. **Only subtract.** Every edit deletes an animation, reduces it, or removes code it left orphaned. Never add motion, change an easing curve, or retune a spring. If an animation should stay but is badly built, list it for `/ui-review motion` and leave it untouched.
 2. **Check what depends on the animation before deleting it.** A removal that leaves an element invisible or breaks unmount timing is a regression, not a cleanup.
 3. **Ask before removing a dependency.** Uninstalling a motion library touches the lockfile and other people's work. Propose it and don't do it.
 4. **Respect documented decisions.** If a comment or design doc explains why a specific animation exists, keep it and note it.
