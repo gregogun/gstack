@@ -103,6 +103,43 @@ test("rejects input that is not JSON, and an unknown adapter, with exit 2", asyn
   assert.match(unknown.stderr, /no adapter "signal" \(have: stdout, telegram\)/);
 });
 
+test("--new-run creates a run folder under ~/.claude/gstack, CLAUDE_CONFIG_DIR or GSTACK_HOME", async (t) => {
+  const home = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "report-home-")));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  const cases = [
+    [{ HOME: home, USERPROFILE: home }, path.join(home, ".claude", "gstack", "runs")],
+    [{ HOME: home, USERPROFILE: home, CLAUDE_CONFIG_DIR: path.join(home, "cfg") }, path.join(home, "cfg", "gstack", "runs")],
+    [{ HOME: home, USERPROFILE: home, CLAUDE_CONFIG_DIR: path.join(home, "cfg"), GSTACK_HOME: path.join(home, "state") }, path.join(home, "state", "runs")],
+  ];
+  for (const [env, runs] of cases) {
+    const result = await run(["--new-run", "Nightly deps: upgrade!"], { env });
+    assert.equal(result.status, 0, result.stderr);
+    const dir = result.stdout.trim();
+    assert.equal(path.dirname(dir), runs);
+    assert.match(path.basename(dir), /^\d{4}-\d{2}-\d{2}T\d{6}Z-nightly-deps-upgrade$/);
+    assert.ok(fs.statSync(dir).isDirectory());
+  }
+});
+
+test("--new-run gives each run its own folder and cuts a long slug", async (t) => {
+  const home = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "report-home-")));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  const env = { GSTACK_HOME: home };
+  const dirs = await Promise.all([1, 2, 3].map(() => run(["--new-run", "same"], { env }).then((r) => r.stdout.trim())));
+  assert.equal(new Set(dirs).size, 3);
+  const long = (await run(["--new-run", "a".repeat(300)], { env })).stdout.trim();
+  assert.match(path.basename(long), /^\d{4}-\d{2}-\d{2}T\d{6}Z-a{40}$/);
+});
+
+test("--new-run rejects a relative GSTACK_HOME and extra arguments with exit 2", async () => {
+  const relative = await run(["--new-run", "x"], { env: { GSTACK_HOME: "relative/state" } });
+  assert.equal(relative.status, 2);
+  assert.match(relative.stderr, /GSTACK_HOME must be an absolute path/);
+  const extra = await run(["--new-run", "x", "report.json"], { env: { GSTACK_HOME: os.tmpdir() } });
+  assert.equal(extra.status, 2);
+  assert.match(extra.stderr, /--new-run takes no other arguments/);
+});
+
 test("telegram is the default adapter and posts the rendered text to the configured chat", async (t) => {
   const { requests, env } = await fakeTelegram(t);
   const result = await run([], { input: sample, env });

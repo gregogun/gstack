@@ -10,7 +10,7 @@ A report is what the user reads on their phone with no other context. Write each
 
 ## Steps
 
-1. **Write the report.** Write it as JSON to `runs/<YYYY-MM-DDTHHmm>-<slug>/report.json` under the gstack state folder, which is `%LOCALAPPDATA%\gstack` on Windows (`$LOCALAPPDATA/gstack` from Git Bash) and `~/.gstack` elsewhere. Create the folders if needed. The file stays as the record of what was sent, including when delivery fails.
+1. **Write the report.** Run `node {{plugin_root}}/skills/report/scripts/report.mjs --new-run <slug>`, with a few words of the task as the slug. It creates a run folder and prints its path. Write the report as JSON to `report.json` in that folder. The file stays as the record of what was sent, including when delivery fails. Run folders live in `runs/` under the gstack state folder, which is `~/.claude/gstack`, or `$CLAUDE_CONFIG_DIR/gstack` when that is set. `GSTACK_HOME` overrides both.
 
    ```json
    {
