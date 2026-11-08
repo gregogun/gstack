@@ -33,6 +33,8 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`dossier`](skills/dossier/SKILL.md): turns a failed Playwright run into one Markdown file per failure, with the trace and a command that reruns that test alone.
 - [`prototype`](skills/prototype/SKILL.md): builds a throwaway sketch to settle a design or behavior question.
 - [`teardown`](skills/teardown/SKILL.md): draws an exploded view or technical illustration of an object or mechanism, with an offline viewer and SVG, PNG and PDF export.
+- [`explain-diff`](skills/explain-diff/SKILL.md): explains a PR, branch or diff as one interactive HTML page for a reader new to the codebase, with a short version, background, intuition, a grouped code walkthrough and a five-question quiz.
+- [`explain-run`](skills/explain-run/SKILL.md): explains a throwaway agent run with no diff, such as a spike or tool evaluation, as one HTML page with a verdict per assumption backed by real output.
 - [`explain-ui`](skills/explain-ui/SKILL.md): explains how a visible effect or a whole site's frontend was built, from a live page or a screenshot.
 - [`motion`](skills/motion/SKILL.md): builds, finds, removes and speeds up web UI motion against exact easing, duration and spring values.
 - [`break`](skills/break/SKILL.md): stress-tests one component or screen with hostile data, every reachable state and hostile environments, then reports what visibly broke before fixing anything.
@@ -77,6 +79,8 @@ The `break` skill is adapted from Jakub Krehel's skills in [jakubkrehel/skills a
 The `motion` skill is adapted from Emil Kowalski's skills in [emilkowalski/skills at `a81dbca`](https://github.com/emilkowalski/skills/tree/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills).
 
 The `explain-ui` skill is adapted from Jakub Krehel's skills in [jakubkrehel/skills at `592aedc`](https://github.com/jakubkrehel/skills/tree/592aedc44d7d5b3e29740984252902f3e5402a1c/skills).
+
+The `explain-diff` and `explain-run` skills are adapted from Geoffrey Litt's [explain-diff-html gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524).
 
 The `teardown` skill is vendored from Jakub Krehel's skills in [jakubkrehel/skills at `592aedc`](https://github.com/jakubkrehel/skills/tree/592aedc44d7d5b3e29740984252902f3e5402a1c/skills).
 

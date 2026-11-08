@@ -75,6 +75,8 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Split a spec into labeled tickets an agent or a human can pick up | [`/to-tickets`](../to-tickets/SKILL.md) |
 | Answer a design or behavior question with a throwaway sketch | [`/prototype`](../prototype/SKILL.md) |
 | Draw an exploded view or technical illustration of an object or mechanism, with an offline viewer and SVG/PNG/PDF export | [`/teardown`](../teardown/SKILL.md) |
+| Understand a PR, branch or diff, as an interactive page with a quiz | [`/explain-diff`](../explain-diff/SKILL.md) |
+| Understand what a throwaway agent run (spike, tool evaluation) actually proved, with no diff to read | [`/explain-run`](../explain-run/SKILL.md) |
 | Explain how something on a web page was built | [`/explain-ui`](../explain-ui/SKILL.md) |
 | Animate, find, remove or fix the performance of UI motion | [`/motion`](../motion/SKILL.md) |
 | Stress-test a component with worst-case data and states | [`/break`](../break/SKILL.md) |
