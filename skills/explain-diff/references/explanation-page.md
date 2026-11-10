@@ -5,9 +5,16 @@ Format and quality rules for the HTML page that **explain-diff** and **explain-r
 ## Reader and voice
 
 - Write for a reader new to the codebase. They don't know its terms, its history or its tools.
-- Use plain, short sentences with one idea each. Plain beats elegant.
-- Define every term at its first use, in the sentence where it appears.
+- Draft every line through the **unslop** skill ([`../../unslop/SKILL.md`](../../unslop/SKILL.md)), headers, callouts, diagram labels and quiz text included. The pass in **Before you hand over** catches what slipped, but it doesn't replace writing it plainly the first time.
+- Write the way you'd explain it to a colleague. Use plain, short sentences with one idea each. Plain beats elegant.
+- Name the mechanism or the number, not how something feels.
+- Define every term at its first use, in the sentence where it appears. Then keep that one name for it.
+- Don't open a section by previewing the next one.
 - Use concrete toy data in examples. Name real numbers only when you checked them (see **Facts**).
+
+## Section headers
+
+The section names in each skill are directions to you, not labels to print. Write each header so a reader who never saw the skill knows what the section holds, in sentence case. "What the run proved" works as a header. "Findings" or "Intuition" alone does not.
 
 ## Plain words outside the code
 
@@ -38,7 +45,8 @@ Before saving, grep the source for every number, name, limit, count and quoted s
 ## Format
 
 - One self-contained HTML file with inline CSS and JavaScript. One long page with section headers and a table of contents. No tabs for the top-level structure.
-- Body font is sans-serif: `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`. Use a monospace font for code only.
+- Set every piece of text in a sans-serif system font stack, `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`, headings, quiz and diagrams included. No serif fonts anywhere, and no web fonts, so the file stays self-contained. Monospace is only for `<pre>` and inline `<code>`.
+- Use a 17px base size, a line height around 1.6, and cap body text at about 70 characters per line.
 - Responsive down to phone width.
 - Save outside the code repo, with a filename that starts with today's date as `YYYY-MM-DD-`, for example `/tmp/2026-01-12-<kind>-<slug>.html`. Give the user the full path.
 - Draw diagrams in HTML, never as ASCII art. Pick a small set of diagram families and reuse them. Put example data in them. Use HTML lists for lists.
@@ -52,9 +60,10 @@ Five multiple-choice questions of medium difficulty. Each needs real understandi
 
 ## Before you hand over
 
-1. Run the **unslop** skill ([`../../unslop/SKILL.md`](../../unslop/SKILL.md)) over all prose on the page.
+1. Run the **unslop** skill over all prose on the page again.
 2. Open the page in a real browser at phone width (about 390 px wide), routed through the **control-ui** skill ([`../../control-ui/SKILL.md`](../../control-ui/SKILL.md)). Click every interactive control: every button, slider, stepper and quiz answer. Done when the page logs zero errors.
 3. Confirm every element `id` is unique, by script, not by eye.
+4. Confirm by script that no `font-family` in the file names a serif face or the bare generic `serif`. `sans-serif` is fine.
 
 ## Model
 
