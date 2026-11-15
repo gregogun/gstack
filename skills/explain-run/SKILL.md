@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Explain Run
 
-Make a rich, interactive explanation of the specified agent run, for a reader new to the project. Adapted from Geoffrey Litt's [explain-diff-html gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524). The run was throwaway code meant to test assumptions about tools we plan to use in a project. There is no diff. The source material is what the agent actually did: the session transcript, the commands it ran, the scripts it wrote, and the outputs, errors and logs they produced.
+Make an interactive explanation of the specified agent run that a reader new to the project, who didn't watch the run, can read once and understand. Adapted from Geoffrey Litt's [explain-diff-html gist](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524). The run was throwaway code meant to test assumptions about tools we plan to use in a project. There is no diff. The source material is what the agent actually did: the session transcript, the commands it ran, the scripts it wrote, and the outputs, errors and logs they produced.
 
 Run this on the `judgment and prose` role or stronger, per [`model-roles.md`](../go-mode/references/model-roles.md). Don't hand it to a fast model.
 
@@ -26,8 +26,8 @@ Do this before writing anything.
 - **Background**: what each tool is and the part of it that matters here. Give a deep background for beginners (which a familiar reader can skip), then a narrow one about the features the run exercised.
 - **The run**: the section where commands and real output belong. A timeline of what the agent did, grouped into phases (setup, first attempt, dead ends, the working approach, measurements). Show the key commands and trimmed real output at each step. Call out dead ends, retries and workarounds, because those are often where the real findings are.
 - **Findings**: one card per assumption, in plain words, with a verdict (Confirmed / Refuted / Partly true / Not actually tested), the evidence behind it (a quoted output, a number, an error), and how confident we should be. Be blunt when something wasn't really proven, for example when it ran against a mock, at toy scale, or the agent declared success without checking.
-- **Intuition**: how the tools actually behave, as the run revealed it. Use concrete examples with the real data from the run. Use figures and diagrams liberally.
-- **Implications**: what this means for the project. Which assumptions are safe to build on, which design choices change, what constraints or gotchas to carry forward, and which follow-up experiments would settle the open questions.
+- **How the tools behave**: what the run revealed about how each tool works. Use concrete examples with the real data from the run, and a figure or diagram wherever it explains faster than prose.
+- **What this means for the project**: which assumptions are safe to build on, which design choices change, what constraints or gotchas to carry forward, and which follow-up experiments would settle the open questions.
 - **Quiz**: five medium-difficulty multiple-choice questions about what the run showed: how the tools behaved, why something failed, what is and isn't proven. They should need real understanding, not gotchas. Follow the quiz rules in the rules file.
 
 ## 3. Format and quality
@@ -54,3 +54,5 @@ Beyond those rules:
 | A verdict rests on the agent's say-so | Mark it "Not actually tested", or cite the output |
 | The page has no "The short version" callout | Add it after the intro |
 | Every wrong quiz answer shows the same message | Write a hint for each question |
+| A header is a bare skill label like "Findings" | Rewrite it as what the section tells the reader |
+| Any text renders in a serif font | Switch it to the sans-serif stack in the rules file |
