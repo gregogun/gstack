@@ -5,9 +5,25 @@ Invoked at the end of every other playbook.
 **Worktree.** go-mode's first-edit trigger sends you here before the first edit, so set this up at the start, not the end.
 
 1. Resolve `<remote>` and `<default>` per [change scope](../references/change-scope.md#default-branch). Run `git fetch <remote>` and set `<base>` to `<remote>/<default>`. With no remote, `<base>` is the local default branch. Skip the fetch and name the base you used.
-2. Run `git worktree add --no-track -b <type>/<slug> <path> <base>`. `<path>` is an absolute path to `<repo>-<slug>` beside the primary checkout, which is the first line of `git worktree list`. `--no-track` keeps the branch from tracking the default branch, so a push never lands on it.
+2. Run `git worktree add --no-track -b <type>/<slug> <path> <base>`. `<path>` is an absolute path to `<repo>-<slug>` beside the primary checkout, which is the first line of `git worktree list`. `--no-track` keeps the branch from tracking the default branch, so a push never lands on it. A stacked child branches off its parent's branch instead: `git worktree add --no-track -b <child> <path> <parent-branch>`.
 3. Every edit, commit, and delegate runs in that worktree. Put its absolute path in every go-agent prompt, and use absolute paths or `git -C <worktree>` for every command. Parallel writers each get their own worktree branched from it, per the **swarm** skill.
 4. Before the first push, run `git fetch <remote>` and rebase onto `<base>` if it moved, so the PR includes what other agents merged meanwhile. Push with `git push -u <remote> HEAD`. Later pushes to an open PR follow the Babysit playbook.
+5. When the task is done, with its last PR open, remove each worktree you created for it that holds nothing the remote lacks. A worktree you did not create, such as one the user named or a parent handed you, stays. A delegate that opens a PR in its parent's worktree leaves it for the parent. Keep a worktree if any of these checks fails:
+   - `git -C <worktree> status --porcelain` prints nothing, so there are no edits and no untracked files.
+   - `git -C <worktree> rev-list --count @{u}..` prints `0`, so every commit is pushed. An error means the branch has no upstream, so the check fails.
+   - `git -C <worktree> status --porcelain --ignored` lists ignored paths only under dependency or build output, such as `node_modules/`, `dist/` or a cache, and no secret-named file such as `.env*`, `*.pem` or `*.key`. `worktree remove` deletes ignored files without asking.
+   - No subagent of yours still works in it, and you left no dev server or preview running there for the user.
+   - `lsof -a -d cwd -Fn | grep "^n<worktree>"` prints nothing, so no shell, editor, or other agent has its working directory in it. `cd` your own shell to the primary checkout first, and stop your own watchers.
+   - The harness session itself was not opened in it.
+
+   Then run `git -C <primary> worktree remove <worktree>` without `--force`, so git refuses a worktree that changed after the checks. Keep the branch. A clean, pushed worktree loses nothing when removed, so this needs no permission. If you keep it, name its path and the failed check in the reply.
+
+**Returning to a branch.** To continue an existing branch, such as an open PR in Session pickup, a fix in Babysit, or a branch the user or a parent named:
+
+1. Run `git fetch <remote>`, then `git worktree list`. If the branch already has a worktree, work there. That worktree is not yours to remove.
+2. If `git worktree list` shows its old path but the directory is gone, run `git worktree prune`.
+3. Run `git worktree add <path> <branch>`, with `<path>` named as in step 2 above. This also works when the branch exists only on the remote. You created this worktree, so remove it per step 5 when you are done.
+4. Run `git -C <path> merge --ff-only <remote>/<branch>` to pick up pushes from other agents. If `<remote>/<branch>` no longer exists, the PR probably merged and the branch was deleted, so check `gh pr view <branch>` and report that. If the merge refuses for any other reason, the branches diverged, so stop and report it.
 
 Subagents sharing one branch each get their own worktree, or run `git fetch && git reset --hard <remote>/<branch>` between them. If your own worktree picked up unrelated work, patch out your change, start a fresh worktree, and apply it there. If a worktree is snarled, reset it to `<base>` and redo the change minimally.
 
