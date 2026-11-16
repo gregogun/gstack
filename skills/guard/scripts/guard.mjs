@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PREFIX_WORDS = new Set(["command", "exec", "nohup", "time", "sudo", "env", "export", "{", "!", "if", "then", "else", "elif", "while", "until", "do"]);
 const POSIX_SHELLS = new Set(["sh", "bash", "zsh", "dash", "ksh"]);
@@ -104,7 +107,7 @@ function commitSkip(args) {
   return null;
 }
 
-const RULES = [
+const HOOK_BYPASS = [
   (inv) => {
     const hit = inv.env.find(([name, value]) => SKIP_ENV[name]?.(value));
     return hit && `\`${hit[0]}=${hit[1]}\` turns off git hooks`;
@@ -126,6 +129,14 @@ const RULES = [
   },
 ];
 
+function hookBypass(inv) {
+  for (const check of HOOK_BYPASS) {
+    const reason = check(inv);
+    if (reason) return `${reason}. Run the command without the skip, then fix whatever the hook reports`;
+  }
+  return null;
+}
+
 function nestedScript(inv) {
   if (inv.program === "eval") return { command: inv.args.join(" "), dialect: "bash" };
   if (POSIX_SHELLS.has(inv.program)) {
@@ -140,31 +151,71 @@ function nestedScript(inv) {
   return null;
 }
 
-function findBypass(command, dialect) {
+function* invocations(command, dialect, cwd) {
   for (const words of splitCommand(command, dialect)) {
     const inv = parseInvocation(words);
-    for (const rule of RULES) {
-      const reason = rule(inv);
-      if (reason) return reason;
-    }
+    if (inv.program === "cd") cwd = path.resolve(cwd, inv.args[0] ?? os.homedir());
+    yield { ...inv, cwd };
     const script = nestedScript(inv);
-    const reason = script && findBypass(script.command, script.dialect);
-    if (reason) return reason;
+    if (script) yield* invocations(script.command, script.dialect, cwd);
+  }
+}
+
+export const RULES = {
+  "hook-bypass": { shell: hookBypass },
+};
+
+export function check(action, ruleNames) {
+  for (const name of ruleNames) {
+    const rule = RULES[name];
+    let reason = null;
+    if (action.kind === "shell" && rule.shell) {
+      for (const inv of invocations(action.command, action.dialect, action.cwd)) if ((reason = rule.shell(inv))) break;
+    } else if (action.kind === "edit" && rule.edit) reason = rule.edit(action.path);
+    if (reason) return `guard(${name}): ${reason}.`;
   }
   return null;
 }
 
-let event;
-try {
-  event = JSON.parse(fs.readFileSync(0, "utf8"));
-} catch (e) {
-  console.error(`bypass-guard: unreadable hook input: ${e.message}`);
-  process.exit(0);
+const CLAUDE_EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+
+export const ADAPTERS = {
+  "claude-code": {
+    action(event) {
+      const input = event.tool_input ?? {};
+      const cwd = event.cwd ?? process.cwd();
+      const dialect = { Bash: "bash", PowerShell: "powershell" }[event.tool_name];
+      if (dialect) return typeof input.command === "string" ? { kind: "shell", command: input.command, dialect, cwd } : null;
+      const file = input.file_path ?? input.notebook_path;
+      if (CLAUDE_EDIT_TOOLS.has(event.tool_name) && typeof file === "string") return { kind: "edit", path: path.resolve(cwd, file) };
+      return null;
+    },
+    deny(reason) {
+      console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: reason } }));
+    },
+  },
+};
+
+function main() {
+  const [harness, ...flags] = process.argv.slice(2);
+  const adapter = ADAPTERS[harness];
+  if (!adapter) {
+    console.error(`guard: usage is guard.mjs <${Object.keys(ADAPTERS).join("|")}> [--rules <name,...>]`);
+    process.exit(1);
+  }
+  const at = flags.indexOf("--rules");
+  const allowed = new Set((process.env.AGENT_GUARD_ALLOW ?? "").split(",").map((s) => s.trim()));
+  const names = (at === -1 ? Object.keys(RULES) : flags[at + 1].split(",")).filter((name) => RULES[name] && !allowed.has(name));
+  let event;
+  try {
+    event = JSON.parse(fs.readFileSync(0, "utf8"));
+  } catch (e) {
+    console.error(`guard: unreadable hook input: ${e.message}`);
+    return;
+  }
+  const action = adapter.action(event);
+  const reason = action && check(action, names);
+  if (reason) adapter.deny(reason);
 }
-const dialect = { Bash: "bash", PowerShell: "powershell" }[event.tool_name];
-const command = event.tool_input?.command;
-const reason = dialect && typeof command === "string" ? findBypass(command, dialect) : null;
-if (reason) {
-  const permissionDecisionReason = `bypass-guard: ${reason}. Run the command without the skip, then fix whatever the hook reports.`;
-  console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason } }));
-}
+
+if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) main();

@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const GUARD = path.join(path.dirname(fileURLToPath(import.meta.url)), "../skills/loop-audit/scripts/bypass-guard.mjs");
+const GUARD = path.join(path.dirname(fileURLToPath(import.meta.url)), "../skills/guard/scripts/guard.mjs");
 
 function runHook(command, tool_name = "Bash") {
   const payload = {
@@ -17,7 +17,7 @@ function runHook(command, tool_name = "Bash") {
     tool_input: { command, description: "test" },
     tool_use_id: "toolu_01",
   };
-  const result = spawnSync(process.execPath, [GUARD], { input: JSON.stringify(payload), encoding: "utf8" });
+  const result = spawnSync(process.execPath, [GUARD, "claude-code"], { input: JSON.stringify(payload), encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
   return result.stdout.trim() ? JSON.parse(result.stdout).hookSpecificOutput : null;
 }
@@ -97,7 +97,7 @@ test("PowerShell commands are checked with PowerShell quoting", () => {
 
 test("other tools and unreadable input pass through", () => {
   assert.equal(runHook("git commit -n", "Read"), null);
-  const result = spawnSync(process.execPath, [GUARD], { input: "not json", encoding: "utf8" });
+  const result = spawnSync(process.execPath, [GUARD, "claude-code"], { input: "not json", encoding: "utf8" });
   assert.equal(result.status, 0);
   assert.equal(result.stdout, "");
 });
