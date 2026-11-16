@@ -63,6 +63,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Know why code is shaped this way, or where a number came from | [`/why`](../why/SKILL.md) |
 | Research a question across the web, papers and docs, and get cited findings for an idea, a design decision, or a skill or tool change | [`/research`](../research/SKILL.md) |
 | Understand a change or subsystem, explained plainly | [`/teach`](../teach/SKILL.md) |
+| Learn the general ideas behind a piece of work, with verified places to read up on each | [`/go-deeper`](../go-deeper/SKILL.md) |
 | Catch up on their own recent work on a topic | [`/recall`](../recall/SKILL.md) |
 | Catch up on what changed in this chat since their last message, in a few plain sentences and small visuals, with enough context to decide each action item | [`/ketchup`](../ketchup/SKILL.md) |
 | Know what a small diff could break outside itself | [`/blast-radius`](../blast-radius/SKILL.md) |
@@ -114,6 +115,7 @@ Close calls:
 
 - `/chat-mode` only talks. `/lite-mode` does small work with one check. `/go-mode` runs a playbook. The newest mode in a chat wins.
 - `/how` explains what the code does. `/why` explains the reasons. `/teach` runs one or both and explains the result plainly.
+- `/teach` explains this codebase. `/go-deeper` names the general ideas behind the work and points to sources outside it to learn them.
 - `/arena` gives every worker the same brief and merges the best parts. `/swarm` splits work into slices or a race and returns one report.
 - `/architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
 - `/interrogate` reviews the diff. `/blast-radius` looks for breakage outside the diff and proves the one fact that makes the change safe.
