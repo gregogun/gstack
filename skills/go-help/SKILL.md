@@ -106,6 +106,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
 | See which feedback loops a project has and lacks, and fix the weakest one | [`/loop-audit`](../loop-audit/SKILL.md) |
+| Stop agents in a project from editing the main checkout, destroying git work, or skipping git hooks | [`/guard`](../guard/SKILL.md) |
 | Find their way around gstack | `/go-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
@@ -153,7 +154,7 @@ Principles are one-rule skills that `/go-mode` reads and cites in its replies. T
 | Runs cost more than expected | See the cost paragraph under Get set up. |
 | A gstack command ran a different skill | Run [{{doctor_command}}](../doctor/SKILL.md). It finds the other skill with that name and offers a fix. |
 | A skill didn't load on its own | Only `/setup-gstack` loads from the user's words. The others load when the user types them or when `/go-mode` runs them, and it doesn't run every skill. |
-| Parallel agents overwrote each other | Give each agent its own worktree. |
+| Parallel agents overwrote each other | Give each agent its own worktree. In a project, [`/guard`](../guard/SKILL.md) blocks edits to the primary checkout so each agent has to make one. |
 | An overnight run moved but finished nothing | {{loop_command}} needs a check that can pass or fail, not a duration. |
 | The reply claims success from a green build | Ask for the real command, flow, stored value, or profile. That's the prove-it-works principle. |
 | A login or other browser-server flow got only mocked component tests | Ask for one real end-to-end test of the main path. That's the test-where-the-bug-lives principle. |
