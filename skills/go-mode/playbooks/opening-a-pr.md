@@ -2,7 +2,14 @@
 
 Invoked at the end of every other playbook.
 
-**Worktree.** Work from a git worktree off main. Subagents inherit it. Multiple subagents on the same branch each get their own worktree, or `git fetch && git reset --hard origin/<branch>` between them. Dirty branch with unrelated work: patch out, fresh worktree, apply. Snarled worktree: reset from main, redo minimally.
+**Worktree.** go-mode's first-edit trigger sends you here before the first edit, so set this up at the start, not the end.
+
+1. Resolve `<remote>` and `<default>` per [change scope](../references/change-scope.md#default-branch). Run `git fetch <remote>` and set `<base>` to `<remote>/<default>`. With no remote, `<base>` is the local default branch. Skip the fetch and name the base you used.
+2. Run `git worktree add --no-track -b <type>/<slug> <path> <base>`. `<path>` is an absolute path to `<repo>-<slug>` beside the primary checkout, which is the first line of `git worktree list`. `--no-track` keeps the branch from tracking the default branch, so a push never lands on it.
+3. Every edit, commit, and delegate runs in that worktree. Put its absolute path in every go-agent prompt, and use absolute paths or `git -C <worktree>` for every command. Parallel writers each get their own worktree branched from it, per the **swarm** skill.
+4. Before the first push, run `git fetch <remote>` and rebase onto `<base>` if it moved, so the PR includes what other agents merged meanwhile. Push with `git push -u <remote> HEAD`. Later pushes to an open PR follow the Babysit playbook.
+
+Subagents sharing one branch each get their own worktree, or run `git fetch && git reset --hard <remote>/<branch>` between them. If your own worktree picked up unrelated work, patch out your change, start a fresh worktree, and apply it there. If a worktree is snarled, reset it to `<base>` and redo the change minimally.
 
 **Commits.** Commit liberally. Rebase into small, ordered commits before opening PRs. Each commit is a future PR: landable, ordered to tell the story. Amend when the fix belongs in a just-made commit. New commit when separable. Commit bodies don't restate the subject.
 

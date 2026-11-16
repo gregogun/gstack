@@ -4,7 +4,7 @@ How a review target becomes a commit range and a file list. Every skill that rev
 
 ## Default branch
 
-Try `refs/remotes/origin/HEAD`, then `gh repo view --json defaultBranchRef`. If the ref is missing, ask the remote with `git remote set-head origin --auto` rather than guessing. It needs the network and writes only a ref under `.git`, so it is permitted. Note it under Verification. With no remote at all, fall back to a local `main` or `master` and state which base you assumed.
+`<remote>` is `origin` when `git remote` lists it, else the remote that `git remote` lists. Try `refs/remotes/<remote>/HEAD`, then `gh repo view --json defaultBranchRef`. If the ref is missing, ask the remote with `git remote set-head <remote> --auto` rather than guessing. It needs the network and writes only a ref under `.git`, so it is permitted. Note it under Verification. With no remote at all, fall back to a local `main` or `master` and state which base you assumed.
 
 ## Targets
 
