@@ -161,47 +161,79 @@ export function checkout(target) {
   const remote = remotes.includes("origin") ? "origin" : remotes[0];
   const remoteHead = remote && git(dir, "symbolic-ref", "--short", "-q", `refs/remotes/${remote}/HEAD`);
   const defaultBranch = remoteHead ? remoteHead.slice(remote.length + 1) : ["main", "master"].find((b) => git(dir, "rev-parse", "--verify", "-q", `refs/heads/${b}`) !== null);
-  return { root, primary: gitDir === commonDir, branch: git(dir, "symbolic-ref", "--short", "-q", "HEAD"), defaultBranch, remote };
+  return { root, commonDir, primary: gitDir === commonDir, branch: git(dir, "symbolic-ref", "--short", "-q", "HEAD"), defaultBranch, remote };
 }
 
-function primaryCheckoutEdit(file) {
+function primaryCheckoutEdit({ path: file, project }) {
   const repo = checkout(path.dirname(file));
   if (!repo?.primary || !repo.branch || repo.branch !== repo.defaultBranch) return null;
+  if (project && checkout(project)?.commonDir !== repo.commonDir) return null;
   const base = repo.remote ? `${repo.remote}/${repo.defaultBranch}` : repo.defaultBranch;
   return `${repo.root} is the primary checkout on ${repo.branch}, where the user and other agents also work. Fetch, run \`git worktree add --no-track -b <type>/<slug> ${repo.root}-<slug> ${base}\`, and make the edit in that worktree. If the user asked for this edit in place, ask them to restart the session with AGENT_GUARD_ALLOW=primary-checkout`;
 }
 
 const shortFlags = (args) => args.filter((a) => /^-[^-]/.test(a)).map((a) => a.slice(1)).join("");
 
-function pushesDefault(args, repo) {
-  if (args.includes("--all") || args.includes("--mirror")) return true;
-  const refspecs = args.filter((a) => !a.startsWith("-")).slice(1);
-  const targets = refspecs.length ? refspecs.map((spec) => spec.replace(/^\+/, "").split(":").at(-1).replace(/^refs\/heads\//, "")) : ["HEAD"];
-  return targets.some((b) => (b === "HEAD" ? repo.branch : b) === repo.defaultBranch);
+const PUSH_VALUE_OPTIONS = new Set(["--push-option", "--repo", "--receive-pack", "--exec"]);
+
+function parsePush(args) {
+  const flags = new Set();
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "--") {
+      positional.push(...args.slice(i + 1));
+      break;
+    }
+    if (a.startsWith("--")) {
+      if (PUSH_VALUE_OPTIONS.has(a)) i++;
+      flags.add(a.split("=")[0]);
+    } else if (a.startsWith("-") && a.length > 1) {
+      for (let j = 1; j < a.length; j++) {
+        if (a[j] === "o") {
+          if (j === a.length - 1) i++;
+          break;
+        }
+        flags.add(`-${a[j]}`);
+      }
+    } else positional.push(a);
+  }
+  return { flags, refspecs: positional.slice(1) };
+}
+
+const globMatches = (pattern, name) => new RegExp(`^${pattern.split("*").map((s) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*")}$`).test(name);
+
+function pushesDefault({ flags, refspecs }, repo) {
+  if (["--all", "--branches", "--mirror"].some((f) => flags.has(f))) return true;
+  const targets = refspecs.length ? refspecs.map((spec) => spec.replace(/^\+/, "").split(":").at(-1).replace(/^refs\/heads\//, "")) : flags.has("--tags") ? [] : ["HEAD"];
+  return targets.some((b) => (b === "HEAD" || b === "@" ? repo.branch === repo.defaultBranch : globMatches(b, repo.defaultBranch)));
 }
 
 function discardsWork({ subcommand: sub, args }) {
   const has = (...flags) => args.some((a) => flags.includes(a));
+  const short = shortFlags(args);
   if (sub === "reset") return has("--hard");
-  if (sub === "clean") return has("--force") || shortFlags(args).includes("f");
-  if (sub === "checkout") return has("--", ".", "--force") || shortFlags(args).includes("f");
-  if (sub === "switch") return has("--discard-changes", "--force") || shortFlags(args).includes("f");
-  if (sub === "restore") return !has("--staged", "-S") || has("--worktree", "-W");
-  if (sub === "stash") return args[0] === "drop" || args[0] === "clear";
+  if (sub === "clean") return (has("--force") || short.includes("f")) && !has("--dry-run") && !short.includes("n");
+  if (sub === "checkout") return has("--", ".", "--force") || short.includes("f");
+  if (sub === "switch") return has("--discard-changes", "--force") || short.includes("f");
+  if (sub === "restore") return !(has("--staged") || short.includes("S")) || has("--worktree") || short.includes("W");
+  if (sub === "stash") return ["drop", "clear"].includes(args.find((a) => !a.startsWith("-")));
   return false;
 }
 
 function destructiveGit(inv) {
   if (inv.program !== "git" || !inv.subcommand) return null;
-  const dirOption = inv.gitOptions.findLast((o) => o.flag === "-C");
-  const repo = checkout(dirOption ? path.resolve(inv.cwd, dirOption.value) : inv.cwd);
+  const dir = inv.gitOptions.filter((o) => o.flag === "-C").reduce((d, o) => path.resolve(d, o.value), inv.cwd);
+  const repo = checkout(dir);
   if (!repo) return null;
   const { subcommand: sub, args } = inv;
   if (sub === "push") {
-    if (args.includes("--force") || args.includes("-f") || shortFlags(args).includes("f") || args.some((a) => a.startsWith("+"))) {
+    const push = parsePush(args);
+    if (push.flags.has("--dry-run") || push.flags.has("-n")) return null;
+    if (push.flags.has("--force") || push.flags.has("-f") || push.refspecs.some((s) => s.startsWith("+"))) {
       return "`git push --force` can overwrite commits others pushed. Use `--force-with-lease` on your own branch";
     }
-    if (pushesDefault(args, repo)) return `this pushes to ${repo.defaultBranch}, the default branch. Push your own branch and open a pull request`;
+    if (pushesDefault(push, repo)) return `this pushes to ${repo.defaultBranch}, the default branch. Push your own branch and open a pull request`;
   }
   if (sub === "branch" && (shortFlags(args).includes("D") || ((args.includes("--delete") || shortFlags(args).includes("d")) && (args.includes("--force") || shortFlags(args).includes("f"))))) {
     return "this deletes a branch even if its commits are not merged. Use `git branch -d`, which refuses to drop unmerged work";
@@ -229,7 +261,7 @@ function nestedScript(inv) {
 function* invocations(command, dialect, cwd) {
   for (const words of splitCommand(command, dialect)) {
     const inv = parseInvocation(words);
-    if (inv.program === "cd") cwd = path.resolve(cwd, inv.args[0] ?? os.homedir());
+    if (inv.program === "cd") cwd = path.resolve(cwd, (inv.args[0] ?? "~").replace(/^~(?=\/|$)/, os.homedir()));
     yield { ...inv, cwd };
     const script = nestedScript(inv);
     if (script) yield* invocations(script.command, script.dialect, cwd);
@@ -248,7 +280,7 @@ export function check(action, ruleNames) {
     let reason = null;
     if (action.kind === "shell" && rule.shell) {
       for (const inv of invocations(action.command, action.dialect, action.cwd)) if ((reason = rule.shell(inv))) break;
-    } else if (action.kind === "edit" && rule.edit) reason = rule.edit(action.path);
+    } else if (action.kind === "edit" && rule.edit) reason = rule.edit(action);
     if (reason) return `guard(${name}): ${reason}.`;
   }
   return null;
@@ -259,12 +291,13 @@ const CLAUDE_EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]
 export const ADAPTERS = {
   "claude-code": {
     action(event) {
+      if (typeof event !== "object" || event === null) return null;
       const input = event.tool_input ?? {};
       const cwd = event.cwd ?? process.cwd();
       const dialect = { Bash: "bash", PowerShell: "powershell" }[event.tool_name];
       if (dialect) return typeof input.command === "string" ? { kind: "shell", command: input.command, dialect, cwd } : null;
       const file = input.file_path ?? input.notebook_path;
-      if (CLAUDE_EDIT_TOOLS.has(event.tool_name) && typeof file === "string") return { kind: "edit", path: path.resolve(cwd, file) };
+      if (CLAUDE_EDIT_TOOLS.has(event.tool_name) && typeof file === "string") return { kind: "edit", path: path.resolve(cwd, file), project: process.env.CLAUDE_PROJECT_DIR || cwd };
       return null;
     },
     deny(reason) {
@@ -276,13 +309,16 @@ export const ADAPTERS = {
 function main() {
   const [harness, ...flags] = process.argv.slice(2);
   const adapter = ADAPTERS[harness];
-  if (!adapter) {
+  const at = flags.indexOf("--rules");
+  const chosen = at === -1 ? Object.keys(RULES) : (flags[at + 1] ?? "").split(",").map((s) => s.trim());
+  const unknown = chosen.filter((name) => !RULES[name]);
+  if (!adapter || unknown.length) {
+    if (unknown.length) console.error(`guard: unknown rule ${unknown.map((n) => `"${n}"`).join(", ")}. Rules are ${Object.keys(RULES).join(", ")}`);
     console.error(`guard: usage is guard.mjs <${Object.keys(ADAPTERS).join("|")}> [--rules <name,...>]`);
     process.exit(1);
   }
-  const at = flags.indexOf("--rules");
   const allowed = new Set((process.env.AGENT_GUARD_ALLOW ?? "").split(",").map((s) => s.trim()));
-  const names = (at === -1 ? Object.keys(RULES) : flags[at + 1].split(",")).filter((name) => RULES[name] && !allowed.has(name));
+  const names = chosen.filter((name) => !allowed.has(name));
   let event;
   try {
     event = JSON.parse(fs.readFileSync(0, "utf8"));

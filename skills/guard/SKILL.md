@@ -10,7 +10,7 @@ Installs `scripts/guard.mjs` as a pre-tool hook in the user's project. The harne
 
 ## Rules
 
-Every rule is on unless the hook command names a subset with `--rules <name,...>`. A user who wants a rule off for one session starts the harness with `AGENT_GUARD_ALLOW=<name,...>` in its environment. The agent's own shell can't change the hook's environment, so only the user can lift a rule.
+Every rule is on unless the hook command names a subset with `--rules <name,...>`. An unknown rule name makes the hook exit with an error, so a typo never turns rules off without a word. A user who wants a rule off for one session starts the harness with `AGENT_GUARD_ALLOW=<name,...>` in its environment. The agent's own shell can't change the hook's environment, so only the user can lift a rule.
 
 ### hook-bypass
 
@@ -27,25 +27,28 @@ It reads `-n` only on `git commit`, so `git log -n 5`, `git push -n` and `grep -
 
 Stops an agent from editing the primary checkout while it is on the default branch. The primary checkout is where the user and other agents work, so concurrent edits there mix together. The denial tells the agent to fetch and create its own worktree off `<remote>/<default>`, with the exact command.
 
-It reads the harness's file-edit tools. An edit through the shell, such as `sed -i` or a redirect, gets past it. Edits in a linked worktree, in a checkout on another branch, and outside git all pass. The default branch is `<remote>/HEAD` for `origin`, or the only remote, and the local `main` or `master` when there is no remote.
+It reads the harness's file-edit tools. An edit through the shell, such as `sed -i` or a redirect, gets past it. Edits in a linked worktree, in a checkout on another branch, outside git, and in a repo other than the project all pass.
+
+The default branch is `refs/remotes/<remote>/HEAD`, where `<remote>` is `origin`, else the first remote `git remote` lists. When that ref is missing, the guard falls back to a local `main` or `master`. A clone has the ref. A repo that added its remote by hand does not, so setup step 3 sets it.
 
 ### destructive-git
 
 Stops git commands that destroy work. Anywhere in the repo it denies:
 
-- `git push --force`, `-f` and a `+` refspec. `--force-with-lease` passes.
-- a push to the default branch, by refspec, `--all`, `--mirror`, or a bare `git push` while on it
+- `git push --force`, `-f` and a `+` refspec. `--force-with-lease` and `--dry-run` pass.
+- a push to the default branch, by refspec or glob refspec, `--all`, `--branches`, `--mirror`, or a bare `git push` while on it. `git push --tags` passes.
 - `git branch -D`, or `--delete --force`. `git branch -d` refuses unmerged work, so it passes.
 
 In the primary checkout only, it also denies the commands that throw away uncommitted work: `git reset --hard`, `git clean -f`, `git checkout -- <path>`, `git checkout .`, `git switch -f`, `git restore` without `--staged`, and `git stash drop` or `clear`. An agent's own worktree holds only its own work, so these pass there. gstack's own playbooks rely on `git reset --hard` in a worktree.
 
-It follows `git -C <dir>` and a leading `cd <dir>` to find which checkout a command acts on.
+It follows `git -C <dir>` and each `cd <dir>` in the command to find which checkout a command acts on. A `cd` inside `( )` or `$( )` still counts after the subshell ends, so a later command can be checked against the wrong checkout. PowerShell's `Set-Location` is not followed.
 
 ## Setup
 
 1. Copy `{{plugin_root}}/skills/guard/scripts/guard.mjs` to `.agents/hooks/guard.mjs` in the project. The plugin's folder changes with each update, so the project needs its own copy. `.agents/` is not tied to one harness, so every harness's config points at the same file.
 2. Ask which harnesses the project's contributors use. Wire each one below. Ask before editing any settings file.
-3. If the project already runs an older `bypass-guard.mjs` hook, replace its entry with the guard entry and delete the old file.
+3. Run `git symbolic-ref -q refs/remotes/<remote>/HEAD`. If it prints nothing, run `git remote set-head <remote> --auto`, so the guard reads the real default branch.
+4. If the project already runs an older `bypass-guard.mjs` hook, replace its entry with the guard entry and delete the old file.
 
 ### Claude Code
 
@@ -68,7 +71,7 @@ Add this to `.claude/settings.json`, or to `.claude/settings.local.json` for thi
 
 `guard.mjs` has an adapter only for Claude Code. Most agent harnesses now have a pre-tool hook of the same shape: JSON in on stdin, a deny decision out. A new harness is one entry in the script's `ADAPTERS` table:
 
-- `action(event)` turns the harness's hook input into `{ kind: "shell", command, dialect, cwd }`, `{ kind: "edit", path }`, or `null` for a call no rule reads.
+- `action(event)` turns the harness's hook input into `{ kind: "shell", command, dialect, cwd }`, `{ kind: "edit", path, project }`, or `null`. `project` is the folder the session opened, so `primary-checkout` skips edits to other repos for a call no rule reads.
 - `deny(reason)` writes the deny decision in that harness's format.
 
 Add an adapter only against a running copy of the harness, and add its wiring here. A table entry tested on sample JSON from the docs proves nothing about the real hook.
