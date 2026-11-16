@@ -17,12 +17,14 @@ Pick the layer per behavior, not per change:
 
 A React login flow is the common case. The bug lives in the cookie the server sets, the redirect after submit, and the session that must survive a reload. Write one end-to-end test that signs in with valid credentials, lands on the protected page, reloads, and is still signed in. Cover field validation and error display with component tests, and pure validation rules with unit tests. Component tests with a mocked `fetch`, and nothing else, never see the cookie, the redirect, or the session.
 
-Run each layer at its cadence. Run each command in single-run mode, because a watch process never exits:
+Run each layer on the earliest stage whose time budget it fits. A hook that runs past its budget gets skipped, and a skipped hook catches nothing. Measure with a warm cache, and run each command in single-run mode, because a watch process never exits:
 
-- **After every save.** Sub-second checks: the type check, lint, and the unit tests of the module you edit.
-- **After every meaningful edit.** The tests that cover the files you changed, at every layer.
-- **Before you declare done.** The slow suites, the end-to-end tests among them.
-- **In CI.** Suites that only CI runs, such as a cross-browser matrix. Leave them to CI and read its result.
+- **Edit loop, seconds.** After every meaningful edit: the type check, lint, and the tests that cover the files you changed.
+- **pre-commit, under 10 s in total.** Format, lint, and secret scan of the staged files.
+- **pre-push, under 2 min in total.** Unit tests, the full type check, the build.
+- **CI, as long as merge can wait.** Every check above on a clean checkout, plus the integration and end-to-end suites. Run the slow suites that work locally before you declare done. Leave CI-only suites, such as a cross-browser matrix, to CI and read its result.
+
+When a hook you trigger runs past its budget, let it finish, and report the stage, its measured time, and its slowest check, as a proposal to move that check one stage later. The full stage table, with nightly and post-deploy, is in the **loop-audit** skill's [`references/stage-placement.md`](../loop-audit/references/stage-placement.md).
 
 In a project with no end-to-end suite, generate one with Playwright Test Agents instead of writing it by hand. A project that already has an end-to-end runner gets its new test in that runner.
 
