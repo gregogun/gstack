@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -99,5 +101,84 @@ test("other tools and unreadable input pass through", () => {
   assert.equal(runHook("git commit -n", "Read"), null);
   const result = spawnSync(process.execPath, [GUARD, "claude-code"], { input: "not json", encoding: "utf8" });
   assert.equal(result.status, 0);
+  assert.equal(result.stdout, "");
+});
+
+function sh(cwd, command) {
+  const result = spawnSync("sh", ["-c", command], { cwd, encoding: "utf8" });
+  assert.equal(result.status, 0, `${command}: ${result.stderr}`);
+}
+
+function repos() {
+  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "guard-")));
+  sh(root, "git init -q --bare -b main remote.git && git clone -q -o upstream remote.git primary 2>/dev/null");
+  const primary = path.join(root, "primary");
+  sh(primary, "git config user.email t@t && git config user.name t && echo a > f && git add f && git commit -qm init && git push -q upstream main && git remote set-head upstream --auto >/dev/null");
+  sh(primary, "git worktree add -q --no-track -b feat/x ../worktree upstream/main && git branch -q merged");
+  sh(root, "git init -q -b main local && cd local && git config user.email t@t && git config user.name t && echo a > f && git add f && git commit -qm init");
+  sh(root, "git clone -q remote.git feature 2>/dev/null && cd feature && git checkout -q -b feat/y");
+  return { root, primary, worktree: path.join(root, "worktree"), local: path.join(root, "local"), feature: path.join(root, "feature") };
+}
+
+function hook(event, env = {}) {
+  const result = spawnSync(process.execPath, [GUARD, "claude-code"], {
+    input: JSON.stringify({ hook_event_name: "PreToolUse", ...event }),
+    encoding: "utf8",
+    env: { ...process.env, AGENT_GUARD_ALLOW: "", ...env },
+  });
+  assert.equal(result.status, 0, result.stderr);
+  return result.stdout.trim() ? JSON.parse(result.stdout).hookSpecificOutput.permissionDecisionReason : null;
+}
+
+const edit = (file, env) => hook({ tool_name: "Write", cwd: path.dirname(file), tool_input: { file_path: file, content: "x" } }, env);
+const run = (cwd, command) => hook({ tool_name: "Bash", cwd, tool_input: { command } });
+
+test("edits in the primary checkout on the default branch are denied", () => {
+  const r = repos();
+  assert.match(edit(path.join(r.primary, "f")) ?? "", /^guard\(primary-checkout\): .*git worktree add --no-track -b <type>\/<slug> .*primary-<slug> upstream\/main/);
+  assert.match(edit(path.join(r.primary, "new/dir/g")) ?? "", /^guard\(primary-checkout\)/, "a new file in a new folder");
+  assert.match(edit(path.join(r.local, "f")) ?? "", /primary checkout on main.* main\b/, "a repo with no remote falls back to local main");
+  assert.match(hook({ tool_name: "Edit", cwd: r.primary, tool_input: { file_path: "f" } }) ?? "", /^guard\(primary-checkout\)/, "a relative path resolves against cwd");
+});
+
+test("edits in a worktree, on another branch, outside git, or allowed by the user pass", () => {
+  const r = repos();
+  assert.equal(edit(path.join(r.worktree, "f")), null);
+  assert.equal(edit(path.join(r.feature, "f")), null);
+  assert.equal(edit(path.join(r.root, "loose.txt")), null);
+  assert.equal(edit(path.join(r.primary, "f"), { AGENT_GUARD_ALLOW: "primary-checkout" }), null);
+});
+
+test("commands that discard work are denied only in the primary checkout", () => {
+  const r = repos();
+  for (const command of ["git reset --hard", "git clean -fd", "git checkout -- f", "git checkout .", "git restore f", "git stash drop", "git switch -f feat/x", 'bash -c "git reset --hard"']) {
+    assert.match(run(r.primary, command) ?? "", /^guard\(destructive-git\): .*primary checkout/, command);
+    assert.equal(run(r.worktree, command), null, `${command} in a worktree`);
+  }
+  for (const command of ["git status", "git reset --soft HEAD", "git restore --staged f", "git checkout -b feat/z", "git clean -n"]) {
+    assert.equal(run(r.primary, command), null, command);
+  }
+  assert.match(run(r.worktree, `git -C ${r.primary} reset --hard`) ?? "", /primary checkout/, "git -C");
+  assert.match(run(r.worktree, `cd ${r.primary} && git reset --hard`) ?? "", /primary checkout/, "cd first");
+});
+
+test("force pushes, pushes to the default branch, and forced branch deletes are denied anywhere", () => {
+  const r = repos();
+  for (const command of ["git push -f", "git push --force upstream feat/x", "git push upstream +feat/x", "git push upstream HEAD:main", "git push upstream main", "git push upstream refs/heads/main", "git push --all upstream", "git branch -D merged", "git branch --delete --force merged"]) {
+    assert.match(run(r.worktree, command) ?? "", /^guard\(destructive-git\)/, command);
+  }
+  assert.match(run(r.primary, "git push") ?? "", /pushes to main/, "a bare push from main");
+  assert.match(run(r.primary, "git push upstream HEAD") ?? "", /pushes to main/, "HEAD while on main");
+  for (const command of ["git push -u upstream HEAD", "git push --force-with-lease upstream feat/x", "git push upstream feat/x", "git branch -d merged"]) {
+    assert.equal(run(r.worktree, command), null, command);
+  }
+});
+
+test("--rules limits the hook to the named rules", () => {
+  const r = repos();
+  const result = spawnSync(process.execPath, [GUARD, "claude-code", "--rules", "hook-bypass"], {
+    input: JSON.stringify({ hook_event_name: "PreToolUse", tool_name: "Bash", cwd: r.primary, tool_input: { command: "git reset --hard" } }),
+    encoding: "utf8",
+  });
   assert.equal(result.stdout, "");
 });

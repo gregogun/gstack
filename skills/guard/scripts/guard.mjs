@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -137,6 +138,80 @@ function hookBypass(inv) {
   return null;
 }
 
+function git(dir, ...args) {
+  const result = spawnSync("git", ["-C", dir, ...args], { encoding: "utf8" });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
+
+function existingDir(target) {
+  let dir = target;
+  while (!fs.existsSync(dir)) {
+    if (path.dirname(dir) === dir) return null;
+    dir = path.dirname(dir);
+  }
+  return fs.statSync(dir).isDirectory() ? dir : path.dirname(dir);
+}
+
+export function checkout(target) {
+  const dir = existingDir(target);
+  const paths = dir && git(dir, "rev-parse", "--path-format=absolute", "--show-toplevel", "--git-dir", "--git-common-dir");
+  if (!paths) return null;
+  const [root, gitDir, commonDir] = paths.split("\n");
+  const remotes = (git(dir, "remote") ?? "").split("\n").filter(Boolean);
+  const remote = remotes.includes("origin") ? "origin" : remotes[0];
+  const remoteHead = remote && git(dir, "symbolic-ref", "--short", "-q", `refs/remotes/${remote}/HEAD`);
+  const defaultBranch = remoteHead ? remoteHead.slice(remote.length + 1) : ["main", "master"].find((b) => git(dir, "rev-parse", "--verify", "-q", `refs/heads/${b}`) !== null);
+  return { root, primary: gitDir === commonDir, branch: git(dir, "symbolic-ref", "--short", "-q", "HEAD"), defaultBranch, remote };
+}
+
+function primaryCheckoutEdit(file) {
+  const repo = checkout(path.dirname(file));
+  if (!repo?.primary || !repo.branch || repo.branch !== repo.defaultBranch) return null;
+  const base = repo.remote ? `${repo.remote}/${repo.defaultBranch}` : repo.defaultBranch;
+  return `${repo.root} is the primary checkout on ${repo.branch}, where the user and other agents also work. Fetch, run \`git worktree add --no-track -b <type>/<slug> ${repo.root}-<slug> ${base}\`, and make the edit in that worktree. If the user asked for this edit in place, ask them to restart the session with AGENT_GUARD_ALLOW=primary-checkout`;
+}
+
+const shortFlags = (args) => args.filter((a) => /^-[^-]/.test(a)).map((a) => a.slice(1)).join("");
+
+function pushesDefault(args, repo) {
+  if (args.includes("--all") || args.includes("--mirror")) return true;
+  const refspecs = args.filter((a) => !a.startsWith("-")).slice(1);
+  const targets = refspecs.length ? refspecs.map((spec) => spec.replace(/^\+/, "").split(":").at(-1).replace(/^refs\/heads\//, "")) : ["HEAD"];
+  return targets.some((b) => (b === "HEAD" ? repo.branch : b) === repo.defaultBranch);
+}
+
+function discardsWork({ subcommand: sub, args }) {
+  const has = (...flags) => args.some((a) => flags.includes(a));
+  if (sub === "reset") return has("--hard");
+  if (sub === "clean") return has("--force") || shortFlags(args).includes("f");
+  if (sub === "checkout") return has("--", ".", "--force") || shortFlags(args).includes("f");
+  if (sub === "switch") return has("--discard-changes", "--force") || shortFlags(args).includes("f");
+  if (sub === "restore") return !has("--staged", "-S") || has("--worktree", "-W");
+  if (sub === "stash") return args[0] === "drop" || args[0] === "clear";
+  return false;
+}
+
+function destructiveGit(inv) {
+  if (inv.program !== "git" || !inv.subcommand) return null;
+  const dirOption = inv.gitOptions.findLast((o) => o.flag === "-C");
+  const repo = checkout(dirOption ? path.resolve(inv.cwd, dirOption.value) : inv.cwd);
+  if (!repo) return null;
+  const { subcommand: sub, args } = inv;
+  if (sub === "push") {
+    if (args.includes("--force") || args.includes("-f") || shortFlags(args).includes("f") || args.some((a) => a.startsWith("+"))) {
+      return "`git push --force` can overwrite commits others pushed. Use `--force-with-lease` on your own branch";
+    }
+    if (pushesDefault(args, repo)) return `this pushes to ${repo.defaultBranch}, the default branch. Push your own branch and open a pull request`;
+  }
+  if (sub === "branch" && (shortFlags(args).includes("D") || ((args.includes("--delete") || shortFlags(args).includes("d")) && (args.includes("--force") || shortFlags(args).includes("f"))))) {
+    return "this deletes a branch even if its commits are not merged. Use `git branch -d`, which refuses to drop unmerged work";
+  }
+  if (repo.primary && discardsWork(inv)) {
+    return `\`git ${sub}\` here discards uncommitted work in ${repo.root}, the primary checkout, which may belong to the user or another agent. Do this only in your own worktree`;
+  }
+  return null;
+}
+
 function nestedScript(inv) {
   if (inv.program === "eval") return { command: inv.args.join(" "), dialect: "bash" };
   if (POSIX_SHELLS.has(inv.program)) {
@@ -163,6 +238,8 @@ function* invocations(command, dialect, cwd) {
 
 export const RULES = {
   "hook-bypass": { shell: hookBypass },
+  "primary-checkout": { edit: primaryCheckoutEdit },
+  "destructive-git": { shell: destructiveGit },
 };
 
 export function check(action, ruleNames) {
