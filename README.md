@@ -22,6 +22,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`why`](skills/why/SKILL.md): finds out why code is shaped the way it is.
 - [`research`](skills/research/SKILL.md): researches a question across the web, papers, docs and code, and turns it into cited findings for an idea, a design decision or a skill change.
 - [`teach`](skills/teach/SKILL.md): runs `how` and `why` and gives one plain explanation.
+- [`go-deeper`](skills/go-deeper/SKILL.md): picks the two or three general ideas behind a piece of work and points to verified places to learn each one, tied back to where it shows up in the code.
 - [`recall`](skills/recall/SKILL.md): rebuilds recent context on a topic from chat history.
 - [`ketchup`](skills/ketchup/SKILL.md): summarizes what changed in this chat since the last message.
 - [`blast-radius`](skills/blast-radius/SKILL.md): finds what a small diff could break outside itself.
