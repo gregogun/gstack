@@ -87,29 +87,4 @@ The fix is done when the weakest loop's row would now move to rank 4, and both r
 
 ## Bypass guard
 
-In Claude Code, a `PreToolUse` hook stops an agent from skipping the git hooks. Offer it when the project has git hooks, and set it up when the user agrees. The hook splits each Bash or PowerShell command into separate invocations and denies these:
-
-- `git commit` with `-n`, a cluster such as `-anm`, or `--no-verify` or a prefix of it such as `--no-veri`, also after `git -C <path>` or `-c <key>=<value>`
-- `--no-verify` on any other git command, such as `git push` and `git merge`
-- `git -c core.hooksPath=<dir>`
-- the env prefixes `HUSKY=0`, `LEFTHOOK=0`, `LEFTHOOK=false` and `LEFTHOOK_EXCLUDE=`, on any command or through `env`, `export` or `$env:`
-
-It reads `-n` only on `git commit`, so `git log -n 5`, `git push -n` and `grep -n` still run. It also reads the body of `sh -c`, `bash -c`, `eval` and `$(...)`. It does not see git aliases, scripts that the command runs, or `git config core.hooksPath`, so CI still reruns the hook checks.
-
-1. Copy `{{plugin_root}}/skills/loop-audit/scripts/bypass-guard.mjs` to `.claude/hooks/bypass-guard.mjs` in the project. The plugin's folder changes with each update, so the project needs its own copy.
-2. Ask before editing settings. Add this to `.claude/settings.json`, or to `.claude/settings.local.json` for this user only:
-
-   ```json
-   {
-     "hooks": {
-       "PreToolUse": [
-         {
-           "matcher": "Bash|PowerShell",
-           "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/bypass-guard.mjs\"" }]
-         }
-       ]
-     }
-   }
-   ```
-
-Done when a new session that runs `git commit --no-verify -m test` gets a denial that starts with `bypass-guard:`, and `git log -n 1` still runs.
+When the project has git hooks, offer the `hook-bypass` rule of the **guard** skill ([`../guard/SKILL.md`](../guard/SKILL.md)). It stops an agent from skipping the git hooks. Set it up per that skill when the user agrees, with `--rules hook-bypass` if they want only this rule.
