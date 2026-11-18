@@ -58,6 +58,7 @@ Start each chat in a mode. [`/chat-mode`](skills/chat-mode/SKILL.md) only talks.
 - [`housekeeping`](skills/housekeeping/SKILL.md): audits and cleans up worktrees, branches, stashes, stale PRs, scratch and disk caches.
 - [`report`](skills/report/SKILL.md): sends a short status report to your phone through Telegram, or prints it. It also schedules a daily unattended run that reports when it ends.
 - [`automate-me`](skills/automate-me/SKILL.md): drafts a personal `-mode` skill from your own history.
+- [`upstream-review`](skills/upstream-review/SKILL.md): reports what changed in upstream pstack since the last review and which changes fit gstack, with the token cost of each. It changes no code.
 - [`reflect`](skills/reflect/SKILL.md): turns what a finished task taught into skill edits.
 - [`correct`](skills/correct/SKILL.md): stops agents from repeating the same mistakes in a repo.
 - [`loop-audit`](skills/loop-audit/SKILL.md): lists a project's eight feedback loops with a command or a proposal for each, and builds the fix for the weakest one.
@@ -70,7 +71,7 @@ Each harness renders its own copy of the skills with `node scripts/build.mjs <ha
 
 ## Upstream
 
-This repo is a snapshot fork of pstack from [cursor/plugins at commit `182f2ce`](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/pstack) (2026-10-16), copied without upstream history. Staying in sync with upstream is not a goal.
+This repo is a snapshot fork of pstack from [cursor/plugins at commit `182f2ce`](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/pstack) (2026-10-16), copied without upstream history. Staying in sync with upstream is not a goal. [`/upstream-review`](skills/upstream-review/SKILL.md) reports what upstream changed so you can pick what to take.
 
 The `deslop`, `control-cli` and `control-ui` skills come from the `cursor-team-kit` plugin in [cursor/plugins at the same commit](https://github.com/cursor/plugins/tree/182f2ce414e83224915c190d2f63239c1608d0a5/cursor-team-kit/skills).
 

@@ -104,6 +104,7 @@ The default answer is `/go-mode`, which runs most of the others when its steps n
 | Pick a model and effort for each role | [`/setup-gstack`](../setup-gstack/SKILL.md) |
 | Find skills that take a gstack command's name, a stale build, or a bad model config | [{{doctor_command}}](../doctor/SKILL.md) |
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
+| See what changed in upstream pstack since the last review, and which changes gstack should take, as a report that changes nothing | [`/upstream-review`](../upstream-review/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
 | See which feedback loops a project has and lacks, and fix the weakest one | [`/loop-audit`](../loop-audit/SKILL.md) |
