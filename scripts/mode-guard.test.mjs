@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { denial, isReadOnly, nextState } from "../skills/chat-mode/scripts/mode-guard.mjs";
@@ -93,4 +94,22 @@ test("the hook denies a write after /chat-mode and allows it after /lite-mode", 
   const allowed = run(write);
   assert.equal(allowed.status, 0);
   assert.equal(allowed.stdout, "", "no decision means the normal permission flow runs");
+});
+
+test("after compaction the hook points the agent back at its mode skill, and says nothing without a mode", () => {
+  const session = `test-${randomUUID()}`;
+  const run = (event) => spawnSync(process.execPath, [GUARD], { input: JSON.stringify({ session_id: session, ...event }), encoding: "utf8" });
+  const compact = { hook_event_name: "SessionStart", source: "compact" };
+
+  assert.equal(run(compact).stdout, "", "no mode set means nothing to restore");
+
+  run({ hook_event_name: "UserPromptSubmit", prompt: "/gstack:go-mode build it" });
+  const out = JSON.parse(run(compact).stdout).hookSpecificOutput;
+  assert.equal(out.hookEventName, "SessionStart");
+  const skill = out.additionalContext.match(/read (\S+SKILL\.md) in full/)?.[1];
+  assert.ok(skill && path.isAbsolute(skill), "names the skill by absolute path");
+  assert.match(fs.readFileSync(skill, "utf8"), /^name: go-mode$/m, "the path is the go-mode skill");
+  assert.ok(out.additionalContext.length <= 10000, "fits under Claude Code's additionalContext cap, so it is not cut to a preview");
+
+  assert.equal(run({ hook_event_name: "SessionStart", source: "startup" }).stdout, "", "only compaction restores");
 });

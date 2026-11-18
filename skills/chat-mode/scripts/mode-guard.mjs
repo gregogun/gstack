@@ -105,6 +105,15 @@ function readState(sessionId) {
   }
 }
 
+/* Mode skills set disable-model-invocation, so the Skill tool cannot reload them after compaction.
+   Point at the file instead of inlining it: Claude Code cuts additionalContext over 10,000 characters
+   to a 2,000-character preview, and go-mode's SKILL.md is twice that.
+*/
+function restoreModeDirective(mode) {
+  const skill = path.resolve(path.dirname(fileURLToPath(import.meta.url)), `../../${mode}-mode/SKILL.md`);
+  return `Context was compacted, and this session runs under /gstack:${mode}-mode. Before any other tool call or reply, use the Read tool to read ${skill} in full. Then keep following it as if the user had just invoked /gstack:${mode}-mode.`;
+}
+
 function main() {
   let event;
   try {
@@ -122,6 +131,8 @@ function main() {
     if (reason) {
       console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: reason } }));
     }
+  } else if (event.hook_event_name === "SessionStart" && event.source === "compact" && state.mode) {
+    console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: restoreModeDirective(state.mode) } }));
   }
 }
 
