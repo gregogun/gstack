@@ -38,6 +38,12 @@ the Agent tool's `isolation: "remote"`, where the account has it
 
 `~/.claude/gstack-sources.md`
 
+## upstream_reports_dir
+
+<!-- Where the upstream-review skill writes its reports. Used as a noun and as {{upstream_reports_dir}}/<file>.md. Outside the plugin and any repo. No trailing slash. -->
+
+`~/.claude/gstack-upstream-reviews`
+
 ## project_skills_dir
 
 <!-- Used as {{project_skills_dir}}/verify-<app>/. No trailing slash. -->

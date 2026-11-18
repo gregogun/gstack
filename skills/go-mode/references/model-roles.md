@@ -38,6 +38,8 @@ Skills read the files at each spawn, so an edit applies to the next spawn withou
 | `why synthesizer` | one | no | why | the strongest reasoning model, at low effort |
 | `research explorer` | one | yes | research | a fast, cheap model; gathering is search and quoting, not judgment |
 | `research synthesizer` | one | no | research | the strongest reasoning model, at low effort |
+| `upstream explorer` | one | yes | upstream-review | a fast, cheap model; reading diffs and quoting, not judgment |
+| `upstream assessor` | one | no | upstream-review | the strongest reasoning model, at low effort |
 | `reflect tooling` | one | no | reflect | a fast, cheap model, from a different family than the judgment role where possible |
 | `reflect judgment, divergent, synthesizer` | one | no | reflect | the strongest reasoning model, at low effort |
 | `swarm workers` | one | no | swarm, and go-mode verification | a fast, cheap model |

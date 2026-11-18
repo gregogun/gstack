@@ -24,6 +24,8 @@ A role marked "Can drop" in `model-roles.md` may move its effort one step down t
 | `why synthesizer` | opus | low |
 | `research explorer` | haiku | medium |
 | `research synthesizer` | opus | low |
+| `upstream explorer` | haiku | medium |
+| `upstream assessor` | opus | low |
 | `reflect tooling` | haiku | medium |
 | `reflect judgment, divergent, synthesizer` | opus | low |
 | `swarm workers` | haiku | medium |
