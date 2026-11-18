@@ -20,6 +20,9 @@
     "UserPromptSubmit": [
       { "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/chat-mode/scripts/mode-guard.mjs\"" }] }
     ],
+    "SessionStart": [
+      { "matcher": "compact", "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/chat-mode/scripts/mode-guard.mjs\"" }] }
+    ],
     "PreToolUse": [
       { "matcher": "*", "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/chat-mode/scripts/mode-guard.mjs\"" }] }
     ]
