@@ -35,7 +35,8 @@ The symptom, the loop command with its red output (redacted), the minimal repro,
 
 When the run is unattended (CI, a schedule, or the prompt says so), nobody sees an offer. File the diagnosis as a ticket instead, on the tracker and in the template the **to-tickets** skill uses, written through the **unslop** and **technical-writing** skills. Its acceptance criteria: the loop command goes green and the original symptom is gone.
 
-- Label it `ready-for-agent` when the cause is confirmed and the fix is clear.
+- Label it `needs-triage` when the cause is confirmed and the fix is clear. Nobody asked for this ticket, so the owner confirms it before an agent picks it up.
 - Label it `ready-for-human` when the fix needs judgment, or when step 1 would have asked the user. Say what was tried.
+- Add a proposed priority label and its reason, per the **to-tickets** skill's [`references/priority.md`](../to-tickets/references/priority.md).
 
 On GitHub, create a missing label with `gh label create <label> --force` before applying it.
