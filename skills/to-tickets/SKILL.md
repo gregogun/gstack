@@ -18,8 +18,8 @@ disable-model-invocation: true
    - Prefactoring comes first.
    - A test belongs in a ticket only when the ticket touches a critical path the spec's Testing section names. Everything else is verified by running it.
 4. **Wire the blocking edges.** Each ticket lists the tickets that must close before it can start. A ticket with no blockers can start immediately.
-5. **Label each ticket.** `ready-for-agent` when an agent can finish and verify it alone. `ready-for-human` when it needs a judgment call, external access, a design decision, or manual testing. Say why in the ticket.
-6. **Confirm the breakdown once.** Present a numbered list: title, blocked by, label, and what it delivers. Apply the user's edits, then publish. Don't quiz the user on granularity.
+5. **Label each ticket.** `ready-for-agent` when an agent can finish and verify it alone. `ready-for-human` when it needs a judgment call, external access, a design decision, or manual testing. Say why in the ticket. Also give each ticket a priority label (`p1`, `p2` or `p3`) per [`references/priority.md`](references/priority.md). A spec's tickets are `p2` unless the user marks one urgent, since blocking edges already order them.
+6. **Confirm the breakdown once.** Present a numbered list: title, blocked by, labels, and what it delivers. Apply the user's edits, then publish. Don't quiz the user on granularity.
 7. **Publish** each ticket from the template below, through the **technical-writing** skill, in dependency order so blockers exist before the tickets that reference them.
    - **The tracker:** the one the spec lives in. Otherwise the one the user names, or what the repo already uses: GitHub issues when the remote is on GitHub and `gh` works, or a folder that already holds specs. With neither, use `docs/specs/<spec-slug>/tickets/`.
    - **On GitHub:** one issue per ticket. Run `gh label create <label> --force` before first use of each label, then apply it. Link each ticket to its spec, as a native sub-issue where the repo supports it. Use native blocking links where the repo supports them, otherwise the "Blocked by" section.
@@ -42,7 +42,8 @@ When the batches can't each stay green, keep the sequence on one shared branch a
 ```markdown
 # <Ticket title>
 
-Status: <ready-for-agent | ready-for-human>   (local files only; on GitHub this is the label)
+Status: <ready-for-agent | ready-for-human | needs-triage>   (local files only; on GitHub this is the label)
+Priority: <p1 | p2 | p3>                                    (local files only; on GitHub this is the label)
 
 ## Parent
 
